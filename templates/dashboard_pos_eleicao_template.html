@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel Pós-Eleição B3</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f9f9f7; --surface: #fcfcfb; --surface-2: #f0efec; --border: rgba(11, 11, 11, .10);
+  --text: #0b0b0b; --text-2: #52514e; --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
+  --pos: #256abf; --neg: #d03b3b; --mid: #f0efec; --pos-txt: #1c5cab; --neg-txt: #b8312f;
+  --accent: #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
+    --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+    --pos: #3987e5; --neg: #e66767; --mid: #383835; --pos-txt: #86b6ef; --neg-txt: #f08c8b;
+    --accent: #3987e5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
+  --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+  --pos: #3987e5; --neg: #e66767; --mid: #383835; --pos-txt: #86b6ef; --neg-txt: #f08c8b;
+  --accent: #3987e5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 20px 16px 40px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -.01em; }
+h2 { font-size: 15px; margin: 0; font-weight: 650; }
+.sub, .muted { color: var(--muted); }
+.sub { font-size: 13px; }
+button, select, input { font: inherit; color: var(--text); }
+.btn { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { background: var(--surface-2); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.cardhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.grid32 { display: grid; grid-template-columns: 3fr 2fr; gap: 12px; margin-top: 12px; }
+@media (max-width: 900px) { .grid2, .grid32 { grid-template-columns: 1fr; } }
+.full { margin-top: 12px; }
+.note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+select, input[type="search"], input[type="text"] { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 6px 10px; }
+
+/* seletor de pregão */
+.dayctl { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0; margin-top: 12px; border-bottom: 1px solid var(--border); }
+.dayrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dayrow input[type="range"] { flex: 1; min-width: 180px; accent-color: var(--accent); }
+.dayrow b { font-size: 16px; min-width: 52px; }
+.chips { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.chip { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 2px 9px; font-size: 12px; cursor: pointer; color: var(--text-2); }
+.chip.on { background: var(--text); color: var(--surface); border-color: var(--text); }
+
+/* KPIs */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 12px; }
+.kpi .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.kpi .v { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.kpi .d { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.pos { color: var(--pos-txt); } .neg { color: var(--neg-txt); }
+
+/* gráficos */
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); min-width: 170px; max-width: 280px; display: none; z-index: 3; }
+.tip .h { font-weight: 650; margin-bottom: 4px; }
+.tip .r { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
+.tip .r span:first-child::before { content: ""; display: inline-block; width: 10px; height: 3px; border-radius: 2px; background: var(--c); margin-right: 6px; vertical-align: 3px; }
+.tip .ctx { color: var(--text-2); margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--text-2); }
+.legend label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); }
+.legend input { margin: 0; accent-color: var(--accent); }
+
+/* contexto do pregão */
+.ctxbox { font-size: 13px; color: var(--text-2); margin-top: 10px; padding: 10px 12px; background: var(--surface-2); border-radius: 8px; }
+.ctxbox a { color: var(--accent); }
+
+/* mapa de calor */
+.heat { overflow-x: auto; }
+.heat table { border-collapse: separate; border-spacing: 2px; width: 100%; font-size: 12px; font-variant-numeric: tabular-nums; }
+.heat th { font-weight: 500; color: var(--muted); padding: 2px 4px; white-space: nowrap; }
+.heat th.sel { color: var(--text); font-weight: 700; }
+.heat td.lab { text-align: left; white-space: nowrap; padding-right: 8px; color: var(--text); max-width: 220px; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.heat td.lab small { color: var(--muted); }
+.heat td.c { text-align: center; padding: 5px 2px; border-radius: 4px; min-width: 44px; cursor: default; }
+.heat td.c.sel { outline: 2px solid var(--text); outline-offset: -1px; }
+.heat tr:hover td.lab { text-decoration: underline; }
+.scale { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-top: 8px; }
+.scale .bar { height: 8px; width: 160px; border-radius: 4px; }
+
+/* ranking */
+.rank { display: grid; gap: 3px; font-size: 12px; }
+.rank .r { display: grid; grid-template-columns: 64px 1fr 58px; gap: 8px; align-items: center; cursor: pointer; border-radius: 4px; padding: 1px 2px; }
+.rank .r:hover { background: var(--surface-2); }
+.rank .trk { position: relative; height: 12px; }
+.rank .trk i { position: absolute; top: 0; height: 100%; border-radius: 4px; }
+.rank .trk .z { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--axis); }
+.rank .trk .ref { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed var(--text-2); opacity: .6; }
+.rank .n { text-align: right; font-variant-numeric: tabular-nums; }
+.rank .sep { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; margin: 8px 0 2px; }
+
+/* comparador */
+.cmpbar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.tag { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); border-radius: 999px; padding: 2px 4px 2px 10px; font-size: 12px; }
+.tag i { width: 12px; height: 3px; border-radius: 2px; background: var(--c); }
+.tag button { border: 0; background: none; cursor: pointer; color: var(--muted); padding: 0 4px; }
+
+/* tabela */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+.tablebox { overflow-x: auto; }
+table.t { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+table.t th { position: sticky; top: 0; background: var(--surface); text-align: right; font-weight: 600; color: var(--text-2); padding: 7px 8px; border-bottom: 1px solid var(--border); cursor: pointer; white-space: nowrap; user-select: none; }
+table.t td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.t .l { text-align: left; }
+table.t tr:hover td { background: var(--surface-2); }
+table.t tr { cursor: pointer; }
+table.t td.nm { max-width: 200px; overflow: hidden; text-overflow: ellipsis; color: var(--text-2); }
+.tk { font-weight: 650; }
+.spark { vertical-align: middle; }
+.badge { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 11px; background: var(--surface-2); color: var(--text-2); }
+footer { margin-top: 18px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Painel pós-eleição — B3</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <button class="btn" id="tema" type="button">Tema</button>
+  </header>
+
+  <div class="dayctl">
+    <div class="dayrow">
+      <span class="muted">Acumulado até o pregão</span>
+      <input type="range" id="dia" min="1" step="1" aria-label="Pregão selecionado">
+      <b id="diaV"></b>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="card full">
+    <div class="cardhead"><h2 id="tLinha">Acumulado desde a véspera da eleição</h2><div class="legend" id="legRef"></div></div>
+    <div class="chart" id="cLinha"></div>
+    <div class="ctxbox" id="ctx"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="cardhead"><h2>Ibovespa — variação de cada pregão</h2></div>
+      <div class="chart" id="cDia"></div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2>2º turno — P(vitória de Flávio) pelas pesquisas</h2></div>
+      <div class="chart" id="cPesq"></div>
+      <div class="note">Média dos votos válidos das pesquisas vigentes em cada fechamento, convertida em probabilidade com erro assumido de 3 p.p.
+        (mesma conta dos dashboards diários). Começa em 09/10, quando a série de pesquisas passou a ser registrada.</div>
+    </div>
+  </div>
+
+  <div class="card full">
+    <div class="cardhead">
+      <h2>Desempenho por grupo ao longo dos pregões</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="grupo" aria-label="Agrupar por">
+          <option value="setor_economico">Setor econômico (B3)</option>
+          <option value="setor">Subsetor (B3) / tipo de FII</option>
+          <option value="oposicao">Efeito de vitória de Flávio (Jev)</option>
+          <option value="juros_dir">Efeito de juros menores (Jev)</option>
+          <option value="p_programas">Programas sociais (Jev)</option>
+          <option value="p_governo">Exposição ao governo (Jev)</option>
+          <option value="p_dolar">Receita em dólar (Jev)</option>
+          <option value="decisao">Decisão da análise de dividendos</option>
+        </select>
+        <select id="classeG" aria-label="Classe de ativo">
+          <option value="acao">Ações</option>
+          <option value="fii">FIIs</option>
+          <option value="">Ações e FIIs</option>
+        </select>
+      </div>
+    </div>
+    <div class="heat" id="heat"></div>
+    <div class="scale" id="escala"></div>
+    <div class="note">Média simples do acumulado dos ativos de cada grupo desde a véspera da eleição. Ordenado pelo pregão selecionado.
+      Clique em um grupo para filtrar a tabela.</div>
+  </div>
+
+  <div class="grid32">
+    <div class="card">
+      <div class="cardhead"><h2>Comparar ativos com o Ibovespa</h2>
+        <div class="cmpbar"><input type="text" id="addTk" list="tks" placeholder="Adicionar ticker" style="width:130px"><datalist id="tks"></datalist></div>
+      </div>
+      <div class="cmpbar" id="tags" style="margin-bottom:6px"></div>
+      <div class="chart" id="cCmp"></div>
+      <div class="note">Até 3 ativos. Clique em uma linha da tabela ou do ranking para adicionar. Linha tracejada = Ibovespa.</div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2 id="tRank">Maiores altas e quedas</h2>
+        <select id="classeR" aria-label="Classe do ranking"><option value="acao">Ações</option><option value="fii">FIIs</option></select></div>
+      <div class="rank" id="rank"></div>
+    </div>
+  </div>
+
+  <div class="card full">
+    <div class="cardhead"><h2 id="tTab">Todos os ativos</h2></div>
+    <div class="filters">
+      <input type="search" id="q" placeholder="Buscar ticker, nome, setor" style="min-width:220px">
+      <select id="classeT" aria-label="Classe na tabela"><option value="">Ações e FIIs</option><option value="acao">Ações</option><option value="fii">FIIs</option></select>
+      <span id="filtroG"></span>
+    </div>
+    <div class="tablebox">
+      <table class="t"><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table>
+    </div>
+  </div>
+
+  <footer id="rodape"></footer>
+</div>
+
+<script>
+const DADOS = /*__DADOS__*/null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmtN = (v, d = 1) => v.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (v, d = 1) => v == null || isNaN(v) ? "–" : fmtN(100 * v, d) + "%";
+const sp = (v, d = 1) => v == null || isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fmtN(Math.abs(100 * v), d) + "%";
+const spp = (v, d = 1) => v == null || isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fmtN(Math.abs(100 * v), d) + " p.p.";
+const cls = v => v == null ? "" : v >= 0 ? "pos" : "neg";
+const media = a => { a = a.filter(v => v != null && !isNaN(v)); return a.length ? a.reduce((s, x) => s + x, 0) / a.length : null; };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+const DIAS = DADOS.dias, N = DIAS.length;
+const REF = Object.fromEntries(DADOS.referencias.map(r => [r.id, r]));
+const A = DADOS.ativos;
+const ACOES = A.filter(a => a.classe === "acao"), FIIS = A.filter(a => a.classe === "fii");
+const CTX = Object.fromEntries(DADOS.contexto.filter(c => c.dia).map(c => [c.dia, c]));
+const mediaSerie = lista => DIAS.map((_, i) => media(lista.map(a => a.acum[i])));
+const SERIES = [
+  { id: "ibov", nome: "Ibovespa", cor: "--s1", vals: REF.ibov.acum, on: true },
+  { id: "smll", nome: "Small caps (SMAL11)", cor: "--s2", vals: REF.smll.acum, on: true },
+  { id: "acoes", nome: `Média das ${ACOES.length} ações analisadas`, cor: "--s3", vals: mediaSerie(ACOES), on: true },
+  { id: "dolar", nome: "Dólar (R$/US$)", cor: "--s4", vals: REF.dolar.acum, on: true },
+  { id: "fiis", nome: `Média dos ${FIIS.length} FIIs`, cor: "--s5", vals: mediaSerie(FIIS), on: false },
+];
+const diaVar = (s, i) => i > 0 && s[i] != null && s[i - 1] != null ? (1 + s[i]) / (1 + s[i - 1]) - 1 : null;
+
+const estado = { i: N - 1, grupo: "setor_economico", classeG: "acao", classeR: "acao", cmp: [], sort: "acum", dir: -1, filtroG: null };
+
+// ---------------------------------------------------------------- tema
+const root = document.documentElement;
+try { const t = localStorage.getItem("tema-painel"); if (t) root.dataset.theme = t; } catch (_) {}
+$("#tema").onclick = () => {
+  const escuro = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = escuro ? "light" : "dark";
+  try { localStorage.setItem("tema-painel", root.dataset.theme); } catch (_) {}
+  render();
+};
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+
+// ---------------------------------------------------------------- escalas
+function ticks(lo, hi, n = 5) {
+  const span = hi - lo || 1, raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => span / s <= n) || 10 * mag;
+  const out = [];
+  for (let v = Math.floor(lo / step) * step; v <= hi + step * 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+
+// gráfico de linhas com crosshair e tooltip; series: [{nome, cor, vals, dash}]
+function linhas(el, series, { H = 300, fmtY = v => sp(v, 0), fmtTip = v => sp(v), zero = true, ctx = false, onClick, marcaSel = true, rotuloFim = true } = {}) {
+  const W = 760, m = { l: 48, r: rotuloFim ? 128 : 14, t: 12, b: 26 };
+  const vals = series.flatMap(s => s.vals).filter(v => v != null).concat(zero ? [0] : []);
+  if (!vals.length) { el.innerHTML = `<div class="note">Sem dados.</div>`; return; }
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const pad = (hi - lo || .01) * .08; lo -= pad; hi += pad;
+  const tk = ticks(lo, hi); lo = Math.min(lo, tk[0]); hi = Math.max(hi, tk[tk.length - 1]);
+  const X = i => m.l + (N === 1 ? 0 : i / (N - 1)) * (W - m.l - m.r);
+  const Y = v => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
+  let g = "";
+  for (const v of tk) g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v === 0 ? "var(--axis)" : "var(--grid)"}" stroke-width="1"/>
+    <text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${fmtY(v)}</text>`;
+  const passo = Math.ceil(N / 10);
+  DIAS.forEach((d, i) => { if (i % passo === 0 || i === N - 1) g += `<text x="${X(i)}" y="${H - 6}" text-anchor="middle">${d}</text>`; });
+  if (marcaSel) g += `<line x1="${X(estado.i)}" x2="${X(estado.i)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--text)" stroke-width="1" opacity=".35" stroke-dasharray="3 3"/>`;
+  // rótulos diretos no fim, sem sobreposição
+  const fins = [];
+  for (const s of series) {
+    let pts = "", d = "", pen = false;
+    s.vals.forEach((v, i) => { if (v == null) { pen = false; return; } d += `${pen ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`; pen = true; });
+    g += `<path d="${d}" fill="none" stroke="var(${s.cor})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" ${s.dash ? `stroke-dasharray="5 4"` : ""}/>`;
+    const li = s.vals.map((v, i) => v == null ? -1 : i).filter(i => i >= 0).pop();
+    if (li != null) { g += `<circle cx="${X(li)}" cy="${Y(s.vals[li])}" r="3.5" fill="var(${s.cor})" stroke="var(--surface)" stroke-width="2"/>`; fins.push({ y: Y(s.vals[li]), s, v: s.vals[li] }); }
+  }
+  if (rotuloFim) {
+    fins.sort((a, b) => a.y - b.y);
+    for (let k = 1; k < fins.length; k++) if (fins[k].y - fins[k - 1].y < 14) fins[k].y = fins[k - 1].y + 14;
+    for (const f of fins) g += `<text x="${W - m.r + 8}" y="${f.y + 4}" style="fill:var(--text-2)">${esc(f.s.curto || f.s.nome)} ${fmtTip(f.v)}</text>`;
+  }
+  g += `<line class="xh" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" stroke="var(--text-2)" stroke-width="1" style="display:none"/>`;
+  g += `<rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent" class="hit" style="cursor:${onClick ? "pointer" : "crosshair"}"/>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(series.map(s => s.nome).join(", "))}">${g}</svg><div class="tip"></div>`;
+  const svg = el.querySelector("svg"), tip = el.querySelector(".tip"), xh = el.querySelector(".xh"), hit = el.querySelector(".hit");
+  const idx = ev => { const r = svg.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width * W; return Math.max(0, Math.min(N - 1, Math.round((x - m.l) / (W - m.l - m.r) * (N - 1)))); };
+  hit.addEventListener("mousemove", ev => {
+    const i = idx(ev), r = svg.getBoundingClientRect();
+    xh.setAttribute("x1", X(i)); xh.setAttribute("x2", X(i)); xh.style.display = "";
+    const linhasTip = series.map(s => ({ s, v: s.vals[i] })).filter(o => o.v != null).sort((a, b) => b.v - a.v);
+    const c = ctx && CTX[DIAS[i]];
+    tip.innerHTML = `<div class="h">${DIAS[i]}${i === 0 ? " · base" : ""}</div>` +
+      linhasTip.map(o => `<div class="r" style="--c:var(${o.s.cor})"><span>${esc(o.s.curto || o.s.nome)}</span><b>${fmtTip(o.v)}</b></div>`).join("") +
+      (c ? `<div class="ctx">${esc(c.texto.length > 220 ? c.texto.slice(0, 217) + "…" : c.texto)}</div>` : "");
+    tip.style.display = "block";
+    const px = X(i) / W * r.width, tw = tip.offsetWidth;
+    tip.style.left = (px + 14 + tw > r.width ? px - tw - 14 : px + 14) + "px";
+    tip.style.top = Math.max(0, (ev.clientY - r.top) - 30) + "px";
+  });
+  hit.addEventListener("mouseleave", () => { tip.style.display = "none"; xh.style.display = "none"; });
+  if (onClick) hit.addEventListener("click", ev => onClick(idx(ev)));
+}
+
+// ---------------------------------------------------------------- seletor de pregão
+const slider = $("#dia");
+slider.max = N - 1; slider.value = estado.i;
+slider.addEventListener("input", () => { estado.i = +slider.value; render(); });
+function chips() {
+  $("#chips").innerHTML = DIAS.slice(1).map((d, k) => `<button type="button" class="chip ${k + 1 === estado.i ? "on" : ""}" data-i="${k + 1}">${d}</button>`).join("");
+  document.querySelectorAll("#chips .chip").forEach(b => b.onclick = () => selDia(+b.dataset.i));
+}
+function selDia(i) { estado.i = Math.max(1, i); slider.value = estado.i; render(); }
+
+// ---------------------------------------------------------------- KPIs
+function kpis() {
+  const i = estado.i, ib = REF.ibov.acum, ac = SERIES[2].vals;
+  const acima = ACOES.filter(a => a.acum[i] != null && a.acum[i] > ib[i]).length;
+  const pq = DADOS.pesquisas[DIAS[i]];
+  const nivel = REF.ibov.nivel[i];
+  const it = [
+    ["Ibovespa acumulado", sp(ib[i]), cls(ib[i]), nivel ? `${fmtN(nivel, 0)} pontos · dia ${sp(diaVar(ib, i), 2)}` : ""],
+    ["Small caps (SMAL11)", sp(REF.smll.acum[i]), cls(REF.smll.acum[i]), `dia ${sp(diaVar(REF.smll.acum, i), 2)}`],
+    ["Dólar", sp(REF.dolar.acum[i]), cls(-REF.dolar.acum[i]), REF.dolar.nivel[i] ? `R$ ${fmtN(REF.dolar.nivel[i], 3)} · dia ${sp(diaVar(REF.dolar.acum, i), 2)}` : ""],
+    ["Média das ações", sp(ac[i]), cls(ac[i]), `mediana ${sp(mediana(ACOES.map(a => a.acum[i])))}`],
+    ["Ações acima do Ibovespa", `${acima} de ${ACOES.length}`, "", pct(acima / ACOES.length, 0) + " das analisadas"],
+    ["P(vitória de Flávio)", pq ? pct(pq.p, 0) : "–", "", pq ? `${pct(pq.validos)} dos válidos · ${pq.n} pesquisas` : "sem pesquisas registradas"],
+  ];
+  $("#kpis").innerHTML = it.map(([l, v, c, d]) => `<div class="card kpi"><div class="l">${l}</div><div class="v ${c}">${v}</div><div class="d">${d}</div></div>`).join("");
+}
+function mediana(a) { a = a.filter(v => v != null).sort((x, y) => x - y); if (!a.length) return null; const k = a.length >> 1; return a.length % 2 ? a[k] : (a[k - 1] + a[k]) / 2; }
+
+// ---------------------------------------------------------------- gráfico principal
+function legenda() {
+  $("#legRef").innerHTML = SERIES.map((s, k) => `<label><input type="checkbox" data-k="${k}" ${s.on ? "checked" : ""}><i style="--c:var(${s.cor})"></i>${esc(s.nome)}</label>`).join("");
+  document.querySelectorAll("#legRef input").forEach(c => c.onchange = () => { SERIES[c.dataset.k].on = c.checked; principal(); });
+}
+function principal() {
+  const s = SERIES.filter(x => x.on).map(x => ({ ...x, curto: x.nome.replace(/^Média d[oa]s \d+ /, "Média ").replace(" analisadas", "") }));
+  linhas($("#cLinha"), s, { H: 320, ctx: true, onClick: i => selDia(i) });
+  const c = CTX[DIAS[estado.i]];
+  $("#ctx").innerHTML = c ? `<b>${esc(DIAS[estado.i])}</b> · ${esc(c.texto.replace(/^[^:]*:\s*/, ""))} · <a href="${esc(c.url)}" target="_blank" rel="noopener">fonte</a>`
+    : `<span class="muted">Sem nota de contexto para ${esc(DIAS[estado.i])}.</span>`;
+}
+
+// ---------------------------------------------------------------- barras do dia (Ibovespa)
+function barrasDia() {
+  const el = $("#cDia"), W = 640, H = 300, m = { l: 48, r: 8, t: 12, b: 26 };
+  const v = DIAS.map((_, i) => diaVar(REF.ibov.acum, i)).slice(1);
+  const lo = Math.min(0, ...v), hi = Math.max(0, ...v), tk = ticks(lo, hi, 4);
+  const y0 = Math.min(lo, tk[0]), y1 = Math.max(hi, tk[tk.length - 1]);
+  const Y = x => m.t + (y1 - x) / (y1 - y0) * (H - m.t - m.b);
+  const bw = (W - m.l - m.r) / v.length;
+  let g = tk.map(t => `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(t)}" y2="${Y(t)}" stroke="${t === 0 ? "var(--axis)" : "var(--grid)"}"/><text x="${m.l - 6}" y="${Y(t) + 4}" text-anchor="end">${sp(t, 0)}</text>`).join("");
+  v.forEach((x, k) => {
+    const i = k + 1, xa = m.l + k * bw + 1, w = Math.max(2, bw - 2), top = Math.min(Y(x), Y(0)), h = Math.max(1, Math.abs(Y(x) - Y(0)));
+    const r = Math.min(4, w / 2, h);
+    // cantos arredondados só na ponta do dado
+    const path = x >= 0
+      ? `M${xa},${top + h}V${top + r}Q${xa},${top} ${xa + r},${top}H${xa + w - r}Q${xa + w},${top} ${xa + w},${top + r}V${top + h}Z`
+      : `M${xa},${top}V${top + h - r}Q${xa},${top + h} ${xa + r},${top + h}H${xa + w - r}Q${xa + w},${top + h} ${xa + w},${top + h - r}V${top}Z`;
+    g += `<path d="${path}" fill="var(${x >= 0 ? "--pos" : "--neg"})" opacity="${i === estado.i ? 1 : .75}" ${i === estado.i ? `stroke="var(--text)" stroke-width="1.5"` : ""}/>
+      <rect x="${m.l + k * bw}" y="${m.t}" width="${bw}" height="${H - m.t - m.b}" fill="transparent" data-i="${i}" style="cursor:pointer"><title>${DIAS[i]}: ${sp(x, 2)}</title></rect>`;
+    if (v.length <= 8 || k % 2 === (v.length - 1) % 2) g += `<text x="${m.l + k * bw + bw / 2}" y="${H - 6}" text-anchor="middle">${DIAS[i]}</text>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Variação diária do Ibovespa">${g}</svg>`;
+  el.querySelectorAll("rect[data-i]").forEach(r => r.onclick = () => selDia(+r.dataset.i));
+}
+
+// ---------------------------------------------------------------- pesquisas
+function pesquisas() {
+  const vals = DIAS.map(d => DADOS.pesquisas[d]?.p ?? null);
+  const validos = DIAS.map(d => DADOS.pesquisas[d]?.validos ?? null);
+  linhas($("#cPesq"), [
+    { nome: "P(vitória de Flávio)", curto: "P(vitória)", cor: "--s1", vals },
+    { nome: "Flávio — média dos válidos", curto: "Válidos", cor: "--s2", vals: validos },
+  ], { H: 210, zero: false, fmtY: v => pct(v, 0), fmtTip: v => pct(v, 1), onClick: i => selDia(i) });
+}
+
+// ---------------------------------------------------------------- mapa de calor
+const ROT = {
+  oposicao: v => v == null ? null : v >= .5 ? "Ganha com Flávio (≥ +0,5)" : v <= -.5 ? "Ganha com Lula (≤ −0,5)" : "Neutra",
+  juros_dir: v => v == null ? null : v >= .5 ? "Ganha com juros menores" : v <= -.5 ? "Perde com juros menores" : "Neutra a juros",
+  p_programas: v => v == null ? null : v >= .5 ? "Depende de programas sociais" : "Não depende",
+  p_governo: v => v == null ? null : v >= .5 ? "Exposta ao governo" : "Pouco exposta",
+  p_dolar: v => v == null ? null : v >= .5 ? "Receita em dólar" : "Receita em reais",
+};
+const TIPO = { tijolo: "FII de tijolo", papel: "FII de papel", fundo_de_fundos: "Fundo de fundos", hibrido: "FII híbrido", desenvolvimento: "FII de desenvolvimento", outro: "FII — outro" };
+function chaveGrupo(a, g) {
+  if (ROT[g]) return a.classe === "fii" ? "FIIs" : ROT[g](a[g]);
+  if (g === "setor" && a.classe === "fii") return TIPO[a.setor] || "FII";
+  return a[g] || "–";
+}
+function ativosG(classe) { return A.filter(a => !classe || a.classe === classe); }
+function grupos() {
+  const g = {};
+  for (const a of ativosG(estado.classeG)) { const k = chaveGrupo(a, estado.grupo); if (k) (g[k] ??= []).push(a); }
+  return Object.entries(g).map(([k, l]) => ({ k, l, s: mediaSerie(l) }));
+}
+function mix(c1, c2, t) {
+  const h = c => c.startsWith("#") ? [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16)) : c.match(/\d+/g).slice(0, 3).map(Number);
+  const a = h(c1), b = h(c2);
+  return `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * t)).join(",")})`;
+}
+function corCelula(v, M) {
+  if (v == null) return { bg: "transparent", fg: "var(--muted)" };
+  const t = Math.min(1, Math.abs(v) / M);
+  return { bg: mix(css("--mid"), css(v >= 0 ? "--pos" : "--neg"), Math.pow(t, .8)), fg: t > .55 ? "#fff" : "var(--text)" };
+}
+function heat() {
+  const gs = grupos().sort((a, b) => (b.s[estado.i] ?? -9) - (a.s[estado.i] ?? -9));
+  const M = Math.max(.02, ...gs.flatMap(g => g.s.slice(1)).filter(v => v != null).map(Math.abs));
+  const ib = REF.ibov.acum;
+  const linha = (lab, s, extra, k) => `<tr ${k != null ? `data-k="${esc(k)}"` : ""}><td class="lab" title="${esc(lab)}">${esc(lab)} ${extra}</td>` +
+    s.slice(1).map((v, j) => { const c = corCelula(v, M); return `<td class="c ${j + 1 === estado.i ? "sel" : ""}" style="background:${c.bg};color:${c.fg}" title="${esc(lab)} · ${DIAS[j + 1]}: ${sp(v)}">${sp(v, 1)}</td>`; }).join("") + "</tr>";
+  $("#heat").innerHTML = `<table><thead><tr><th></th>${DIAS.slice(1).map((d, j) => `<th class="${j + 1 === estado.i ? "sel" : ""}">${d}</th>`).join("")}</tr></thead><tbody>` +
+    linha("Ibovespa", ib, "", null) +
+    gs.map(g => linha(g.k, g.s, `<small>n=${g.l.length}</small>`, g.k)).join("") + "</tbody></table>";
+  document.querySelectorAll("#heat tr[data-k]").forEach(tr => tr.querySelector(".lab").onclick = () => {
+    estado.filtroG = { g: estado.grupo, k: tr.dataset.k, classe: estado.classeG }; tabela();
+    $("#tTab").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  $("#escala").innerHTML = `<span>${sp(-M, 0)}</span><span class="bar" style="background:linear-gradient(90deg, ${css("--neg")}, ${css("--mid")}, ${css("--pos")})"></span><span>${sp(M, 0)}</span>`;
+}
+
+// ---------------------------------------------------------------- ranking
+function ranking() {
+  const i = estado.i, l = A.filter(a => a.classe === estado.classeR && a.acum[i] != null).sort((a, b) => b.acum[i] - a.acum[i]);
+  const top = l.slice(0, 10), fim = l.slice(-10).reverse();
+  const ref = estado.classeR === "acao" ? REF.ibov.acum[i] : REF.ifix.acum[i];
+  const vs = top.concat(fim).map(a => a.acum[i]).concat([0, ref ?? 0]);
+  const lo = Math.min(...vs), hi = Math.max(...vs), X = v => (v - lo) / (hi - lo || 1) * 100;
+  const row = a => `<div class="r" data-t="${esc(a.ticker)}" title="${esc(a.nome || "")} · ${esc(a.setor || "")}"><span class="tk">${esc(a.ticker)}</span>
+    <span class="trk"><span class="z" style="left:${X(0)}%"></span><i style="left:${Math.min(X(0), X(a.acum[i]))}%;width:${Math.abs(X(a.acum[i]) - X(0))}%;background:var(${a.acum[i] >= 0 ? "--pos" : "--neg"})"></i>
+    ${ref != null ? `<span class="ref" style="left:${X(ref)}%"></span>` : ""}</span><span class="n ${cls(a.acum[i])}">${sp(a.acum[i])}</span></div>`;
+  $("#tRank").textContent = `Maiores altas e quedas até ${DIAS[i]}`;
+  $("#rank").innerHTML = `<div class="sep">10 maiores altas</div>${top.map(row).join("")}<div class="sep">10 maiores quedas</div>${fim.map(row).join("")}
+    <div class="note">Tracejado = ${estado.classeR === "acao" ? "Ibovespa" : "XFIX11 (aprox. do IFIX)"} (${sp(ref)}).</div>`;
+  document.querySelectorAll("#rank .r").forEach(r => r.onclick = () => addCmp(r.dataset.t));
+}
+
+// ---------------------------------------------------------------- comparador
+const CORES_CMP = ["--s1", "--s2", "--s3"];
+function addCmp(t) {
+  t = (t || "").trim().toUpperCase();
+  if (!A.some(a => a.ticker === t) || estado.cmp.includes(t)) return;
+  if (estado.cmp.length >= 3) estado.cmp.shift();
+  estado.cmp.push(t); comparador();
+}
+function comparador() {
+  // cor fixa por posição de entrada; reatribui em ordem ao remover para não repetir
+  const s = estado.cmp.map((t, k) => { const a = A.find(x => x.ticker === t); return { nome: t, cor: CORES_CMP[k], vals: a.acum }; });
+  $("#tags").innerHTML = estado.cmp.map((t, k) => `<span class="tag"><i style="--c:var(${CORES_CMP[k]})"></i>${esc(t)}<button type="button" data-t="${esc(t)}" aria-label="Remover ${esc(t)}">×</button></span>`).join("")
+    || `<span class="muted" style="font-size:12px">Nenhum ativo selecionado.</span>`;
+  document.querySelectorAll("#tags button").forEach(b => b.onclick = () => { estado.cmp = estado.cmp.filter(x => x !== b.dataset.t); comparador(); });
+  linhas($("#cCmp"), [{ nome: "Ibovespa", cor: "--text-2", vals: REF.ibov.acum, dash: true }, ...s], { H: 260, onClick: i => selDia(i) });
+}
+$("#addTk").addEventListener("change", e => { addCmp(e.target.value); e.target.value = ""; });
+$("#tks").innerHTML = A.map(a => `<option value="${esc(a.ticker)}">${esc(a.nome || "")}</option>`).join("");
+
+// ---------------------------------------------------------------- tabela
+const COLS = [
+  ["ticker", "Ticker", "l"], ["nome", "Nome", "l"], ["setor", "Setor / tipo", "l"], ["spark", "Trajetória", "l"], ["acum", "Acumulado", ""],
+  ["vsref", "vs referência", ""], ["dia", "Dia", ""], ["max", "Máx. no período", ""], ["dd", "Do pico", ""], ["oposicao", "2º t.", ""], ["juros_dir", "Juros↓", ""], ["decisao", "Decisão", "l"],
+];
+function metricas(a) {
+  const i = estado.i, s = a.acum.slice(0, i + 1).filter(v => v != null);
+  const ref = (a.classe === "acao" ? REF.ibov : REF.ifix).acum[i];
+  const pico = Math.max(...s);
+  return { acum: a.acum[i], vsref: a.acum[i] != null && ref != null ? a.acum[i] - ref : null, dia: diaVar(a.acum, i), max: pico,
+    dd: a.acum[i] != null ? (1 + a.acum[i]) / (1 + pico) - 1 : null };
+}
+function spark(a) {
+  const W = 90, H = 22, v = a.acum.slice(0, estado.i + 1), ok = v.filter(x => x != null);
+  if (ok.length < 2) return "";
+  const lo = Math.min(0, ...ok), hi = Math.max(0, ...ok), X = k => k / (v.length - 1) * (W - 4) + 2, Y = x => 2 + (hi - x) / (hi - lo || 1) * (H - 4);
+  const d = v.map((x, k) => x == null ? "" : `${k ? "L" : "M"}${X(k).toFixed(1)},${Y(x).toFixed(1)}`).join("");
+  const last = v[v.length - 1];
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true"><line x1="0" x2="${W}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--axis)"/>
+    <path d="${d}" fill="none" stroke="var(${last >= 0 ? "--pos" : "--neg"})" stroke-width="1.5"/></svg>`;
+}
+function tabela() {
+  const q = $("#q").value.trim().toLowerCase(), c = $("#classeT").value, f = estado.filtroG;
+  let l = A.filter(a => (!c || a.classe === c) && (!q || [a.ticker, a.nome, a.setor, a.setor_economico, a.segmento].some(x => (x || "").toLowerCase().includes(q))));
+  if (f) l = l.filter(a => (!f.classe || a.classe === f.classe) && chaveGrupo(a, f.g) === f.k);
+  $("#filtroG").innerHTML = f ? `<span class="tag">Grupo: ${esc(f.k)}<button type="button" id="limpaG" aria-label="Remover filtro">×</button></span>` : "";
+  if (f) $("#limpaG").onclick = () => { estado.filtroG = null; tabela(); };
+  const M = new Map(l.map(a => [a.ticker, metricas(a)]));
+  const val = (a, k) => M.get(a.ticker)[k] ?? a[k];
+  const k = estado.sort;
+  l.sort((a, b) => { const x = val(a, k), y = val(b, k); if (x == null) return 1; if (y == null) return -1; return (typeof x === "string" ? x.localeCompare(y) : x - y) * estado.dir; });
+  $("#tTab").textContent = `Todos os ativos — acumulado até ${DIAS[estado.i]} (${l.length})`;
+  $("#thead").innerHTML = COLS.map(([k, t, c]) => `<th class="${c}" data-k="${k}">${t}${estado.sort === k ? (estado.dir < 0 ? " ↓" : " ↑") : ""}</th>`).join("");
+  document.querySelectorAll("#thead th").forEach(th => th.onclick = () => {
+    const k = th.dataset.k; if (k === "spark") return;
+    estado.dir = estado.sort === k ? -estado.dir : (["ticker", "nome", "setor", "decisao"].includes(k) ? 1 : -1); estado.sort = k; tabela();
+  });
+  const fx = v => v == null ? "–" : (v > 0 ? "+" : "") + fmtN(v, 1);
+  $("#tbody").innerHTML = l.map(a => { const m = M.get(a.ticker); return `<tr data-t="${esc(a.ticker)}">
+    <td class="l tk">${esc(a.ticker)}</td><td class="l nm" title="${esc(a.nome || "")}">${esc(a.nome || "")}</td>
+    <td class="l nm" title="${esc(a.setor_economico || "")}">${esc(a.classe === "fii" ? (TIPO[a.setor] || "FII") : a.setor || "")}</td>
+    <td class="l">${spark(a)}</td>
+    <td class="${cls(m.acum)}" style="font-weight:650">${sp(m.acum)}</td><td class="${cls(m.vsref)}">${spp(m.vsref)}</td><td class="${cls(m.dia)}">${sp(m.dia, 2)}</td>
+    <td>${sp(m.max)}</td><td class="${m.dd < -.05 ? "neg" : ""}">${sp(m.dd)}</td>
+    <td>${a.classe === "acao" ? fx(a.oposicao) : "–"}</td><td>${a.classe === "acao" ? fx(a.juros_dir) : "–"}</td>
+    <td class="l"><span class="badge">${esc(a.decisao || "–")}</span></td></tr>`; }).join("")
+    || `<tr><td class="l muted" colspan="${COLS.length}">Nenhum ativo com esses filtros.</td></tr>`;
+  document.querySelectorAll("#tbody tr[data-t]").forEach(tr => tr.onclick = () => { addCmp(tr.dataset.t); $("#cCmp").scrollIntoView({ behavior: "smooth", block: "center" }); });
+}
+["#q", "#classeT"].forEach(s => $(s).addEventListener("input", tabela));
+$("#grupo").addEventListener("input", e => { estado.grupo = e.target.value; heat(); });
+$("#classeG").addEventListener("input", e => { estado.classeG = e.target.value; heat(); });
+$("#classeR").addEventListener("input", e => { estado.classeR = e.target.value; ranking(); });
+
+// ---------------------------------------------------------------- render
+function render() {
+  $("#diaV").textContent = DIAS[estado.i];
+  chips(); kpis(); principal(); barrasDia(); pesquisas(); heat(); ranking(); comparador(); tabela();
+}
+$("#sub").textContent = `${N - 1} pregões desde a véspera da eleição (${DADOS.data_base}) · ${ACOES.length} ações e ${FIIS.length} FIIs já analisados · gerado em ${DADOS.gerado_em}` +
+  (DADOS.sem_serie.length ? ` · sem cotação: ${DADOS.sem_serie.join(", ")}` : "");
+$("#rodape").innerHTML = `Acumulado = fechamento do pregão ÷ fechamento de ${esc(DADOS.data_base)} − 1 (Yahoo Finance). Referências: Ibovespa (^BVSP), small caps (ETF SMAL11),
+  FIIs (ETF XFIX11, aproximação do IFIX, sem série no Yahoo) e dólar (BRL=X; alta do dólar = real mais fraco). Cadastro, setores da B3 e fatores do Jev (TypeSafe):
+  dashboard diário de ${esc(DADOS.fonte_cadastro)}. Contexto de cada pregão: resumos do InfoMoney nas leituras diárias. Não é recomendação de investimento.`;
+estado.cmp = [...ACOES].sort((a, b) => b.acum[N - 1] - a.acum[N - 1]).slice(0, 1).map(a => a.ticker)
+  .concat([...ACOES].sort((a, b) => a.acum[N - 1] - b.acum[N - 1]).slice(0, 1).map(a => a.ticker));
+legenda(); render();
+</script>
+</body>
+</html>

@@ -1,0 +1,618 @@
+{
+  "6012bca7fa35fe9a0ab0b4fc461fb570a8d77b05": {
+    "ticker": "ALLD3",
+    "oposicao": 0.58,
+    "oposicao_confianca": 0.65,
+    "p_programas": 0.17,
+    "juros_direcao": 0.93,
+    "juros_direcao_confianca": 0.79
+  },
+  "8caa5eb409a5e9df9f373defc541ec74e1e252d5": {
+    "ticker": "RIAA3",
+    "oposicao": 0.67,
+    "oposicao_confianca": 0.72,
+    "p_programas": 0.17,
+    "juros_direcao": 1.16,
+    "juros_direcao_confianca": 0.72
+  },
+  "54bbf6c47df7a93dee64a16307bede2d83caa8d5": {
+    "ticker": "JHSF3",
+    "oposicao": 0.47,
+    "oposicao_confianca": 0.57,
+    "p_programas": 0.44,
+    "juros_direcao": 1.48,
+    "juros_direcao_confianca": 0.57
+  },
+  "597685af3948968a0ee507db82c83e681806ab5b": {
+    "ticker": "BRSR6",
+    "oposicao": 0.68,
+    "oposicao_confianca": 0,
+    "p_programas": 0.4,
+    "juros_direcao": -1.43,
+    "juros_direcao_confianca": 0.55
+  },
+  "d5b5b7e919dcde05900a9b85bf13ba18aea1774e": {
+    "ticker": "POMO4",
+    "oposicao": 0.18,
+    "oposicao_confianca": 0.3,
+    "p_programas": 0.26,
+    "juros_direcao": 1.12,
+    "juros_direcao_confianca": 0.86
+  },
+  "bcda98332662efb6d6b40fe062afae08cefea63b": {
+    "ticker": "SBFG3",
+    "oposicao": 0.53,
+    "oposicao_confianca": 0.6,
+    "p_programas": 0.19,
+    "juros_direcao": 1.26,
+    "juros_direcao_confianca": 0.51
+  },
+  "dc2b2630c0e8070cbe9b45f438733b56ed604d1b": {
+    "ticker": "PLPL3",
+    "oposicao": -0.05,
+    "oposicao_confianca": 0.13,
+    "p_programas": 0.56,
+    "juros_direcao": 1.52,
+    "juros_direcao_confianca": 0.61
+  },
+  "3a7cb47671a436859e895478304a8e02c037acdc": {
+    "ticker": "VULC3",
+    "oposicao": 0.59,
+    "oposicao_confianca": 0.65,
+    "p_programas": 0.14,
+    "juros_direcao": 0.94,
+    "juros_direcao_confianca": 0.9
+  },
+  "7c5fdcf00212073c0c071e724e32efc126885ba6": {
+    "ticker": "EVEN3",
+    "oposicao": -0.18,
+    "oposicao_confianca": 0.02,
+    "p_programas": 0.56,
+    "juros_direcao": 1.86,
+    "juros_direcao_confianca": 0.88
+  },
+  "c30f9e37c57002ccea3d32b7b1e75c9ee25333c3": {
+    "ticker": "MDNE3",
+    "oposicao": 0.02,
+    "oposicao_confianca": 0.18,
+    "p_programas": 0.46,
+    "juros_direcao": 1.44,
+    "juros_direcao_confianca": 0.55
+  },
+  "88f70f98097173976d38e07a5ea7015f7b4f5793": {
+    "ticker": "PETR4",
+    "oposicao": 1.17,
+    "oposicao_confianca": 0.46,
+    "p_programas": 0.14,
+    "juros_direcao": 0.71,
+    "juros_direcao_confianca": 0.7
+  },
+  "0088c73df990781cad5e802c0b3377d6945d7ad6": {
+    "ticker": "PINE4",
+    "oposicao": 0.76,
+    "oposicao_confianca": 0.77,
+    "p_programas": 0.21,
+    "juros_direcao": -1.42,
+    "juros_direcao_confianca": 0.54
+  },
+  "8d229238fa3578e23e0f9697af4502fd68a0e14e": {
+    "ticker": "CEAB3",
+    "oposicao": 0.64,
+    "oposicao_confianca": 0.71,
+    "p_programas": 0.14,
+    "juros_direcao": 1.03,
+    "juros_direcao_confianca": 0.88
+  },
+  "4cfe50bac8c8f5cc17f39c04e65be462240ed690": {
+    "ticker": "MTRE3",
+    "oposicao": 0.44,
+    "oposicao_confianca": 0.53,
+    "p_programas": 0.48,
+    "juros_direcao": 1.89,
+    "juros_direcao_confianca": 0.93
+  },
+  "3538cb67343fa47971936688b5213ddeaafed982": {
+    "ticker": "TEND3",
+    "oposicao": -0.08,
+    "oposicao_confianca": 0.1,
+    "p_programas": 0.5,
+    "juros_direcao": 1.56,
+    "juros_direcao_confianca": 0.65
+  },
+  "f6110fc8500d1631aaf4a50cbda0a9af2baed3eb": {
+    "ticker": "LOGG3",
+    "oposicao": 0.58,
+    "oposicao_confianca": 0.62,
+    "p_programas": 0.29,
+    "juros_direcao": 1.45,
+    "juros_direcao_confianca": 0.56
+  },
+  "60c5ae3576800b2d9a63993cc3016f486b3acd43": {
+    "ticker": "CYRE3",
+    "oposicao": 0.32,
+    "oposicao_confianca": 0.43,
+    "p_programas": 0.55,
+    "juros_direcao": 1.92,
+    "juros_direcao_confianca": 0.94
+  },
+  "bb52e9d769770b15f709401273fadba13e7139eb": {
+    "ticker": "LAVV3",
+    "oposicao": 0.01,
+    "oposicao_confianca": 0.17,
+    "p_programas": 0.53,
+    "juros_direcao": 1.82,
+    "juros_direcao_confianca": 0.88
+  },
+  "677c67d6540002f988743ba288a310f04b3385b8": {
+    "ticker": "GRND3",
+    "oposicao": 0.66,
+    "oposicao_confianca": 0.72,
+    "p_programas": 0.14,
+    "juros_direcao": 0.13,
+    "juros_direcao_confianca": 0.26
+  },
+  "4e008b9b1709398e0521db99a2784a3890fc3fcc": {
+    "ticker": "VLID3",
+    "oposicao": 0.38,
+    "oposicao_confianca": 0.47,
+    "p_programas": 0.16,
+    "juros_direcao": 0.74,
+    "juros_direcao_confianca": 0.8
+  },
+  "6ae0c6dc5b6b3515f6970681456569c4b11f057d": {
+    "ticker": "DIRR3",
+    "oposicao": 0.15,
+    "oposicao_confianca": 0.3,
+    "p_programas": 0.5,
+    "juros_direcao": 1.64,
+    "juros_direcao_confianca": 0.7
+  },
+  "58e90bc3c6e056319f4be9feb3f6cc746cb971b0": {
+    "ticker": "SHUL4",
+    "oposicao": 0.62,
+    "oposicao_confianca": 0.69,
+    "p_programas": 0.2,
+    "juros_direcao": 0.14,
+    "juros_direcao_confianca": 0.28
+  },
+  "54568a6f62a7ef7da9705aad527895dca104ec09": {
+    "ticker": "RECV3",
+    "oposicao": 0.82,
+    "oposicao_confianca": 0.52,
+    "p_programas": 0.12,
+    "juros_direcao": 0.58,
+    "juros_direcao_confianca": 0.62
+  },
+  "3c63c3f3c250c05c3c7e95692effeb8089c50029": {
+    "ticker": "WIZC3",
+    "oposicao": 0.63,
+    "oposicao_confianca": 0.68,
+    "p_programas": 0.19,
+    "juros_direcao": -1.29,
+    "juros_direcao_confianca": 0.4
+  },
+  "7e4b3b4ba61a8cebd897492e820a46c6cc949726": {
+    "ticker": "ABCB4",
+    "oposicao": 0.72,
+    "oposicao_confianca": 0.62,
+    "p_programas": 0.3,
+    "juros_direcao": -1.48,
+    "juros_direcao_confianca": 0.58
+  },
+  "97af16b66c5514c2d97183998cf1e1f6eff76f15": {
+    "ticker": "LEVE3",
+    "oposicao": 0.69,
+    "oposicao_confianca": 0.73,
+    "p_programas": 0.13,
+    "juros_direcao": 1.05,
+    "juros_direcao_confianca": 0.89
+  },
+  "1a14b66937d0483c2f4d340ed9a333e4abb11e2c": {
+    "ticker": "SANB11",
+    "oposicao": 0.66,
+    "oposicao_confianca": 0.51,
+    "p_programas": 0.32,
+    "juros_direcao": -1.48,
+    "juros_direcao_confianca": 0.57
+  },
+  "ff49c17191db37e88d7710e4b59036eeed97e315": {
+    "ticker": "BMGB4",
+    "oposicao": 0.76,
+    "oposicao_confianca": 0.76,
+    "p_programas": 0.28,
+    "juros_direcao": -1.41,
+    "juros_direcao_confianca": 0.52
+  },
+  "3af202a32eaccb2fd7922d9d1bddc7104fd2334a": {
+    "ticker": "SEER3",
+    "oposicao": 0.44,
+    "oposicao_confianca": 0.53,
+    "p_programas": 0.56,
+    "juros_direcao": 0.98,
+    "juros_direcao_confianca": 0.89
+  },
+  "faaf4c13085fe1dfa1531836e68381fdb60fd68d": {
+    "ticker": "ISAE4",
+    "oposicao": 1,
+    "oposicao_confianca": 0.74,
+    "p_programas": 0.13,
+    "juros_direcao": 1.47,
+    "juros_direcao_confianca": 0.57
+  },
+  "9a1d051cfa0ca643d8f803eeff5f940c19be5652": {
+    "ticker": "CMIG4",
+    "oposicao": 1.22,
+    "oposicao_confianca": 0.49,
+    "p_programas": 0.16,
+    "juros_direcao": 1.31,
+    "juros_direcao_confianca": 0.63
+  },
+  "0b5f909141055966880e33a4ea63b5d603da7187": {
+    "ticker": "EZTC3",
+    "oposicao": 0.23,
+    "oposicao_confianca": 0.35,
+    "p_programas": 0.46,
+    "juros_direcao": 1.51,
+    "juros_direcao_confianca": 0.6
+  },
+  "2e521e3b2b3399eb953889a90d454efe37ea604e": {
+    "ticker": "CURY3",
+    "oposicao": -1.49,
+    "oposicao_confianca": 0.6,
+    "p_programas": 0.95,
+    "juros_direcao": 1.65,
+    "juros_direcao_confianca": 0.72
+  },
+  "c455e811dc01d6676da728d9cb8c7c4ebda30818": {
+    "ticker": "LREN3",
+    "oposicao": 0.61,
+    "oposicao_confianca": 0.68,
+    "p_programas": 0.16,
+    "juros_direcao": 0.93,
+    "juros_direcao_confianca": 0.52
+  },
+  "f1c04a717c87290314c6b113bf95bbc35f4cbf1f": {
+    "ticker": "PGMN3",
+    "oposicao": 0.75,
+    "oposicao_confianca": 0.81,
+    "p_programas": 0.29,
+    "juros_direcao": 1.07,
+    "juros_direcao_confianca": 0.88
+  },
+  "fe5f703d109a1975217297743aa3cf4de1b34404": {
+    "ticker": "BBDC4",
+    "oposicao": 0.73,
+    "oposicao_confianca": 0.64,
+    "p_programas": 0.32,
+    "juros_direcao": -1.44,
+    "juros_direcao_confianca": 0.55
+  },
+  "cb1dbe220c9c77e08c23f30cfc0d267970d7c065": {
+    "ticker": "MILS3",
+    "oposicao": 0.79,
+    "oposicao_confianca": 0.82,
+    "p_programas": 0.16,
+    "juros_direcao": 1.7,
+    "juros_direcao_confianca": 0.74
+  },
+  "8e9c06a64e5a2a90b43af65711a76fe806d94ed8": {
+    "ticker": "BEEF3",
+    "oposicao": 0.56,
+    "oposicao_confianca": 0.64,
+    "p_programas": 0.15,
+    "juros_direcao": 1.46,
+    "juros_direcao_confianca": 0.57
+  },
+  "2408195421084e1f3e97e8c7cb3bfecddbeb2946": {
+    "ticker": "BBSE3",
+    "oposicao": 0.58,
+    "oposicao_confianca": 0.32,
+    "p_programas": 0.25,
+    "juros_direcao": -1.54,
+    "juros_direcao_confianca": 0.62
+  },
+  "7767eb4a915911a2c887d4581ae5321398fbe26b": {
+    "ticker": "PSSA3",
+    "oposicao": 0.73,
+    "oposicao_confianca": 0.74,
+    "p_programas": 0.27,
+    "juros_direcao": -1.49,
+    "juros_direcao_confianca": 0.59
+  },
+  "719e6538719954910d120f3e2901079cd9f01b0f": {
+    "ticker": "INTB3",
+    "oposicao": 0.61,
+    "oposicao_confianca": 0.69,
+    "p_programas": 0.19,
+    "juros_direcao": 0.02,
+    "juros_direcao_confianca": 0.17
+  },
+  "05f5b1efa8f9040c68dc5b938eaf7eca8c321bfe": {
+    "ticker": "MDIA3",
+    "oposicao": 0.69,
+    "oposicao_confianca": 0.75,
+    "p_programas": 0.13,
+    "juros_direcao": 0.18,
+    "juros_direcao_confianca": 0.33
+  },
+  "3db72207988bb413022277b4a4cf30fcda055158": {
+    "ticker": "VBBR3",
+    "oposicao": 0.64,
+    "oposicao_confianca": 0.67,
+    "p_programas": 0.14,
+    "juros_direcao": 0.95,
+    "juros_direcao_confianca": 0.83
+  },
+  "5de93ffd9eb70a6f972f45b55974e922cf7fb074": {
+    "ticker": "ITSA4",
+    "oposicao": 0.73,
+    "oposicao_confianca": 0.65,
+    "p_programas": 0.43,
+    "juros_direcao": -1.27,
+    "juros_direcao_confianca": 0.41
+  },
+  "cf37b1991323f61dc442cf3d4b3948267c52be89": {
+    "ticker": "TAEE11",
+    "oposicao": 1.04,
+    "oposicao_confianca": 0.72,
+    "p_programas": 0.11,
+    "juros_direcao": 1.64,
+    "juros_direcao_confianca": 0.7
+  },
+  "f26f6d91478707d53d659dd1a7e3d9edf5b35d98": {
+    "ticker": "MOTV3",
+    "oposicao": 1.06,
+    "oposicao_confianca": 0.82,
+    "p_programas": 0.11,
+    "juros_direcao": 1.81,
+    "juros_direcao_confianca": 0.86
+  },
+  "6dcded58211902f8dfe16b8c8ba1f14789f894a1": {
+    "ticker": "CPFE3",
+    "oposicao": 0.91,
+    "oposicao_confianca": 0.76,
+    "p_programas": 0.18,
+    "juros_direcao": 1.44,
+    "juros_direcao_confianca": 0.55
+  },
+  "4497d7332cc8738d202864c9ad0dc3914a5e2d40": {
+    "ticker": "FIQE3",
+    "oposicao": 0.87,
+    "oposicao_confianca": 0.85,
+    "p_programas": 0.14,
+    "juros_direcao": 0.98,
+    "juros_direcao_confianca": 0.87
+  },
+  "ca43a0801a5791b2ff13cd60263dfee92dc017ae": {
+    "ticker": "BRBI11",
+    "oposicao": 0.61,
+    "oposicao_confianca": 0.61,
+    "p_programas": 0.15,
+    "juros_direcao": -1.47,
+    "juros_direcao_confianca": 0.54
+  },
+  "f64ee3ee35332c1f0c38df5a80f7b65c07789b2c": {
+    "ticker": "TGMA3",
+    "oposicao": 0.81,
+    "oposicao_confianca": 0.85,
+    "p_programas": 0.11,
+    "juros_direcao": 0.74,
+    "juros_direcao_confianca": 0.77
+  },
+  "5ef118e5988d7e29748d647b8c185b0e7e92dc80": {
+    "ticker": "ITUB4",
+    "oposicao": 0.79,
+    "oposicao_confianca": 0.75,
+    "p_programas": 0.29,
+    "juros_direcao": -1.52,
+    "juros_direcao_confianca": 0.62
+  },
+  "a91d23aa4c905588918a434e618bc9aa4a763c9b": {
+    "ticker": "MOVI3",
+    "oposicao": 0.81,
+    "oposicao_confianca": 0.82,
+    "p_programas": 0.15,
+    "juros_direcao": 1.99,
+    "juros_direcao_confianca": 0.99
+  },
+  "04d3ecd5a8bc4258deb4c19f34659795efd9da71": {
+    "ticker": "BLAU3",
+    "oposicao": 0.69,
+    "oposicao_confianca": 0.75,
+    "p_programas": 0.32,
+    "juros_direcao": 0.59,
+    "juros_direcao_confianca": 0.64
+  },
+  "ebb7001ed51a2d43ad6cd7c35d3d7b7db8b9bf39": {
+    "ticker": "CMIN3",
+    "oposicao": 0.54,
+    "oposicao_confianca": 0.57,
+    "p_programas": 0.09,
+    "juros_direcao": 0.24,
+    "juros_direcao_confianca": 0.77
+  },
+  "978a6e6a66af5ca21488df474a48fbff9db589a5": {
+    "ticker": "AZZA3",
+    "oposicao": 0.68,
+    "oposicao_confianca": 0.73,
+    "p_programas": 0.14,
+    "juros_direcao": 1.13,
+    "juros_direcao_confianca": 0.83
+  },
+  "8f53cd33ae2097e8038f45903ebb3530c7109cc1": {
+    "ticker": "UGPA3",
+    "oposicao": 0.75,
+    "oposicao_confianca": 0.78,
+    "p_programas": 0.15,
+    "juros_direcao": 0.96,
+    "juros_direcao_confianca": 0.81
+  },
+  "c21b20172961c4385bae42130a5704fb16bd49dc": {
+    "ticker": "CXSE3",
+    "oposicao": 0.07,
+    "oposicao_confianca": 0,
+    "p_programas": 0.55,
+    "juros_direcao": -1.55,
+    "juros_direcao_confianca": 0.62
+  },
+  "fcc8357eeb67ee401574910de1bdf90ad53dfabf": {
+    "ticker": "RENT3",
+    "oposicao": 0.85,
+    "oposicao_confianca": 0.88,
+    "p_programas": 0.15,
+    "juros_direcao": 1.98,
+    "juros_direcao_confianca": 0.99
+  },
+  "9c4beb653ad8c683233f9dd01a2c416192a2fe04": {
+    "ticker": "FESA4",
+    "oposicao": 0.53,
+    "oposicao_confianca": 0.6,
+    "p_programas": 0.14,
+    "juros_direcao": -0.13,
+    "juros_direcao_confianca": 0.44
+  },
+  "eea30dec50fa129e3c97ea80d19a68099a7b29f4": {
+    "ticker": "BRAP4",
+    "oposicao": 0.37,
+    "oposicao_confianca": 0.62,
+    "p_programas": 0.11,
+    "juros_direcao": -0.46,
+    "juros_direcao_confianca": 0.42
+  },
+  "8ed63f6fffa45371a8c9c9ed7b9122892425e360": {
+    "ticker": "RANI3",
+    "oposicao": 0.72,
+    "oposicao_confianca": 0.77,
+    "p_programas": 0.18,
+    "juros_direcao": 1.19,
+    "juros_direcao_confianca": 0.78
+  },
+  "a5e2377984655caa65ebe42f94e3154bb426f51e": {
+    "ticker": "VIVT3",
+    "oposicao": 0.92,
+    "oposicao_confianca": 0.83,
+    "p_programas": 0.19,
+    "juros_direcao": 0.98,
+    "juros_direcao_confianca": 0.87
+  },
+  "55db87606ec78a9be133ddaa91700fbd07511c0c": {
+    "ticker": "ALPA4",
+    "oposicao": 0.69,
+    "oposicao_confianca": 0.76,
+    "p_programas": 0.14,
+    "juros_direcao": 0.96,
+    "juros_direcao_confianca": 0.93
+  },
+  "66080f7cdace6b37eff334095bc57598844bd545": {
+    "ticker": "PASS3",
+    "oposicao": 0.91,
+    "oposicao_confianca": 0.77,
+    "p_programas": 0.14,
+    "juros_direcao": 1.54,
+    "juros_direcao_confianca": 0.63
+  },
+  "383d834204e5104c5183a9cf7fa26b9427551119": {
+    "ticker": "ABEV3",
+    "oposicao": 0.77,
+    "oposicao_confianca": 0.81,
+    "p_programas": 0.11,
+    "juros_direcao": 0.03,
+    "juros_direcao_confianca": 0.19
+  },
+  "ae76d6a4fd9bf0ffec9c73fa05ecb517f660be39": {
+    "ticker": "BMOB3",
+    "oposicao": 0.67,
+    "oposicao_confianca": 0.73,
+    "p_programas": 0.11,
+    "juros_direcao": 0.19,
+    "juros_direcao_confianca": 0.33
+  },
+  "47f17a47ac064f54fbbefd1ae61839fca00d4279": {
+    "ticker": "CPLE3",
+    "oposicao": 1.15,
+    "oposicao_confianca": 0.43,
+    "p_programas": 0.21,
+    "juros_direcao": 1.54,
+    "juros_direcao_confianca": 0.62
+  },
+  "3b1aa21f919f8b9f938246b7836bc914d7b53c96": {
+    "ticker": "SMFT3",
+    "oposicao": 0.7,
+    "oposicao_confianca": 0.76,
+    "p_programas": 0.09,
+    "juros_direcao": 1.35,
+    "juros_direcao_confianca": 0.67
+  },
+  "053af5fb0770ed9cd2111fb923953a9ccfc9225f": {
+    "ticker": "ALOS3",
+    "oposicao": 0.51,
+    "oposicao_confianca": 0.57,
+    "p_programas": 0.24,
+    "juros_direcao": -0.32,
+    "juros_direcao_confianca": 0
+  },
+  "48fc6318e7754ee5a2119bfacbfa65e25c8b5da1": {
+    "ticker": "CAML3",
+    "oposicao": 0.6,
+    "oposicao_confianca": 0.68,
+    "p_programas": 0.17,
+    "juros_direcao": 1.41,
+    "juros_direcao_confianca": 0.58
+  },
+  "922994bd1f90e1f15dba4dde34da1cb841503c62": {
+    "ticker": "RDOR3",
+    "oposicao": 0.69,
+    "oposicao_confianca": 0.74,
+    "p_programas": 0.21,
+    "juros_direcao": 0.97,
+    "juros_direcao_confianca": 0.9
+  },
+  "320e5cc4211095e81ba842b4324369ebc67cea1c": {
+    "ticker": "UNIP6",
+    "oposicao": 0.66,
+    "oposicao_confianca": 0.72,
+    "p_programas": 0.14,
+    "juros_direcao": 1.15,
+    "juros_direcao_confianca": 0.75
+  },
+  "db10dc8bbd80d4b0691eff826bd9991f90d32085": {
+    "ticker": "ARML3",
+    "oposicao": 0.82,
+    "oposicao_confianca": 0.82,
+    "p_programas": 0.16,
+    "juros_direcao": 1.89,
+    "juros_direcao_confianca": 0.93
+  },
+  "05ef2fe9591083df410d7990dd35d16148d644fb": {
+    "ticker": "YDUQ3",
+    "oposicao": 0.29,
+    "oposicao_confianca": 0.4,
+    "p_programas": 0.62,
+    "juros_direcao": 1.54,
+    "juros_direcao_confianca": 0.62
+  },
+  "fb5087eef56ab9746cde567cbcbc640308102371": {
+    "ticker": "VALE3",
+    "oposicao": 0.47,
+    "oposicao_confianca": 0.59,
+    "p_programas": 0.09,
+    "juros_direcao": 0.47,
+    "juros_direcao_confianca": 0.57
+  },
+  "e7506146e5cb57e490e8207ad08ff507ee002e8b": {
+    "ticker": "KLBN11",
+    "oposicao": 0.74,
+    "oposicao_confianca": 0.79,
+    "p_programas": 0.19,
+    "juros_direcao": 1.62,
+    "juros_direcao_confianca": 0.7
+  },
+  "ddedb99f998af7026fb5d6a6cceccf73cb2ff9fa": {
+    "ticker": "TIMS3",
+    "oposicao": 0.85,
+    "oposicao_confianca": 0.86,
+    "p_programas": 0.18,
+    "juros_direcao": -0.2,
+    "juros_direcao_confianca": 0
+  }
+}

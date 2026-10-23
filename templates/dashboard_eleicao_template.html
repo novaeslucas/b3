@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leitura Pós-Eleição B3</title>
+<style>
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --surface-2: #f0f2f5; --border: #dfe3e8;
+  --text: #1a1f26; --muted: #5d6773; --faint: #8a939e;
+  --accent: #2f5fd0;
+  --estudar: #1f8a5b; --monitorar: #b7791f; --descartar: #c2413b; --neutro: #8a939e;
+  --estudar-bg: #e3f4ec; --monitorar-bg: #fbf0dc; --descartar-bg: #fbe5e3;
+  --fund: #2f5fd0; --b3: #e08a2e;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1216; --surface: #171b21; --surface-2: #1f242c; --border: #2b323c;
+    --text: #e7ebf0; --muted: #9aa5b1; --faint: #6b7682;
+    --accent: #7aa2ff;
+    --estudar: #4cc38a; --monitorar: #e0a84a; --descartar: #ef6b64; --neutro: #6b7682;
+    --estudar-bg: #16302a; --monitorar-bg: #33280f; --descartar-bg: #3a1c1b;
+    --fund: #7aa2ff; --b3: #f0a65a;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1216; --surface: #171b21; --surface-2: #1f242c; --border: #2b323c;
+  --text: #e7ebf0; --muted: #9aa5b1; --faint: #6b7682;
+  --accent: #7aa2ff;
+  --estudar: #4cc38a; --monitorar: #e0a84a; --descartar: #ef6b64; --neutro: #6b7682;
+  --estudar-bg: #16302a; --monitorar-bg: #33280f; --descartar-bg: #3a1c1b;
+  --fund: #7aa2ff; --b3: #f0a65a;
+  --shadow: none;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.wrap { max-width: 1280px; margin: 0 auto; padding: 24px 16px 48px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; }
+h2 { font-size: 15px; margin: 0 0 12px; }
+.sub { color: var(--muted); font-size: 13px; }
+.theme { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 4px 10px; cursor: pointer; font: inherit; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+.kpi { cursor: pointer; transition: border-color .15s; }
+.kpi:hover, .kpi.on { border-color: var(--accent); }
+.kpi .v { font-size: 26px; font-weight: 650; }
+.kpi .l { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 16px 0 8px; }
+.filters input, .filters select {
+  background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; font: inherit; min-width: 0;
+}
+.filters input { flex: 1 1 200px; }
+.filters label { color: var(--muted); font-size: 13px; display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.filters label input { flex: none; }
+.tablebox { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 980px; }
+th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; cursor: pointer; user-select: none; position: sticky; top: 0; background: var(--surface-2); }
+th:hover { color: var(--text); }
+th.l, td.l { text-align: left; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--surface-2); }
+tbody tr.sel { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
+td.tk { font-weight: 650; }
+.setor { color: var(--muted); max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.b-estudar { color: var(--estudar); background: var(--estudar-bg); }
+.b-monitorar { color: var(--monitorar); background: var(--monitorar-bg); }
+.b-descartar { color: var(--descartar); background: var(--descartar-bg); }
+.b-neutro { color: var(--muted); background: var(--surface-2); }
+.bar { position: relative; height: 6px; width: 64px; background: var(--surface-2); border-radius: 3px; display: inline-block; vertical-align: middle; margin-left: 8px; }
+.bar > i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--accent); }
+.warn { color: var(--descartar); }
+.ok { color: var(--estudar); }
+.muted { color: var(--muted); }
+svg text { fill: var(--muted); font-size: 11px; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+.detail-empty { color: var(--muted); display: grid; place-items: center; min-height: 260px; text-align: center; }
+.dhead { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.dhead .t { font-size: 20px; font-weight: 700; }
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px 12px; margin: 12px 0; }
+.facts div { font-size: 12px; color: var(--muted); }
+.facts b { display: block; color: var(--text); font-size: 14px; font-weight: 600; }
+.rows { display: grid; gap: 6px; margin-bottom: 14px; }
+.row { display: grid; grid-template-columns: 130px 1fr 44px; gap: 8px; align-items: center; font-size: 12px; }
+.row .track { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.row .track i { display: block; height: 100%; background: var(--c, var(--accent)); border-radius: 4px; }
+.row .n { text-align: right; color: var(--text); }
+.sec { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 14px 0 8px; }
+.note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+footer { color: var(--faint); font-size: 12px; margin-top: 20px; }
+.context { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+.context b { color: var(--text); font-weight: 600; }
+.context a { color: var(--accent); text-decoration: none; }
+.tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.tabs button { border: 0; background: transparent; color: var(--muted); font: inherit; padding: 7px 16px; cursor: pointer; }
+.tabs button.on { background: var(--accent); color: #fff; }
+.cardhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.cardhead h2 { margin: 0; }
+.cardhead select { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 5px 8px; font: inherit; }
+.hb { display: grid; gap: 4px; }
+.hb .grp { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 10px 0 2px; }
+.hb .grp:first-child { margin-top: 0; }
+.hb .r { display: grid; grid-template-columns: minmax(120px, 190px) 1fr 70px; gap: 8px; align-items: center; font-size: 12px; }
+.hb .r .lab { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hb .r .lab small { color: var(--faint); }
+.hb .trk { position: relative; height: 14px; }
+.hb .trk i { position: absolute; top: 2px; height: 10px; border-radius: 2px; background: var(--c, var(--accent)); }
+.hb .trk .zero { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--border); }
+.hb .trk .ref { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed var(--text); opacity: .45; }
+.hb .r .n { text-align: right; font-weight: 600; }
+.pos { color: var(--estudar); } .neg { color: var(--descartar); }
+.note a { color: var(--accent); }
+.grid2 + .grid2 { margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Leitura pós-eleição — pregão de <span id="dPregao"></span></h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <button class="theme" id="theme" type="button">Tema</button>
+  </header>
+  <div class="context">
+    <span>1º turno (04/10): <b>Flávio Bolsonaro 47,03%</b> × <b>Lula 45,16%</b> — 2º turno em 25/10</span>
+    <span>Dólar <b>−4,12%</b> (R$ 5,00) · Prefixado 2032 <b>−1,20 p.p.</b> (12,95%)</span>
+    <span>Fontes: <a href="https://www.infomoney.com.br/mercados/ibovespa-hoje-bolsa-de-valores-ao-vivo-05102026/" target="_blank" rel="noopener">InfoMoney</a>,
+      <a href="https://pt.wikipedia.org/wiki/Elei%C3%A7%C3%A3o_presidencial_no_Brasil_em_2026" target="_blank" rel="noopener">Wikipédia</a>,
+      <a href="https://euqueroinvestir.com/tesouro-direto/tesouro-direto-hoje-taxas-caem-eleicao-5-outubro-2026" target="_blank" rel="noopener">Eu Quero Investir</a></span>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="cardhead"><h2>O que explicou o dia — fatores julgados pelo Jev (ações)</h2></div>
+      <div class="hb" id="fatores"></div>
+      <div class="note">Média da variação do dia por grupo. Linha tracejada = Ibovespa. O Jev avaliou só o negócio de cada empresa, sem ver preços.</div>
+    </div>
+    <div class="card">
+      <div class="cardhead">
+        <h2>Variação do dia × fator</h2>
+        <select id="eixo">
+          <option value="p_dolar">Receita em dólar (P)</option>
+          <option value="p_governo">Exposição ao governo (P)</option>
+          <option value="juros">Sensibilidade a juros (0–2)</option>
+          <option value="dy_antes">DY antes do pregão</option>
+          <option value="score_antes">Score de dividendos</option>
+        </select>
+      </div>
+      <div id="scatter"></div>
+      <div class="legend">
+        <span style="--c: var(--estudar)">estudar</span>
+        <span style="--c: var(--monitorar)">monitorar</span>
+        <span style="--c: var(--descartar)">descartar</span>
+        <span class="muted">· clique em um ponto para detalhar</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="tabs" id="tabs"><button data-t="acoes" class="on" type="button">Ações</button><button data-t="fiis" type="button">FIIs</button></div>
+    <input id="q" type="search" placeholder="Buscar ticker, nome, setor ou segmento">
+    <select id="fDec">
+      <option value="">Todas as decisões</option>
+      <option value="estudar">estudar</option>
+      <option value="monitorar">monitorar</option>
+      <option value="descartar">descartar</option>
+    </select>
+    <label><input type="checkbox" id="fDy"> só quem ficou abaixo do DY mínimo</label>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="cardhead"><h2 id="tGrupos"></h2></div>
+      <div class="hb" id="grupos"></div>
+    </div>
+    <div class="card" id="detail"><div class="detail-empty">Selecione um ativo no gráfico ou na tabela.</div></div>
+  </div>
+
+  <div class="tablebox" style="margin-top: 12px">
+    <table>
+      <thead><tr id="thead"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <footer>
+    Variação do dia: fechamento do pregão analisado ÷ fechamento anterior (Yahoo Finance). DY, P/L, P/VP e score "hoje"
+    reaplicam o preço novo às análises de dividendos.py e fiis.py (Fundamentus); a classificação de qualidade não foi refeita —
+    um pregão muda preço, não fundamento. Fatores de governo, dólar e juros: perguntas ao Jev (TypeSafe) sobre o negócio de cada empresa.
+    Um único pregão, antes do 2º turno. Não é recomendação de investimento.
+  </footer>
+</div>
+
+<script>
+const DADOS = /*__DADOS__*/null;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const pct = (v, d = 1) => v == null ? "–" : (100 * v).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }) + "%";
+const sp = (v, d = 2) => v == null ? "–" : (v > 0 ? "+" : "") + pct(v, d);
+const n2 = (v, d = 2) => v == null ? "–" : v.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const brl = v => v == null ? "–" : "R$ " + n2(v, 2);
+const media = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null;
+const COR = d => `var(--${d === "-" ? "neutro" : d})`;
+const CLASSE = c => ({ SUSTENTAVEL: "Sustentável", ATENCAO: "Atenção", FRAGIL: "Frágil" })[(c || "").split("_").pop()] || "–";
+const TIPO = { tijolo: "Tijolo", papel: "Papel", fundo_de_fundos: "Fundo de fundos", hibrido: "Híbrido", desenvolvimento: "Desenvolvimento", outro: "Outro" };
+const DY_MIN = { acoes: 0.05, fiis: 0.08 };
+const abaixo = (e, aba) => e.dy_hoje < DY_MIN[aba] && e.dy_antes >= DY_MIN[aba];
+
+const root = document.documentElement;
+try { const t = localStorage.getItem("tema"); if (t) root.dataset.theme = t; } catch (_) {}
+$("#theme").onclick = () => {
+  const escuro = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = escuro ? "light" : "dark";
+  try { localStorage.setItem("tema", root.dataset.theme); } catch (_) {}
+};
+
+const estado = { aba: "acoes", sort: "var_dia", dir: -1, sel: null };
+$("#dPregao").textContent = DADOS.data_pregao;
+$("#sub").textContent = `${DADOS.acoes.length} ações e ${DADOS.fiis.length} FIIs já analisados · variação vs ${DADOS.data_base} · gerado em ${DADOS.gerado_em}` +
+  (DADOS.sem_preco.length ? ` · sem cotação: ${DADOS.sem_preco.join(", ")}` : "");
+
+function kpis() {
+  const A = DADOS.acoes, F = DADOS.fiis;
+  const est = A.filter(e => e.decisao === "estudar");
+  const items = [
+    ["Ibovespa", sp(DADOS.ibov), DADOS.ibov],
+    ["Ações analisadas (média)", sp(media(A.map(e => e.var_dia))), media(A.map(e => e.var_dia))],
+    ["Ações “estudar” (média)", sp(media(est.map(e => e.var_dia))), media(est.map(e => e.var_dia))],
+    ["FIIs analisados (média)", sp(media(F.map(e => e.var_dia))), media(F.map(e => e.var_dia))],
+    ["Ações abaixo do DY mín.", String(A.filter(e => abaixo(e, "acoes")).length), null],
+  ];
+  if (DADOS.ifix != null) items.splice(3, 0, ["IFIX", sp(DADOS.ifix), DADOS.ifix]);
+  $("#kpis").innerHTML = items.map(([l, v, x]) => `
+    <div class="card"><div class="l" style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em">${l}</div>
+    <div class="v ${x == null ? "" : x >= 0 ? "pos" : "neg"}" style="font-size:26px;font-weight:650">${v}</div></div>`).join("");
+}
+
+// barras horizontais com zero e linha de referência (Ibovespa)
+function hbar(el, blocos, ref) {
+  const vals = blocos.flatMap(b => b.rows.map(r => r.v)).concat(ref == null ? [] : [ref], [0]);
+  const lo = Math.min(...vals), hi = Math.max(...vals), span = hi - lo || 1;
+  const x = v => (v - lo) / span * 100;
+  el.innerHTML = blocos.map(b => (b.titulo ? `<div class="grp">${esc(b.titulo)}</div>` : "") + b.rows.map(r => `
+    <div class="r" title="${esc(r.l)} · n=${r.n}">
+      <span class="lab">${esc(r.l)} <small>n=${r.n}</small></span>
+      <span class="trk">
+        <span class="zero" style="left:${x(0)}%"></span>
+        <i style="left:${Math.min(x(0), x(r.v))}%; width:${Math.abs(x(r.v) - x(0))}%; --c:${r.c || "var(--accent)"}"></i>
+        ${ref == null ? "" : `<span class="ref" style="left:${x(ref)}%"></span>`}
+      </span>
+      <span class="n ${r.v >= 0 ? "pos" : "neg"}">${sp(r.v)}</span>
+    </div>`).join("")).join("");
+}
+
+function agrupar(lista, chave, cor) {
+  const g = {};
+  for (const e of lista) (g[chave(e)] ??= []).push(e.var_dia);
+  return Object.entries(g).map(([l, vs]) => ({ l, v: media(vs), n: vs.length, c: cor ? cor(l) : null })).sort((a, b) => b.v - a.v);
+}
+
+function fatores() {
+  const A = DADOS.acoes;
+  hbar($("#fatores"), [
+    { titulo: "Receita (Jev)", rows: agrupar(A, e => e.p_dolar >= .5 ? "Em dólar" : "Em reais") },
+    { titulo: "Exposição ao governo federal (Jev)", rows: agrupar(A, e => e.p_governo >= .5 ? "Exposta" : "Pouco exposta") },
+    { titulo: "Sensibilidade a juros domésticos (Jev)", rows: agrupar(A, e => e.juros >= 1.5 ? "Alta" : e.juros >= .5 ? "Moderada" : "Baixa") },
+    { titulo: "Decisão da análise de dividendos", rows: agrupar(A, e => e.decisao, l => COR(l)) },
+  ], DADOS.ibov);
+}
+
+function lista() {
+  const q = $("#q").value.trim().toLowerCase(), dec = $("#fDec").value, dy = $("#fDy").checked;
+  return DADOS[estado.aba].filter(e =>
+    (!dec || e.decisao === dec) && (!dy || abaixo(e, estado.aba)) &&
+    (!q || [e.ticker, e.nome, e.setor, e.segmento, TIPO[e.tipo]].join(" ").toLowerCase().includes(q)));
+}
+
+function grupos(l) {
+  if (estado.aba === "acoes") {
+    $("#tGrupos").textContent = "Variação média por setor";
+    hbar($("#grupos"), [{ rows: agrupar(l, e => e.setor || "–") }], DADOS.ibov);
+  } else {
+    $("#tGrupos").textContent = "FIIs — variação média por tipo, segmento e decisão";
+    hbar($("#grupos"), [
+      { titulo: "Tipo (Jev)", rows: agrupar(l, e => TIPO[e.tipo] || "–") },
+      { titulo: "Segmento (Fundamentus)", rows: agrupar(l, e => e.segmento || "–") },
+      { titulo: "Decisão", rows: agrupar(l, e => e.decisao, x => COR(x)) },
+    ], DADOS.ifix);
+  }
+}
+
+function scatter() {
+  const campo = $("#eixo").value, A = DADOS.acoes;
+  const W = 640, H = 300, m = { l: 48, r: 14, t: 10, b: 34 };
+  const xs = A.map(e => e[campo]), ys = A.map(e => e.var_dia);
+  const fixo = { p_dolar: [0, 1], p_governo: [0, 1], juros: [0, 2] }[campo];
+  const [x0, x1] = fixo || [Math.min(...xs), Math.max(...xs)];
+  const y0 = Math.min(0, ...ys), y1 = Math.max(...ys);
+  const X = v => m.l + (v - x0) / (x1 - x0 || 1) * (W - m.l - m.r);
+  const Y = v => H - m.b - (v - y0) / (y1 - y0 || 1) * (H - m.t - m.b);
+  const fmtX = campo === "dy_antes" ? (v => pct(v, 0)) : campo === "score_antes" ? (v => n2(v, 0)) : (v => n2(v, 1));
+  let g = "";
+  const passo = (y1 - y0) > .2 ? .05 : .02;
+  for (let v = Math.ceil(y0 / passo) * passo; v <= y1 + 1e-9; v += passo)
+    g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--border)"/><text x="${m.l - 6}" y="${Y(v) + 4}" text-anchor="end">${pct(v, 0)}</text>`;
+  for (let i = 0; i <= 4; i++) { const v = x0 + (x1 - x0) * i / 4; g += `<text x="${X(v)}" y="${H - m.b + 16}" text-anchor="middle">${fmtX(v)}</text>`; }
+  if (DADOS.ibov != null) g += `<line x1="${m.l}" x2="${W - m.r}" y1="${Y(DADOS.ibov)}" y2="${Y(DADOS.ibov)}" stroke="var(--text)" stroke-dasharray="4 4" opacity=".45"/><text x="${W - m.r}" y="${Y(DADOS.ibov) - 5}" text-anchor="end">Ibovespa</text>`;
+  g += `<text x="${(W + m.l) / 2}" y="${H - 2}" text-anchor="middle">${esc($("#eixo").selectedOptions[0].text)}</text>`;
+  const sel = estado.aba === "acoes" ? estado.sel : null;
+  const pts = [...A].sort((a, b) => (a.ticker === sel) - (b.ticker === sel)).map(e => {
+    const s = e.ticker === sel;
+    return `<circle cx="${X(e[campo])}" cy="${Y(e.var_dia)}" r="${s ? 7.5 : 5}" fill="${COR(e.decisao)}" fill-opacity=".85"
+      stroke="${s ? "var(--text)" : "var(--surface)"}" stroke-width="${s ? 2 : 1}" data-t="${esc(e.ticker)}" style="cursor:pointer">
+      <title>${esc(e.ticker)} · ${sp(e.var_dia)} · ${esc(e.decisao)}</title></circle>` +
+      (s ? `<text x="${X(e[campo]) + 10}" y="${Y(e.var_dia) - 8}" style="fill: var(--text); font-weight: 600">${esc(e.ticker)}</text>` : "");
+  }).join("");
+  $("#scatter").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Variação do dia por fator">${g}${pts}</svg>`;
+  document.querySelectorAll("#scatter circle").forEach(c => c.onclick = () => { estado.aba = "acoes"; selecionar(c.dataset.t); });
+}
+
+const COLS = {
+  acoes: [
+    ["ticker", "Ticker", "l"], ["setor", "Setor", "l"], ["var_dia", "Dia", ""], ["dy_antes", "DY antes", ""], ["dy_hoje", "DY hoje", ""],
+    ["score_hoje", "Score", ""], ["p_governo", "Gov.", ""], ["p_dolar", "US$", ""], ["juros", "Juros", ""], ["jev_classe", "Jev", "l"], ["decisao", "Decisão", "l"],
+  ],
+  fiis: [
+    ["ticker", "Ticker", "l"], ["segmento", "Segmento", "l"], ["tipo", "Tipo (Jev)", "l"], ["var_dia", "Dia", ""], ["dy_antes", "DY antes", ""],
+    ["dy_hoje", "DY hoje", ""], ["pvp_hoje", "P/VP hoje", ""], ["score_hoje", "Score", ""], ["jev_classe", "Jev", "l"], ["decisao", "Decisão", "l"],
+  ],
+};
+
+function celula(e, k) {
+  switch (k) {
+    case "ticker": return `<td class="l tk">${esc(e.ticker)}</td>`;
+    case "setor": case "segmento": return `<td class="l setor" title="${esc(e[k])}">${esc(e[k])}</td>`;
+    case "tipo": return `<td class="l">${esc(TIPO[e.tipo] || "–")}</td>`;
+    case "var_dia": return `<td class="${e.var_dia >= 0 ? "pos" : "neg"}" style="font-weight:600">${sp(e.var_dia)}</td>`;
+    case "dy_antes": return `<td>${pct(e.dy_antes)}</td>`;
+    case "dy_hoje": return `<td class="${abaixo(e, estado.aba) ? "warn" : ""}">${pct(e.dy_hoje)}</td>`;
+    case "pvp_hoje": return `<td>${n2(e.pvp_hoje)}</td>`;
+    case "score_hoje": return `<td>${n2(e.score_hoje, 1)}<span class="bar"><i style="width:${e.score_hoje}%"></i></span></td>`;
+    case "p_governo": case "p_dolar": return `<td>${n2(e[k])}</td>`;
+    case "juros": return `<td>${n2(e.juros)}</td>`;
+    case "jev_classe": return `<td class="l"><span class="badge b-${({ SUSTENTAVEL: "estudar", ATENCAO: "monitorar", FRAGIL: "descartar" })[(e.jev_classe || "").split("_").pop()] || "neutro"}">${CLASSE(e.jev_classe)}</span></td>`;
+    case "decisao": return `<td class="l"><span class="badge b-${e.decisao === "-" ? "neutro" : e.decisao}">${esc(e.decisao)}</span></td>`;
+  }
+}
+
+function tabela(l) {
+  const cols = COLS[estado.aba];
+  if (!cols.some(c => c[0] === estado.sort)) { estado.sort = "var_dia"; estado.dir = -1; }
+  $("#thead").innerHTML = cols.map(([k, t, c]) => `<th class="${c}" data-k="${k}">${t}${estado.sort === k ? (estado.dir < 0 ? " ↓" : " ↑") : ""}</th>`).join("");
+  document.querySelectorAll("#thead th").forEach(th => th.onclick = () => {
+    const k = th.dataset.k;
+    estado.dir = estado.sort === k ? -estado.dir : (["ticker", "setor", "segmento", "tipo", "jev_classe", "decisao"].includes(k) ? 1 : -1);
+    estado.sort = k; render();
+  });
+  const k = estado.sort;
+  l = [...l].sort((a, b) => {
+    const x = a[k], y = b[k];
+    if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * estado.dir;
+  });
+  $("#tbody").innerHTML = l.map(e => `<tr data-t="${esc(e.ticker)}" class="${estado.sel === e.ticker ? "sel" : ""}">${cols.map(c => celula(e, c[0])).join("")}</tr>`).join("")
+    || `<tr><td class="l muted" colspan="${cols.length}">Nenhum ativo com esses filtros.</td></tr>`;
+  document.querySelectorAll("#tbody tr[data-t]").forEach(tr => tr.onclick = () => selecionar(tr.dataset.t));
+}
+
+function linhaBarra(l, v, max, cor, fmt) {
+  return `<div class="row"><span>${l}</span><span class="track"><i style="width:${v == null ? 0 : Math.max(0, Math.min(100, v / max * 100))}%; --c:${cor}"></i></span><span class="n">${fmt(v)}</span></div>`;
+}
+
+function detalhe() {
+  const e = DADOS[estado.aba].find(x => x.ticker === estado.sel);
+  if (!e) { $("#detail").innerHTML = `<div class="detail-empty">Selecione um ativo no gráfico ou na tabela.</div>`; return; }
+  const acao = estado.aba === "acoes";
+  const ref = acao ? DADOS.ibov : DADOS.ifix, refNome = acao ? "Ibovespa" : "IFIX";
+  $("#detail").innerHTML = `
+    <div class="dhead">
+      <div><div class="t">${esc(e.ticker)} <span class="${e.var_dia >= 0 ? "pos" : "neg"}">${sp(e.var_dia)}</span></div>
+        <div class="sub">${esc(e.nome || "")}</div>
+        <div class="sub">${esc(acao ? e.setor : e.segmento)}${!acao && e.tipo ? " · " + esc(TIPO[e.tipo]) : ""}</div></div>
+      <span class="badge b-${e.decisao === "-" ? "neutro" : e.decisao}">${esc(e.decisao)}</span>
+    </div>
+    <div class="facts">
+      <div>Fechamento ${esc(DADOS.data_base)}<b>${brl(e.cot_base)}</b></div>
+      <div>Fechamento ${esc(DADOS.data_pregao)}<b>${brl(e.cot_pregao)}</b></div>
+      ${ref != null ? `<div>vs ${refNome}<b class="${e.var_dia - ref >= 0 ? "pos" : "neg"}">${sp(e.var_dia - ref)} p.p.</b></div>` : ""}
+      <div>DY antes → hoje<b class="${abaixo(e, estado.aba) ? "warn" : ""}">${pct(e.dy_antes)} → ${pct(e.dy_hoje)}</b></div>
+      <div>${acao ? "P/L hoje" : "P/VP hoje"}<b>${n2(acao ? e.pl_hoje : e.pvp_hoje)}</b></div>
+      <div>Score antes → hoje<b>${n2(e.score_antes, 1)} → ${n2(e.score_hoje, 1)}</b></div>
+      <div>Classe de qualidade (Jev)<b>${CLASSE(e.jev_classe)} <span class="muted">${n2(e.jev_confianca)}</span></b></div>
+    </div>
+    ${acao ? `<div class="sec">Fatores do negócio (Jev)</div><div class="rows">
+      ${linhaBarra("Exposição ao governo", e.p_governo, 1, "var(--monitorar)", v => n2(v))}
+      ${linhaBarra("Receita em dólar", e.p_dolar, 1, "var(--b3)", v => n2(v))}
+      ${linhaBarra("Sensibilidade a juros", e.juros, 2, "var(--accent)", v => n2(v) + " / 2")}
+    </div>` : ""}
+    ${abaixo(e, estado.aba) ? `<div class="note warn">Com o preço de hoje o DY ficou abaixo do mínimo de ${pct(DY_MIN[estado.aba], 0)}: o ativo sai da próxima análise.</div>` : ""}
+    <div class="note">A classe de qualidade não foi refeita: reflete os fundamentos, que não mudam em um pregão.</div>`;
+}
+
+function selecionar(t) { estado.sel = t; render(); }
+
+function render() {
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === estado.aba));
+  $("#fDy").parentElement.lastChild.textContent = ` só quem ficou abaixo do DY mínimo (${pct(DY_MIN[estado.aba], 0)})`;
+  const l = lista();
+  kpis(); fatores(); scatter(); grupos(l); tabela(l); detalhe();
+}
+
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
+  estado.aba = b.dataset.t;
+  const top = [...DADOS[estado.aba]].sort((a, c) => c.var_dia - a.var_dia)[0];
+  estado.sel = (DADOS[estado.aba].find(e => e.decisao === "estudar") || top)?.ticker;
+  render();
+});
+["#q", "#fDec", "#fDy", "#eixo"].forEach(s => $(s).addEventListener("input", render));
+estado.sel = DADOS.acoes.find(e => e.decisao === "estudar")?.ticker ?? DADOS.acoes[0]?.ticker;
+render();
+</script>
+</body>
+</html>

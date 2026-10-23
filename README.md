@@ -1,0 +1,275 @@
+# Dividendos, FIIs e eleição 2026 na B3 — score determinístico + Jev
+
+Análise da qualidade dos dividendos de ações e dos rendimentos de fundos imobiliários (FIIs) listados na B3, seguida
+de um acompanhamento diário do mercado entre o 1º turno (04/10/2026) e o 2º turno (25/10/2026) da eleição
+presidencial.
+
+A ideia central é **separar o que é conta do que é julgamento**:
+
+- tudo que é cálculo (filtros, indicadores, score de 0 a 100, variações de preço, probabilidade a partir das
+  pesquisas) é feito em Python, com pesos e limites explícitos no código;
+- o que exige leitura qualitativa — “esse dividendo é sustentável?”, “esse DY está inflado?”, “essa empresa depende
+  do governo federal?” — é perguntado ao **Jev**, um modelo da TypeSafe que recebe o estado já calculado e devolve
+  julgamentos tipados com probabilidades;
+- a decisão final (`estudar` / `monitorar` / `descartar`) é uma regra escrita no código que combina as duas coisas.
+
+O Jev não calcula nada e não vê preço-alvo: ele classifica a partir dos números que o código lhe entrega.
+
+> ⚠️ **Não é recomendação de investimento.** É um estudo de metodologia com dados públicos, que podem conter erros.
+
+---
+
+## Sumário
+
+- [Estrutura do repositório](#estrutura-do-repositório)
+- [Fontes de dados](#fontes-de-dados)
+- [Metodologia](#metodologia)
+  - [1. Ações: Dividend Quality Score](#1-ações-dividend-quality-score)
+  - [2. FIIs: score de qualidade do rendimento](#2-fiis-score-de-qualidade-do-rendimento)
+  - [3. Leitura pós-eleição (pregões diários)](#3-leitura-pós-eleição-pregões-diários)
+  - [4. Fatores do 2º turno](#4-fatores-do-2º-turno)
+  - [5. Painel geral](#5-painel-geral)
+- [Onde o Jev foi aplicado](#onde-o-jev-foi-aplicado)
+- [Resultados](#resultados)
+- [Como executar](#como-executar)
+- [Limitações](#limitações)
+
+---
+
+## Estrutura do repositório
+
+```
+.
+├── dividendos.py              # ações: coleta, score, Jev, conferência com a B3 → resultados/
+├── fiis.py                    # FIIs: idem, adaptado a fundos imobiliários   → resultados/
+├── leitura_pos_eleicao.py     # 1ª leitura do pregão pós-1º turno (05/10)   → resultados/
+├── painel_pos_eleicao.py      # painel acumulado de todas as leituras diárias → resultados/
+├── templates/                 # HTML dos dashboards (os scripts embutem os dados neles)
+├── resultados/                # CSVs e dashboards gerados pelos scripts da raiz
+│   ├── resultado_dividendos.csv / dashboard.html
+│   ├── resultado_fiis.csv       / dashboard_fiis.html
+│   ├── leitura_pos_eleicao.csv  / dashboard_eleicao.html
+│   └── dashboard_pos_eleicao.html          ← painel geral, bom ponto de partida
+├── leituras/AAAA_MM_DD/       # uma pasta por pregão (06/10 a 22/10): scripts do dia + CSV + dashboard
+├── cache/jev*.json            # respostas do Jev usadas nas análises (chave = hash do estado + perguntas)
+└── docs/pesquisa_endpoint_b3.md  # levantamento das fontes gratuitas de proventos da B3
+```
+
+Cada pasta em `leituras/` guarda **a versão do script que rodou naquele dia** (com o contexto e as pesquisas
+daquela data) e o que ela produziu. Isso deixa cada leitura reprodutível e mostra como a análise evoluiu: em 06/10
+entrou a classificação setorial oficial da B3 (`setores_b3.py`); a partir de 09/10, os fatores do 2º turno
+(`fatores_2turno.py`).
+
+Os dashboards são HTML estáticos, com os dados embutidos — basta abrir no navegador.
+
+## Fontes de dados
+
+| Fonte | Uso |
+|---|---|
+| **Fundamentus** (`resultado.php`, `fii_resultado.php`, `detalhes.php`, `proventos.php`, `fii_proventos.php`) | Indicadores de todas as ações/FIIs, detalhes por ativo e histórico de proventos |
+| **B3** (`GetListedCashDividends`, `GetListedSupplementFunds`, `GetDetail`) | Conferência independente dos proventos e classificação setorial oficial |
+| **Yahoo Finance** (`query1.finance.yahoo.com/v8/finance/chart`) | Fechamentos diários de ativos, Ibovespa, SMAL11, XFIX11 e dólar |
+| **Pesquisas eleitorais** (Datafolha, Quaest, Atlas etc.) | Probabilidade de vitória no 2º turno, calculada em código |
+
+Os endpoints da B3 não são documentados; o levantamento de por que foram escolhidos (e das armadilhas deles) está em
+[docs/pesquisa_endpoint_b3.md](docs/pesquisa_endpoint_b3.md).
+
+## Metodologia
+
+### 1. Ações: Dividend Quality Score
+
+[`dividendos.py`](dividendos.py)
+
+1. **Universo:** a tabela `resultado.php` do Fundamentus (todas as ações em uma requisição).
+2. **Filtros rígidos:** liquidez média ≥ R$ 2 milhões/dia, DY ≥ 5%, P/L > 0 (lucro positivo) e **um ticker por
+   empresa** (o mais líquido entre ON/PN/units). Ficam as 80 mais líquidas.
+3. **Detalhes por candidata:** setor, dívida líquida, lucro e EBIT de 12 meses, oscilação de 12 meses e proventos
+   por ano (dividendos + JCP).
+4. **Métricas** sobre os 6 últimos anos completos: anos com pagamento, cortes (queda > 20% a/a), CAGR dos
+   dividendos, payout (= DY × P/L), dívida líquida/EBIT, último ano vs. média anterior.
+5. **Score 0–100**, média ponderada de cinco pilares. Cada sub-indicador é mapeado linearmente de um valor “ruim”
+   (0) a um “bom” (1), com saturação; pilares sem dado saem da média e os pesos são renormalizados.
+
+   | Pilar | Peso | Sub-indicadores (ruim → bom) |
+   |---|---:|---|
+   | Sustentabilidade | 25% | payout (> 120% → ≤ 90%), dív. líq./EBIT (4× → 1×), liquidez corrente (0,8 → 1,5) |
+   | Histórico | 20% | anos pagos (3 → 6 de 6), cortes (3 → 0) |
+   | Rentabilidade | 20% | ROE (5% → 20%), ROIC (5% → 15%), margem líquida (0% → 20%) |
+   | Crescimento | 20% | receita 5a (0% → 15%), CAGR dos dividendos (−5% → 10%) |
+   | Valuation | 15% | P/L (20 → 5), P/VP (4 → 1), EV/EBITDA (12 → 4) |
+
+6. **Jev** classifica cada empresa (ver [abaixo](#onde-o-jev-foi-aplicado)).
+7. **Decisão** (regra no código):
+   - `descartar` se o Jev classifica como **FRÁGIL** ou P(DY inflado) ≥ 0,7;
+   - `estudar` se **SUSTENTÁVEL**, score ≥ 60 e P(DY inflado) < 0,5;
+   - `monitorar` nos demais casos.
+8. **Conferência:** proventos por ano do Fundamentus × B3 (por espécie ON/PN; units não são comparáveis).
+   Divergência > 10% num ano completo é sinalizada.
+
+### 2. FIIs: score de qualidade do rendimento
+
+[`fiis.py`](fiis.py) — mesma estrutura, adaptada a fundos:
+
+- **Filtros:** liquidez ≥ R$ 1 milhão/dia, DY ≥ 8%, P/VP válido; 80 mais líquidos.
+- **Métricas:** distribuição/FFO, dependência de venda de ativos, meses pagos nos últimos 12, coeficiente de
+  variação mensal, tendência de 6 meses, cortes, CAGR, vacância, nº de imóveis, valor de mercado, FFO yield.
+
+  | Pilar | Peso | Sub-indicadores |
+  |---|---:|---|
+  | Sustentabilidade | 30% | dist./FFO (≤ 110% → nota cheia; 150% → 0; FFO negativo → 0), dependência de venda de ativos |
+  | Regularidade | 25% | meses pagos (9 → 12), CV mensal (0,40 → 0,05), cortes |
+  | Crescimento | 15% | CAGR dos rendimentos, tendência de 6 meses |
+  | Portfólio | 15% | valor de mercado (R$ 200 mi → 2 bi, log), vacância e nº de imóveis (só tijolo) |
+  | Valuation | 15% | P/VP (1,3 → 0,85), FFO yield (5% → 11%) |
+
+- **Decisão:** `descartar` só se **FRÁGIL**. Diferente das ações, P(DY inflado) alto sozinho não descarta: o FFO do
+  Fundamentus é contábil e FIIs distribuem por caixa, então dist./FFO um pouco acima de 100% é comum em fundos
+  sólidos. Ele apenas impede o `estudar`.
+- **Conferência:** rendimentos de 12 meses Fundamentus × B3 (`GetListedSupplementFunds`).
+
+### 3. Leitura pós-eleição (pregões diários)
+
+[`leitura_pos_eleicao.py`](leitura_pos_eleicao.py) e [`leituras/`](leituras/)
+
+Base congelada: dados do Fundamentus e respostas do Jev do **snapshot de 05/10** (`--snapshot 2026-10-05`), para que
+**só o preço mude** entre uma leitura e outra. A cada pregão:
+
+1. Fechamentos no Yahoo Finance do pré-eleição (02/10), do pregão anterior e do pregão analisado.
+2. Dois horizontes: **dia** (pregão ÷ anterior) e **acumulado** (pregão ÷ 02/10), comparados com Ibovespa e IFIX.
+3. Reaplica o preço novo aos indicadores que dependem dele (DY, P/L, P/VP, EV/EBITDA aproximado) e recalcula o
+   score. Payout, ROE e histórico **não** mudam: um pregão muda preço, não fundamento — a classificação do Jev não é
+   refeita.
+4. Cruza as variações com os fatores eleitorais do Jev, com a decisão e com o tipo de FII.
+5. Setor oficial da B3 (Setor Econômico / Subsetor / Segmento, via `GetDetail`); quando diverge do Fundamentus,
+   vale a B3 ([`setores_b3.py`](leituras/2026_10_22/setores_b3.py)).
+
+Cada dashboard diário traz no topo o contexto do pregão (notícias, com link da fonte).
+
+### 4. Fatores do 2º turno
+
+[`fatores_2turno.py`](leituras/2026_10_22/fatores_2turno.py), a partir de 09/10.
+
+Os fatores da etapa 3 medem **exposição** (o quanto a empresa depende do governo, do dólar, dos juros), mas não o
+**sentido** do efeito. Esta etapa acrescenta perguntas direcionais, com o contexto do 2º turno no estado:
+
+- efeito de uma vitória da oposição sobre lucro e valuation (−2 a +2);
+- dependência relevante de programas federais (MCMV, Bolsa Família, crédito subsidiado…);
+- direção do efeito de uma queda forte dos juros domésticos (−2 a +2).
+
+A **probabilidade de vitória não é perguntada ao Jev**. Ela vem das pesquisas vigentes (a mais recente de cada
+instituto, em votos válidos) por uma conta explícita: `P = Φ((média dos válidos − 50%) / 3%)`. O dashboard permite
+ajustá-la manualmente e recalcula a exposição esperada de cada ativo.
+
+### 5. Painel geral
+
+[`painel_pos_eleicao.py`](painel_pos_eleicao.py) junta tudo o que as leituras diárias produziram e reconstrói a
+série completa de cada ativo de 02/10 até o último pregão: acumulado por ativo, por setor da B3 e por fator, contra
+Ibovespa, small caps (SMAL11), FIIs (XFIX11, aproximação do IFIX) e dólar. Saída:
+[`resultados/dashboard_pos_eleicao.html`](resultados/dashboard_pos_eleicao.html).
+
+## Onde o Jev foi aplicado
+
+O Jev é chamado pela API de decisões (OpenRouter `~typesafe/jev-latest` ou TypeSafe `jev-latest`). Cada chamada
+envia um **estado** (JSON com os indicadores já calculados) e **perguntas tipadas**; a resposta vem com a escolha e
+as probabilidades. Os tipos usados foram:
+
+- `choice` — escolha entre classes descritas em critérios, com probabilidade de cada uma;
+- `noul` — probabilidade de uma afirmação ser verdadeira;
+- `score` — nota numérica numa escala definida.
+
+| Etapa | Pergunta | Tipo | Como a resposta é usada |
+|---|---|---|---|
+| Ações | Sustentabilidade da política de dividendos: SUSTENTÁVEL / ATENÇÃO / FRÁGIL, considerando o que é normal no setor | `choice` | Entra na regra de decisão |
+| Ações | O DY de 12 meses está inflado por pagamento extraordinário ou queda da cotação? | `noul` | ≥ 0,7 descarta; ≥ 0,5 impede `estudar` |
+| FIIs | Sustentabilidade dos rendimentos mensais (cobertura por FFO, venda de ativos, vacância…) | `choice` | Entra na regra de decisão |
+| FIIs | O DY está inflado por ganho não recorrente, reserva, inflação alta ou queda da cota? | `noul` | ≥ 0,5 impede `estudar` |
+| FIIs | Tipo do fundo: tijolo / papel / fundo de fundos / híbrido / desenvolvimento / outro | `choice` | Agrupamento nos dashboards |
+| Eleição | Decisões do governo federal determinam materialmente os resultados da empresa? | `noul` | Exposição ao governo |
+| Eleição | Parte relevante da receita é em dólar ou atrelada a commodities globais? | `noul` | Exposição ao dólar |
+| Eleição | Sensibilidade de lucro e valuation aos juros domésticos | `score` 0–2 | Exposição aos juros |
+| 2º turno | Efeito de uma vitória da oposição vs. reeleição | `score` −2..+2 | Exposição direcional ao resultado |
+| 2º turno | Dependência de programas sociais federais | `noul` | Exposição a mudança de política |
+| 2º turno | Direção do efeito de uma queda forte dos juros | `score` −2..+2 | Sentido do fator juros |
+
+Todas as perguntas sobre eleição são **sobre o negócio**, nunca sobre o preço. As respostas ficam em
+[`cache/`](cache/) (`jev.json`, `jev_fiis.json`, `jev_eleicao.json`, `jev_2turno.json`), indexadas pelo hash do
+estado + perguntas: rodar de novo com os mesmos dados não chama a API, e mudar uma pergunta só invalida aquela etapa.
+
+## Resultados
+
+Snapshot de **05/10/2026** (cotações de 02/10, último pregão antes do 1º turno).
+
+**Ações** — 77 empresas após os filtros
+([CSV](resultados/resultado_dividendos.csv) · [dashboard](resultados/dashboard.html)):
+
+| Jev | Qtde |  | Decisão | Qtde |
+|---|---:|---|---|---:|
+| SUSTENTÁVEL | 6 | | estudar | 3 |
+| ATENÇÃO | 49 | | monitorar | 32 |
+| FRÁGIL | 22 | | descartar | 42 |
+
+`estudar`: **JHSF3** (score 94,5), **CPFE3** (73,9), **BMGB4** (65,8).
+Conferência com a B3: 69 conferem, 4 divergem em algum ano, 4 são units (não comparáveis).
+
+**FIIs** — 70 fundos após os filtros
+([CSV](resultados/resultado_fiis.csv) · [dashboard](resultados/dashboard_fiis.html)):
+
+| Jev | Qtde |  | Decisão | Qtde |
+|---|---:|---|---|---:|
+| SUSTENTÁVEL | 4 | | estudar | 4 |
+| ATENÇÃO | 45 | | monitorar | 45 |
+| FRÁGIL | 21 | | descartar | 21 |
+
+`estudar`: **LVBI11** (96,2), **HSLG11** (95,0), **KNHF11** (91,3), **JSRE11** (88,9).
+
+**Pós-eleição** — 145 ativos acompanhados em 13 pregões (05/10 na raiz, 06/10 a 22/10 em `leituras/`). Mediana do acumulado de 02/10 a 22/10:
+**+10,6% nas ações** e **+4,6% nos FIIs**, contra **+6,25% do Ibovespa**. Leitura dia a dia em
+[`leituras/`](leituras/) e visão consolidada em
+[`resultados/dashboard_pos_eleicao.html`](resultados/dashboard_pos_eleicao.html).
+
+## Como executar
+
+Requer **Python 3** (testado no 3.12), apenas biblioteca padrão (sem dependências).
+
+```bash
+cp .env.example .env    # e preencha OPENROUTER_API_KEY ou TYPESAFE_API_KEY
+```
+
+```bash
+python dividendos.py            # [--dy-min 5] [--liq-min 2000000] [--limite 80] [--sem-jev] [--sem-b3]
+```
+
+```bash
+python fiis.py                  # [--dy-min 8] [--liq-min 1000000] [--limite 80] [--sem-jev] [--sem-b3]
+```
+
+```bash
+python leituras/2026_10_22/leitura_pos_eleicao.py    # leitura de um pregão (usa o snapshot de 05/10)
+```
+
+```bash
+python painel_pos_eleicao.py    # painel acumulado de todas as leituras
+```
+
+`--sem-jev` roda só a parte determinística (sem chave de API). Os downloads ficam em `cache/` com validade de um
+dia; as páginas baixadas **não** são versionadas, então reproduzir um snapshot antigo (o `--snapshot 2026-10-05` das leituras diárias)
+exige baixar de novo, e os números do Fundamentus podem ter mudado desde então. As respostas do Jev estão
+versionadas, mas só são reaproveitadas se o estado for idêntico.
+
+## Limitações
+
+- **Fontes não oficiais:** Fundamentus e Yahoo Finance são agregadores; os endpoints da B3 não são documentados e
+  já tiveram comportamentos silenciosos (página grande omite registros, nomes com “/” voltam vazios).
+- **JCP bruto:** proventos somam dividendos e JCP pelo valor bruto, como nas fontes.
+- **Payout aproximado:** DY × P/L, sem ajuste para lucros não recorrentes.
+- **Bancos e seguradoras** não têm EBIT; o indicador de alavancagem fica ausente e o pilar é renormalizado.
+- **FFO contábil** do Fundamentus vs. distribuição por caixa nos FIIs (ver regra de decisão).
+- **XFIX11** é uma aproximação do IFIX, que não tem série no Yahoo.
+- **Probabilidade eleitoral** é uma conta simples sobre a média das pesquisas com erro assumido de 3 p.p., não um
+  modelo eleitoral.
+- **O Jev é um modelo:** as classificações são julgamentos probabilísticos sobre dados que podem estar errados, e
+  devem ser lidas junto com o score e a conferência, não isoladamente.
+
+---
+
+Não é recomendação de investimento. Os dados pertencem às respectivas fontes.

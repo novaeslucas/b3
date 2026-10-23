@@ -1,0 +1,541 @@
+{
+  "8abd0d6b5b8f1ea0c4ce680977971daea4662a8c": {
+    "ticker": "ALLD3",
+    "p_governo": 0.07,
+    "p_dolar": 0.08,
+    "juros": 1.59,
+    "juros_confianca": 0.39
+  },
+  "77d3a2d4d6c6f2a6060ee1648508cff63cb5d3c0": {
+    "ticker": "RIAA3",
+    "p_governo": 0.05,
+    "p_dolar": 0.05,
+    "juros": 1.92,
+    "juros_confianca": 0.88
+  },
+  "352e7779139dd3782e42c5ca887fb2c3dea3e805": {
+    "ticker": "JHSF3",
+    "p_governo": 0.11,
+    "p_dolar": 0.06,
+    "juros": 1.98,
+    "juros_confianca": 0.97
+  },
+  "dfd6dd09392c0a083b81352c0afaf1398db1fd3b": {
+    "ticker": "BRSR6",
+    "p_governo": 0.6,
+    "p_dolar": 0.04,
+    "juros": 1.99,
+    "juros_confianca": 0.98
+  },
+  "919418d048427287216234d72c670290527c44f8": {
+    "ticker": "POMO4",
+    "p_governo": 0.12,
+    "p_dolar": 0.25,
+    "juros": 1.62,
+    "juros_confianca": 0.43
+  },
+  "cae798326ef8f7672ee7ada8bdf4517139d0d6ad": {
+    "ticker": "SBFG3",
+    "p_governo": 0.1,
+    "p_dolar": 0.11,
+    "juros": 1.77,
+    "juros_confianca": 0.66
+  },
+  "bd2571b022356b55f3038212f749d2a0091d6714": {
+    "ticker": "PLPL3",
+    "p_governo": 0.15,
+    "p_dolar": 0.06,
+    "juros": 1.97,
+    "juros_confianca": 0.95
+  },
+  "46043432620e6bd483d3bfb9bc578596bf2d1e1b": {
+    "ticker": "VULC3",
+    "p_governo": 0.06,
+    "p_dolar": 0.25,
+    "juros": 1.15,
+    "juros_confianca": 0.74
+  },
+  "0d4148b1b56d60a0d3ad1624b3cb00667baac518": {
+    "ticker": "EVEN3",
+    "p_governo": 0.14,
+    "p_dolar": 0.05,
+    "juros": 1.99,
+    "juros_confianca": 0.99
+  },
+  "f745c35d64b02ef9dc69cec5fe2f1c3e5a7f0322": {
+    "ticker": "MDNE3",
+    "p_governo": 0.13,
+    "p_dolar": 0.06,
+    "juros": 1.95,
+    "juros_confianca": 0.92
+  },
+  "89b931c779cddea095cb6f3362536a2a43e59a16": {
+    "ticker": "PETR4",
+    "p_governo": 0.92,
+    "p_dolar": 0.88,
+    "juros": 0.51,
+    "juros_confianca": 0.24
+  },
+  "c2ae3f56a0460cd5c53b7c3cb7a6563f6453efce": {
+    "ticker": "PINE4",
+    "p_governo": 0.35,
+    "p_dolar": 0.07,
+    "juros": 1.94,
+    "juros_confianca": 0.91
+  },
+  "b97b6311206d246b86171f9cde66264e793fe1c0": {
+    "ticker": "CEAB3",
+    "p_governo": 0.07,
+    "p_dolar": 0.09,
+    "juros": 1.34,
+    "juros_confianca": 0.47
+  },
+  "1eef8f94dd35d757e2b12b068042701120316255": {
+    "ticker": "MTRE3",
+    "p_governo": 0.12,
+    "p_dolar": 0.05,
+    "juros": 2,
+    "juros_confianca": 1
+  },
+  "fb4303a0bc2d265d07324cc2676719af37116ded": {
+    "ticker": "TEND3",
+    "p_governo": 0.11,
+    "p_dolar": 0.04,
+    "juros": 1.98,
+    "juros_confianca": 0.97
+  },
+  "7242890aa1546ca10ea819e6b8226f50506e7f44": {
+    "ticker": "LOGG3",
+    "p_governo": 0.12,
+    "p_dolar": 0.06,
+    "juros": 1.97,
+    "juros_confianca": 0.95
+  },
+  "94508a408adc99e28edd6908ae81939d0595ba17": {
+    "ticker": "CYRE3",
+    "p_governo": 0.12,
+    "p_dolar": 0.05,
+    "juros": 2,
+    "juros_confianca": 1
+  },
+  "8cabbf1fe9bf43849b52964e661d2163b9e05659": {
+    "ticker": "LAVV3",
+    "p_governo": 0.16,
+    "p_dolar": 0.06,
+    "juros": 1.98,
+    "juros_confianca": 0.98
+  },
+  "fa82305b51586aa2954ee0378292a77c5d4d91cb": {
+    "ticker": "GRND3",
+    "p_governo": 0.04,
+    "p_dolar": 0.32,
+    "juros": 0.97,
+    "juros_confianca": 0.66
+  },
+  "1181b521e43ea0e12a0fe853a5e6cde998230f93": {
+    "ticker": "VLID3",
+    "p_governo": 0.19,
+    "p_dolar": 0.13,
+    "juros": 1.06,
+    "juros_confianca": 0.67
+  },
+  "98c44f9172d9fa027afd399581d167f73374c35f": {
+    "ticker": "DIRR3",
+    "p_governo": 0.18,
+    "p_dolar": 0.07,
+    "juros": 1.94,
+    "juros_confianca": 0.91
+  },
+  "fb70e4e933fa6ed573ae67a372c77cc9fc0aaf30": {
+    "ticker": "SHUL4",
+    "p_governo": 0.08,
+    "p_dolar": 0.36,
+    "juros": 0.92,
+    "juros_confianca": 0.59
+  },
+  "a18698741f1f0fcbc762c3ac17181c1cd05e1c8b": {
+    "ticker": "RECV3",
+    "p_governo": 0.5,
+    "p_dolar": 0.62,
+    "juros": 0.7,
+    "juros_confianca": 0.41
+  },
+  "f49105aaa02f493e1a519da8e4f7d07d58f63bde": {
+    "ticker": "WIZC3",
+    "p_governo": 0.16,
+    "p_dolar": 0.06,
+    "juros": 1.68,
+    "juros_confianca": 0.52
+  },
+  "d568e24109e86c0f61559f8b905dabd15e881ed6": {
+    "ticker": "ABCB4",
+    "p_governo": 0.25,
+    "p_dolar": 0.04,
+    "juros": 1.98,
+    "juros_confianca": 0.97
+  },
+  "d66f835c5687e290055c70d20b68f986731219bb": {
+    "ticker": "LEVE3",
+    "p_governo": 0.06,
+    "p_dolar": 0.58,
+    "juros": 1.07,
+    "juros_confianca": 0.65
+  },
+  "61259717bc976f12c5a6ac257fec2f86602fc289": {
+    "ticker": "SANB11",
+    "p_governo": 0.16,
+    "p_dolar": 0.1,
+    "juros": 1.98,
+    "juros_confianca": 0.97
+  },
+  "9e5a9a3f5c105643217e13a475b6c85c2e7acbd4": {
+    "ticker": "BMGB4",
+    "p_governo": 0.14,
+    "p_dolar": 0.04,
+    "juros": 1.99,
+    "juros_confianca": 0.98
+  },
+  "69123b270a58f4c2c8f2c4ecb1505ffcd0bb0e0e": {
+    "ticker": "SEER3",
+    "p_governo": 0.12,
+    "p_dolar": 0.06,
+    "juros": 1.31,
+    "juros_confianca": 0.53
+  },
+  "97a95b5348dcf7ab32c5602e5d1e0b7141e089f5": {
+    "ticker": "ISAE4",
+    "p_governo": 0.58,
+    "p_dolar": 0.09,
+    "juros": 1.93,
+    "juros_confianca": 0.89
+  },
+  "b6ec987a6a8ee0f2d5548882c72d9a06474aae42": {
+    "ticker": "CMIG4",
+    "p_governo": 0.87,
+    "p_dolar": 0.07,
+    "juros": 1.92,
+    "juros_confianca": 0.87
+  },
+  "bea6ab004cf56cc5b4e857a1a449f19bb0c0b3fa": {
+    "ticker": "EZTC3",
+    "p_governo": 0.14,
+    "p_dolar": 0.06,
+    "juros": 1.92,
+    "juros_confianca": 0.88
+  },
+  "b20b52c9715ff3baeb08243f1339586b65cafd4e": {
+    "ticker": "CURY3",
+    "p_governo": 0.13,
+    "p_dolar": 0.07,
+    "juros": 1.96,
+    "juros_confianca": 0.93
+  },
+  "9af75e117ed5764e81f780830b7acb424e4291af": {
+    "ticker": "LREN3",
+    "p_governo": 0.05,
+    "p_dolar": 0.05,
+    "juros": 1.79,
+    "juros_confianca": 0.69
+  },
+  "140b9ea34e3ae224ee9b23841107e3853dfb25a0": {
+    "ticker": "PGMN3",
+    "p_governo": 0.13,
+    "p_dolar": 0.08,
+    "juros": 1.39,
+    "juros_confianca": 0.41
+  },
+  "2c052bdd15fb55dc073461fa0e881fb6f06cc666": {
+    "ticker": "BBDC4",
+    "p_governo": 0.19,
+    "p_dolar": 0.06,
+    "juros": 1.99,
+    "juros_confianca": 0.98
+  },
+  "0697ee89dab88353b4efa9d983815c66c5f79fb0": {
+    "ticker": "MILS3",
+    "p_governo": 0.1,
+    "p_dolar": 0.1,
+    "juros": 1.85,
+    "juros_confianca": 0.78
+  },
+  "704603e0e8af50c4c8a07f627c0934e87d8c726e": {
+    "ticker": "BEEF3",
+    "p_governo": 0.08,
+    "p_dolar": 0.69,
+    "juros": 1.72,
+    "juros_confianca": 0.58
+  },
+  "1366dfb04f782a3e2be6abbb1bf6c892f3067a63": {
+    "ticker": "BBSE3",
+    "p_governo": 0.6,
+    "p_dolar": 0.06,
+    "juros": 1.62,
+    "juros_confianca": 0.44
+  },
+  "4af5631b5910de6d7a94b73c0557dd4bb101a076": {
+    "ticker": "PSSA3",
+    "p_governo": 0.16,
+    "p_dolar": 0.05,
+    "juros": 1.71,
+    "juros_confianca": 0.56
+  },
+  "4eba4b31389d7b02461e99f0da763ff6a524f439": {
+    "ticker": "INTB3",
+    "p_governo": 0.12,
+    "p_dolar": 0.26,
+    "juros": 0.87,
+    "juros_confianca": 0.69
+  },
+  "5f8a28351ba1b0aa20f2d3a8e6e250127f7b3a66": {
+    "ticker": "MDIA3",
+    "p_governo": 0.08,
+    "p_dolar": 0.2,
+    "juros": 0.96,
+    "juros_confianca": 0.79
+  },
+  "b9d5e6806a878509d15caf22f310757d2b6559e5": {
+    "ticker": "VBBR3",
+    "p_governo": 0.36,
+    "p_dolar": 0.51,
+    "juros": 0.97,
+    "juros_confianca": 0.58
+  },
+  "232a4253b9e7d0749bca97916987c5f8619fa1b6": {
+    "ticker": "ITSA4",
+    "p_governo": 0.16,
+    "p_dolar": 0.07,
+    "juros": 1.96,
+    "juros_confianca": 0.93
+  },
+  "91e33325d9ba47317daef665d3e70fe953f5d954": {
+    "ticker": "TAEE11",
+    "p_governo": 0.69,
+    "p_dolar": 0.07,
+    "juros": 1.97,
+    "juros_confianca": 0.95
+  },
+  "058ddabd856bcd50b80961f7aea598a9731ce046": {
+    "ticker": "MOTV3",
+    "p_governo": 0.66,
+    "p_dolar": 0.06,
+    "juros": 1.94,
+    "juros_confianca": 0.91
+  },
+  "359a999ceaae27f8465ffbe00f84d29bd2dae3a5": {
+    "ticker": "CPFE3",
+    "p_governo": 0.7,
+    "p_dolar": 0.06,
+    "juros": 1.95,
+    "juros_confianca": 0.93
+  },
+  "23a0485245efc59adf772fbb38c8e1901703fb04": {
+    "ticker": "FIQE3",
+    "p_governo": 0.3,
+    "p_dolar": 0.08,
+    "juros": 1.37,
+    "juros_confianca": 0.44
+  },
+  "63df06820aa9ee9cfe21ae5eb26ba310bb80daa6": {
+    "ticker": "BRBI11",
+    "p_governo": 0.19,
+    "p_dolar": 0.06,
+    "juros": 1.84,
+    "juros_confianca": 0.77
+  },
+  "25a10e059cab5a43f9f2350c0c204a10bdca5958": {
+    "ticker": "TGMA3",
+    "p_governo": 0.21,
+    "p_dolar": 0.09,
+    "juros": 1.03,
+    "juros_confianca": 0.79
+  },
+  "e2f48f8f75e10e9313fc374689ffcffb401fa9e7": {
+    "ticker": "ITUB4",
+    "p_governo": 0.14,
+    "p_dolar": 0.06,
+    "juros": 1.98,
+    "juros_confianca": 0.96
+  },
+  "4d758101746c6d5aae0d196918f51a81fb03a178": {
+    "ticker": "MOVI3",
+    "p_governo": 0.09,
+    "p_dolar": 0.06,
+    "juros": 1.99,
+    "juros_confianca": 0.99
+  },
+  "f780e2fd76d48fc8504cf303a5155f1b17f0cc58": {
+    "ticker": "BLAU3",
+    "p_governo": 0.12,
+    "p_dolar": 0.06,
+    "juros": 1.27,
+    "juros_confianca": 0.55
+  },
+  "f1288fd795e196f9c8c815a2fae5c19c73f98ece": {
+    "ticker": "CMIN3",
+    "p_governo": 0.15,
+    "p_dolar": 0.85,
+    "juros": 0.09,
+    "juros_confianca": 0.87
+  },
+  "c75ab66d9f8d678a5d3a9370424e38d25c82cced": {
+    "ticker": "AZZA3",
+    "p_governo": 0.07,
+    "p_dolar": 0.14,
+    "juros": 1.59,
+    "juros_confianca": 0.39
+  },
+  "42fa1bd27cc3013a4dc1e6136465fe0f9e7fc78c": {
+    "ticker": "UGPA3",
+    "p_governo": 0.28,
+    "p_dolar": 0.36,
+    "juros": 0.99,
+    "juros_confianca": 0.69
+  },
+  "3a7fcebe8564fad60d8eddbb5390008cf94ae4af": {
+    "ticker": "CXSE3",
+    "p_governo": 0.84,
+    "p_dolar": 0.06,
+    "juros": 1.77,
+    "juros_confianca": 0.66
+  },
+  "d965bba8b2515532d6de458f4b3ab243846873a0": {
+    "ticker": "RENT3",
+    "p_governo": 0.08,
+    "p_dolar": 0.06,
+    "juros": 1.98,
+    "juros_confianca": 0.98
+  },
+  "8234abac4c322f14aa61b27a619db6fa4ab91402": {
+    "ticker": "FESA4",
+    "p_governo": 0.21,
+    "p_dolar": 0.69,
+    "juros": 0.38,
+    "juros_confianca": 0.43
+  },
+  "a36e66c8e7f36aaf739e48bd8b87bcd3bbfac6ab": {
+    "ticker": "BRAP4",
+    "p_governo": 0.16,
+    "p_dolar": 0.72,
+    "juros": 0.09,
+    "juros_confianca": 0.87
+  },
+  "959990e4166c272b76f302250b557873cc9de91e": {
+    "ticker": "RANI3",
+    "p_governo": 0.09,
+    "p_dolar": 0.8,
+    "juros": 1.05,
+    "juros_confianca": 0.41
+  },
+  "8ddf5b9f2413ddb9dedb5f2f61a3b99c7fdf9911": {
+    "ticker": "VIVT3",
+    "p_governo": 0.5,
+    "p_dolar": 0.07,
+    "juros": 1.31,
+    "juros_confianca": 0.53
+  },
+  "fa102f15231d404757e675e99fe08fc144e4a3dc": {
+    "ticker": "ALPA4",
+    "p_governo": 0.05,
+    "p_dolar": 0.19,
+    "juros": 1.11,
+    "juros_confianca": 0.81
+  },
+  "87f7d52921bb3ad7b8edda15970171a8fad89331": {
+    "ticker": "PASS3",
+    "p_governo": 0.48,
+    "p_dolar": 0.11,
+    "juros": 1.88,
+    "juros_confianca": 0.82
+  },
+  "fbc78ffb00ba35519a0c7284eb32e8136c0b01ac": {
+    "ticker": "ABEV3",
+    "p_governo": 0.07,
+    "p_dolar": 0.18,
+    "juros": 0.87,
+    "juros_confianca": 0.77
+  },
+  "654eef9018df81196bc2e5bcb5fca3e9cb34a11d": {
+    "ticker": "BMOB3",
+    "p_governo": 0.08,
+    "p_dolar": 0.15,
+    "juros": 0.73,
+    "juros_confianca": 0.54
+  },
+  "08f297f44f1e521bebaf1fffc7e11ea8db671485": {
+    "ticker": "CPLE3",
+    "p_governo": 0.9,
+    "p_dolar": 0.07,
+    "juros": 1.96,
+    "juros_confianca": 0.94
+  },
+  "3caf265b954cc14778cc6f753b5b6c1c327230bf": {
+    "ticker": "SMFT3",
+    "p_governo": 0.05,
+    "p_dolar": 0.07,
+    "juros": 1.51,
+    "juros_confianca": 0.26
+  },
+  "42f04665d3f758897dffe87b45878810d8ddb4f4": {
+    "ticker": "ALOS3",
+    "p_governo": 0.12,
+    "p_dolar": 0.07,
+    "juros": 1.47,
+    "juros_confianca": 0.21
+  },
+  "b300e18ee22a27ffec8c958309551ab85097b82b": {
+    "ticker": "CAML3",
+    "p_governo": 0.08,
+    "p_dolar": 0.3,
+    "juros": 1.74,
+    "juros_confianca": 0.61
+  },
+  "69e82b20fa0615392d966918748d619d8cb7c191": {
+    "ticker": "RDOR3",
+    "p_governo": 0.13,
+    "p_dolar": 0.05,
+    "juros": 1.2,
+    "juros_confianca": 0.7
+  },
+  "dab1675dc8d9bfc43b7a931a555fb1db3898a3e5": {
+    "ticker": "UNIP6",
+    "p_governo": 0.09,
+    "p_dolar": 0.62,
+    "juros": 1.18,
+    "juros_confianca": 0.42
+  },
+  "bb651fbfdfc28f744020dbdecaa070a89c2eb101": {
+    "ticker": "ARML3",
+    "p_governo": 0.1,
+    "p_dolar": 0.08,
+    "juros": 1.97,
+    "juros_confianca": 0.96
+  },
+  "a42cdef89af44479669b97d7fc72025426425fe9": {
+    "ticker": "YDUQ3",
+    "p_governo": 0.13,
+    "p_dolar": 0.04,
+    "juros": 1.78,
+    "juros_confianca": 0.68
+  },
+  "238c9be0120a471ecbd08ffea46dd78fe5f3eb18": {
+    "ticker": "VALE3",
+    "p_governo": 0.14,
+    "p_dolar": 0.95,
+    "juros": 0.17,
+    "juros_confianca": 0.75
+  },
+  "8f2443f00643e62bc716ede66617c6149e9fbe7a": {
+    "ticker": "KLBN11",
+    "p_governo": 0.08,
+    "p_dolar": 0.8,
+    "juros": 1.52,
+    "juros_confianca": 0.28
+  },
+  "7d87b247060aedd087954ae1071e947fee1f6eb0": {
+    "ticker": "TIMS3",
+    "p_governo": 0.28,
+    "p_dolar": 0.08,
+    "juros": 1.23,
+    "juros_confianca": 0.45
+  }
+}

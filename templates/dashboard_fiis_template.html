@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qualidade de Rendimentos FIIs</title>
+<style>
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --surface-2: #f0f2f5; --border: #dfe3e8;
+  --text: #1a1f26; --muted: #5d6773; --faint: #8a939e;
+  --accent: #2f5fd0;
+  --estudar: #1f8a5b; --monitorar: #b7791f; --descartar: #c2413b; --neutro: #8a939e;
+  --estudar-bg: #e3f4ec; --monitorar-bg: #fbf0dc; --descartar-bg: #fbe5e3;
+  --fund: #2f5fd0; --b3: #e08a2e;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1216; --surface: #171b21; --surface-2: #1f242c; --border: #2b323c;
+    --text: #e7ebf0; --muted: #9aa5b1; --faint: #6b7682;
+    --accent: #7aa2ff;
+    --estudar: #4cc38a; --monitorar: #e0a84a; --descartar: #ef6b64; --neutro: #6b7682;
+    --estudar-bg: #16302a; --monitorar-bg: #33280f; --descartar-bg: #3a1c1b;
+    --fund: #7aa2ff; --b3: #f0a65a;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1216; --surface: #171b21; --surface-2: #1f242c; --border: #2b323c;
+  --text: #e7ebf0; --muted: #9aa5b1; --faint: #6b7682;
+  --accent: #7aa2ff;
+  --estudar: #4cc38a; --monitorar: #e0a84a; --descartar: #ef6b64; --neutro: #6b7682;
+  --estudar-bg: #16302a; --monitorar-bg: #33280f; --descartar-bg: #3a1c1b;
+  --fund: #7aa2ff; --b3: #f0a65a;
+  --shadow: none;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.wrap { max-width: 1280px; margin: 0 auto; padding: 24px 16px 48px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; }
+h2 { font-size: 15px; margin: 0 0 12px; }
+.sub { color: var(--muted); font-size: 13px; }
+.theme { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 4px 10px; cursor: pointer; font: inherit; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+.kpi { cursor: pointer; transition: border-color .15s; }
+.kpi:hover, .kpi.on { border-color: var(--accent); }
+.kpi .v { font-size: 26px; font-weight: 650; }
+.kpi .l { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 16px 0 8px; }
+.filters input, .filters select {
+  background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; font: inherit; min-width: 0;
+}
+.filters input { flex: 1 1 200px; }
+.filters label { color: var(--muted); font-size: 13px; display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.filters label input { flex: none; }
+.tablebox { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 980px; }
+th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; cursor: pointer; user-select: none; position: sticky; top: 0; background: var(--surface-2); }
+th:hover { color: var(--text); }
+th.l, td.l { text-align: left; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--surface-2); }
+tbody tr.sel { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
+td.tk { font-weight: 650; }
+.setor { color: var(--muted); max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.b-estudar { color: var(--estudar); background: var(--estudar-bg); }
+.b-monitorar { color: var(--monitorar); background: var(--monitorar-bg); }
+.b-descartar { color: var(--descartar); background: var(--descartar-bg); }
+.b-neutro { color: var(--muted); background: var(--surface-2); }
+.bar { position: relative; height: 6px; width: 64px; background: var(--surface-2); border-radius: 3px; display: inline-block; vertical-align: middle; margin-left: 8px; }
+.bar > i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--accent); }
+.warn { color: var(--descartar); }
+.ok { color: var(--estudar); }
+.muted { color: var(--muted); }
+svg text { fill: var(--muted); font-size: 11px; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+.detail-empty { color: var(--muted); display: grid; place-items: center; min-height: 260px; text-align: center; }
+.dhead { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.dhead .t { font-size: 20px; font-weight: 700; }
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px 12px; margin: 12px 0; }
+.facts div { font-size: 12px; color: var(--muted); }
+.facts b { display: block; color: var(--text); font-size: 14px; font-weight: 600; }
+.rows { display: grid; gap: 6px; margin-bottom: 14px; }
+.row { display: grid; grid-template-columns: 130px 1fr 44px; gap: 8px; align-items: center; font-size: 12px; }
+.row .track { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.row .track i { display: block; height: 100%; background: var(--c, var(--accent)); border-radius: 4px; }
+.row .n { text-align: right; color: var(--text); }
+.sec { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 14px 0 8px; }
+.note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+footer { color: var(--faint); font-size: 12px; margin-top: 20px; }
+.mbar rect:hover { opacity: .8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Qualidade de Rendimentos — FIIs</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <button class="theme" id="theme" type="button">Tema</button>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Score × Dividend Yield</h2>
+      <div id="scatter"></div>
+      <div class="legend">
+        <span style="--c: var(--estudar)">estudar</span>
+        <span style="--c: var(--monitorar)">monitorar</span>
+        <span style="--c: var(--descartar)">descartar</span>
+        <span class="muted">· clique em um ponto para detalhar · DY acima de 20% aparece na borda</span>
+      </div>
+    </div>
+    <div class="card" id="detail"><div class="detail-empty">Selecione um fundo no gráfico ou na tabela.</div></div>
+  </div>
+
+  <div class="filters">
+    <input id="q" type="search" placeholder="Buscar ticker, nome ou segmento">
+    <select id="fTipo"><option value="">Todos os tipos (Jev)</option></select>
+    <select id="fClasse">
+      <option value="">Jev: todas as classes</option>
+      <option value="RENDIMENTO_SUSTENTAVEL">Sustentável</option>
+      <option value="RENDIMENTO_ATENCAO">Atenção</option>
+      <option value="RENDIMENTO_FRAGIL">Frágil</option>
+    </select>
+    <select id="fSeg"><option value="">Todos os segmentos</option></select>
+    <label><input type="checkbox" id="fDiv"> só divergências com a B3</label>
+  </div>
+
+  <div class="tablebox">
+    <table>
+      <thead><tr id="thead"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <footer>
+    Score determinístico (0–100) calculado em Python; classe, tipo do fundo e P(extraordinário) são julgamentos do Jev (TypeSafe).
+    Decisão: <b>estudar</b> = Jev sustentável, score ≥ 60 e P(extra) &lt; 0,5; <b>descartar</b> = frágil (P(extra) alto sozinho só impede “estudar”, pois Dist./FFO um pouco acima de 100% é comum em FIIs).
+    Fontes: Fundamentus (indicadores e rendimentos) e B3 (conferência dos rendimentos dos últimos 12 meses). Não é recomendação de investimento.
+  </footer>
+</div>
+
+<script>
+const DADOS = /*__DADOS__*/null;
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const pct = (v, d = 1) => v == null ? "–" : (100 * v).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }) + "%";
+const n2 = (v, d = 2) => v == null ? "–" : v.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const brl = v => v == null ? "–" : "R$ " + n2(v, 2);
+const mi = v => v == null ? "–" : v >= 1e9 ? "R$ " + n2(v / 1e9, 2) + " bi" : "R$ " + n2(v / 1e6, 0) + " mi";
+const CLASSE = { RENDIMENTO_SUSTENTAVEL: "Sustentável", RENDIMENTO_ATENCAO: "Atenção", RENDIMENTO_FRAGIL: "Frágil" };
+const CLASSE_COR = { RENDIMENTO_SUSTENTAVEL: "estudar", RENDIMENTO_ATENCAO: "monitorar", RENDIMENTO_FRAGIL: "descartar" };
+const TIPO = { tijolo: "Tijolo", papel: "Papel", fundo_de_fundos: "Fundo de fundos", hibrido: "Híbrido", desenvolvimento: "Desenvolvimento", outro: "Outro" };
+const PILAR = { sustentabilidade: "Sustentabilidade", regularidade: "Regularidade", crescimento: "Crescimento", portfolio: "Portfólio", valuation: "Valuation" };
+const divB3 = e => /^(diverge|erro)/.test(e.conferencia_b3 || "");
+const tijolo = e => (e.qtd_imoveis || 0) > 0;
+
+const root = document.documentElement;
+try { const t = localStorage.getItem("tema"); if (t) root.dataset.theme = t; } catch (_) {}
+$("#theme").onclick = () => {
+  const escuro = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = escuro ? "light" : "dark";
+  try { localStorage.setItem("tema", root.dataset.theme); } catch (_) {}
+};
+
+const estado = { decisao: "", sort: "score", dir: -1, sel: null };
+const fundos = DADOS.fundos;
+$("#sub").textContent = `${fundos.length} FIIs · gerado em ${DADOS.gerado_em} · histórico ${DADOS.anos[0]}–${DADOS.anos.at(-1)}`;
+
+for (const s of [...new Set(fundos.map(e => e.segmento).filter(Boolean))].sort())
+  $("#fSeg").insertAdjacentHTML("beforeend", `<option>${esc(s)}</option>`);
+for (const t of Object.keys(TIPO).filter(t => fundos.some(e => e.jev?.tipo === t)))
+  $("#fTipo").insertAdjacentHTML("beforeend", `<option value="${t}">${TIPO[t]}</option>`);
+
+function kpis() {
+  const c = d => fundos.filter(e => e.decisao === d).length;
+  const items = [
+    ["", "FIIs", fundos.length],
+    ["estudar", "Estudar", c("estudar")],
+    ["monitorar", "Monitorar", c("monitorar")],
+    ["descartar", "Descartar", c("descartar")],
+    ["b3", "Divergem da B3", fundos.filter(divB3).length],
+  ];
+  $("#kpis").innerHTML = items.map(([k, l, v]) => `
+    <div class="card kpi ${estado.decisao === k ? "on" : ""}" data-k="${k}">
+      <div class="l">${l}</div><div class="v" style="${k && k !== "b3" ? `color: var(--${k})` : ""}">${v}</div>
+    </div>`).join("");
+  document.querySelectorAll(".kpi").forEach(el => el.onclick = () => {
+    const k = el.dataset.k;
+    if (k === "b3") { $("#fDiv").checked = !$("#fDiv").checked; estado.decisao = ""; }
+    else estado.decisao = estado.decisao === k ? "" : k;
+    render();
+  });
+}
+
+function filtradas() {
+  const q = $("#q").value.trim().toLowerCase(), cl = $("#fClasse").value, tp = $("#fTipo").value,
+    sg = $("#fSeg").value, dv = $("#fDiv").checked;
+  return fundos.filter(e =>
+    (!estado.decisao || e.decisao === estado.decisao) &&
+    (!cl || e.jev?.classe === cl) && (!tp || e.jev?.tipo === tp) && (!sg || e.segmento === sg) && (!dv || divB3(e)) &&
+    (!q || [e.ticker, e.nome, e.segmento].join(" ").toLowerCase().includes(q)));
+}
+
+const COLS = [
+  ["ticker", "Ticker", "l", e => e.ticker],
+  ["segmento", "Segmento", "l", e => e.segmento || ""],
+  ["tipo", "Tipo (Jev)", "l", e => TIPO[e.jev?.tipo] || ""],
+  ["dy", "DY", "", e => e.dy],
+  ["pvp", "P/VP", "", e => e.pvp],
+  ["dist_ffo", "Dist./FFO", "", e => e.dist_ffo],
+  ["vacancia", "Vacância", "", e => tijolo(e) ? e.vacancia : null],
+  ["meses", "Meses", "", e => e.meses_pagos_12],
+  ["tend", "6m/6m", "", e => e.tendencia_6m],
+  ["score", "Score", "", e => e.score],
+  ["classe", "Jev", "l", e => ["RENDIMENTO_SUSTENTAVEL", "RENDIMENTO_ATENCAO", "RENDIMENTO_FRAGIL"].indexOf(e.jev?.classe)],
+  ["extra", "P(extra)", "", e => e.jev?.p_extraordinario],
+  ["b3", "B3", "l", e => e.conferencia_b3 || ""],
+  ["decisao", "Decisão", "l", e => ["estudar", "monitorar", "descartar"].indexOf(e.decisao)],
+];
+
+function b3Cell(e) {
+  const s = e.conferencia_b3;
+  if (!s) return `<span class="muted">–</span>`;
+  if (s.startsWith("confere")) return `<span class="ok">✓ ${esc(s)}</span>`;
+  if (divB3(e)) return `<span class="warn">⚠ ${esc(s)}</span>`;
+  return `<span class="muted">${esc(s)}</span>`;
+}
+
+function tabela(lista) {
+  $("#thead").innerHTML = COLS.map(([k, l, cls]) =>
+    `<th class="${cls}" data-k="${k}">${l}${estado.sort === k ? (estado.dir < 0 ? " ↓" : " ↑") : ""}</th>`).join("");
+  document.querySelectorAll("#thead th").forEach(th => th.onclick = () => {
+    const k = th.dataset.k;
+    estado.dir = estado.sort === k ? -estado.dir : (["ticker", "segmento", "tipo"].includes(k) ? 1 : -1);
+    estado.sort = k; render();
+  });
+  const get = COLS.find(c => c[0] === estado.sort)[3];
+  lista = [...lista].sort((a, b) => {
+    const x = get(a), y = get(b);
+    if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * estado.dir;
+  });
+  $("#tbody").innerHTML = lista.map(e => {
+    const j = e.jev || {};
+    return `<tr data-t="${esc(e.ticker)}" class="${estado.sel === e.ticker ? "sel" : ""}">
+      <td class="l tk">${esc(e.ticker)}</td>
+      <td class="l setor" title="${esc(e.segmento)}">${esc(e.segmento)}</td>
+      <td class="l">${esc(TIPO[j.tipo] || "–")}</td>
+      <td>${pct(e.dy)}</td>
+      <td>${n2(e.pvp)}</td>
+      <td class="${e.dist_ffo > 1.05 ? "warn" : ""}">${pct(e.dist_ffo, 0)}</td>
+      <td class="${tijolo(e) && e.vacancia > .15 ? "warn" : ""}">${tijolo(e) ? pct(e.vacancia) : "–"}</td>
+      <td class="${e.meses_pagos_12 < 12 ? "warn" : ""}">${e.meses_pagos_12}/12</td>
+      <td class="${e.tendencia_6m != null && e.tendencia_6m < .9 ? "warn" : ""}">${e.tendencia_6m == null ? "–" : n2(e.tendencia_6m)}</td>
+      <td>${n2(e.score, 1)}<span class="bar"><i style="width:${e.score}%"></i></span></td>
+      <td class="l">${j.classe ? `<span class="badge b-${CLASSE_COR[j.classe]}">${CLASSE[j.classe]}</span> <span class="muted">${n2(j.confianca)}</span>` : "–"}</td>
+      <td class="${j.p_extraordinario >= .7 ? "warn" : ""}">${j.p_extraordinario == null ? "–" : n2(j.p_extraordinario)}</td>
+      <td class="l">${b3Cell(e)}</td>
+      <td class="l"><span class="badge b-${e.decisao === "-" ? "neutro" : e.decisao}">${esc(e.decisao)}</span></td>
+    </tr>`;
+  }).join("") || `<tr><td class="l muted" colspan="${COLS.length}">Nenhum fundo com esses filtros.</td></tr>`;
+  document.querySelectorAll("#tbody tr[data-t]").forEach(tr => tr.onclick = () => selecionar(tr.dataset.t));
+}
+
+function scatter(lista) {
+  const W = 640, H = 330, m = { l: 40, r: 14, t: 10, b: 34 }, xmax = .20;
+  const x = v => m.l + Math.min(v, xmax) / xmax * (W - m.l - m.r);
+  const y = v => H - m.b - v / 100 * (H - m.t - m.b);
+  const vis = new Set(lista.map(e => e.ticker));
+  let g = "";
+  for (let s = 0; s <= 100; s += 20) g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(s)}" y2="${y(s)}" stroke="var(--border)"/><text x="${m.l - 8}" y="${y(s) + 4}" text-anchor="end">${s}</text>`;
+  for (let d = 0; d <= xmax + 1e-9; d += .04) g += `<text x="${x(d)}" y="${H - m.b + 18}" text-anchor="middle">${Math.round(d * 100)}%</text>`;
+  g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(60)}" y2="${y(60)}" stroke="var(--estudar)" stroke-dasharray="4 4" opacity=".6"/>`;
+  g += `<text x="${W - m.r}" y="${y(60) - 5}" text-anchor="end">score 60</text>`;
+  g += `<text x="${(W + m.l) / 2}" y="${H - 2}" text-anchor="middle">Dividend yield (12 meses)</text>`;
+  const pts = [...fundos].sort((a, b) => (a.ticker === estado.sel) - (b.ticker === estado.sel)).map(e => {
+    const cor = `var(--${e.decisao === "-" ? "neutro" : e.decisao})`, sel = e.ticker === estado.sel;
+    return `<circle cx="${x(e.dy)}" cy="${y(e.score)}" r="${sel ? 7.5 : 5}" fill="${cor}" fill-opacity="${vis.has(e.ticker) ? .85 : .12}"
+      stroke="${sel ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2 : 1}" data-t="${esc(e.ticker)}" style="cursor:pointer">
+      <title>${esc(e.ticker)} · DY ${pct(e.dy)} · score ${n2(e.score, 1)} · ${esc(e.decisao)}</title></circle>` +
+      (sel ? `<text x="${x(e.dy) + 10}" y="${y(e.score) - 8}" style="fill: var(--text); font-weight: 600">${esc(e.ticker)}</text>` : "");
+  }).join("");
+  $("#scatter").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Score versus dividend yield">${g}${pts}</svg>`;
+  document.querySelectorAll("#scatter circle").forEach(c => c.onclick = () => selecionar(c.dataset.t));
+}
+
+function barras(rows, max, fmt) {
+  return `<div class="rows">${rows.map(([l, v, cor]) => `
+    <div class="row"><span>${l}</span><span class="track"><i style="width:${v == null ? 0 : Math.max(0, Math.min(100, v / max * 100))}%; --c:${cor || "var(--accent)"}"></i></span><span class="n">${fmt(v)}</span></div>`).join("")}</div>`;
+}
+
+function colunas(labels, vals, cor, fmtTip, rotulo) {
+  const W = 420, H = 140, m = { l: 40, r: 8, t: 8, b: 22 };
+  const max = Math.max(...vals, 0.01);
+  const bw = (W - m.l - m.r) / vals.length, w = Math.max(2, bw * .7);
+  const y = v => H - m.b - v / max * (H - m.t - m.b);
+  let s = `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--border)"/>`;
+  s += `<text x="${m.l - 6}" y="${y(max) + 4}" text-anchor="end">${n2(max)}</text><text x="${m.l - 6}" y="${H - m.b}" text-anchor="end">0</text>`;
+  vals.forEach((v, i) => {
+    const cx = m.l + bw * i + bw / 2;
+    s += `<rect x="${cx - w / 2}" y="${y(v)}" width="${w}" height="${H - m.b - y(v)}" rx="1.5" fill="${cor}"><title>${fmtTip(labels[i], v)}</title></rect>`;
+    const lab = rotulo(labels[i], i);
+    if (lab) s += `<text x="${cx}" y="${H - 6}" text-anchor="middle">${lab}</text>`;
+  });
+  return `<svg class="mbar" viewBox="0 0 ${W} ${H}" width="100%" role="img">${s}</svg>`;
+}
+
+function detalhe() {
+  const e = fundos.find(x => x.ticker === estado.sel);
+  if (!e) return;
+  const j = e.jev || {}, probs = j.probabilidades || {};
+  const fund12 = e.mensal.slice(-12).reduce((a, b) => a + b, 0);
+  $("#detail").innerHTML = `
+    <div class="dhead">
+      <div><div class="t">${esc(e.ticker)}</div><div class="sub">${esc(e.nome || "")}</div>
+        <div class="sub">${esc(e.segmento || "")}${e.gestao ? " · gestão " + esc(e.gestao.toLowerCase()) : ""}${j.tipo ? " · " + esc(TIPO[j.tipo]) : ""}</div></div>
+      <span class="badge b-${e.decisao === "-" ? "neutro" : e.decisao}">${esc(e.decisao)}</span>
+    </div>
+    <div class="facts">
+      <div>Cota<b>${brl(e.cotacao)}</b></div><div>DY 12m<b>${pct(e.dy)}</b></div>
+      <div>FFO yield<b>${pct(e.ffo_yield)}</b></div><div>P/VP<b>${n2(e.pvp)}</b></div>
+      <div>Dist./FFO<b class="${e.dist_ffo > 1.05 ? "warn" : ""}">${pct(e.dist_ffo, 0)}</b></div>
+      <div>Valor de mercado<b>${mi(e.valor_mercado)}</b></div>
+      ${tijolo(e) ? `<div>Imóveis<b>${e.qtd_imoveis}</b></div><div>Vacância<b>${pct(e.vacancia)}</b></div><div>Cap rate<b>${pct(e.cap_rate)}</b></div>` : ""}
+      <div>Oscilação 12m<b>${pct(e.oscil_12m)}</b></div>
+    </div>
+    <div class="sec">Score ${n2(e.score, 1)} — pilares</div>
+    ${barras(Object.keys(PILAR).map(k => [`${PILAR[k]} <span class="muted">${Math.round(DADOS.pesos[k] * 100)}%</span>`, e.pilares[k]]), 100, v => v == null ? "–" : v)}
+    <div class="sec">Jev</div>
+    ${j.classe ? barras([
+      ["Sustentável", probs.RENDIMENTO_SUSTENTAVEL, "var(--estudar)"],
+      ["Atenção", probs.RENDIMENTO_ATENCAO, "var(--monitorar)"],
+      ["Frágil", probs.RENDIMENTO_FRAGIL, "var(--descartar)"],
+      ["DY inflado (extra)", j.p_extraordinario, "var(--neutro)"],
+    ], 1, v => v == null ? "–" : n2(v)) + `<div class="note">Tipo: <b>${esc(TIPO[j.tipo] || "–")}</b> (confiança ${n2(j.tipo_confianca)})</div>`
+      : `<div class="muted">Sem classificação do Jev nesta execução.</div>`}
+    <div class="sec">Rendimento por cota — últimos 24 meses (R$, por data-com)</div>
+    ${colunas(DADOS.meses, e.mensal, "var(--fund)", (l, v) => `${l}: R$ ${n2(v, 4)}`, (l, i) => i % 6 === 0 ? l.slice(5) + "/" + l.slice(2, 4) : "")}
+    <div class="sec">Por ano</div>
+    ${colunas(DADOS.anos, e.anual, "var(--fund)", (l, v) => `${l}: R$ ${n2(v, 4)}`, l => l)}
+    <div class="note">Últimos 12 meses: Fundamentus R$ ${n2(fund12, 4)}${e.b3_12m != null ? ` · B3 R$ ${n2(e.b3_12m, 4)}` : ""}${e.amortizacoes_12m ? ` · ${e.amortizacoes_12m} amortização(ões) não incluída(s)` : ""}</div>
+    <div class="note">Conferência com a B3: ${b3Cell(e)}</div>`;
+}
+
+function selecionar(t) { estado.sel = t; render(); }
+
+function render() {
+  const lista = filtradas();
+  kpis(); tabela(lista); scatter(lista); detalhe();
+}
+
+["#q", "#fClasse", "#fTipo", "#fSeg", "#fDiv"].forEach(s => $(s).addEventListener("input", render));
+const melhor = [...fundos].filter(e => e.decisao === "estudar").sort((a, b) => b.score - a.score)[0];
+estado.sel = (melhor || [...fundos].sort((a, b) => b.score - a.score)[0])?.ticker ?? null;
+render();
+</script>
+</body>
+</html>

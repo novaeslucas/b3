@@ -1,0 +1,13 @@
+# Segredos
+.env
+
+# Downloads do Fundamentus, B3 e Yahoo (refeitos a cada execução)
+cache/*
+# ...exceto as respostas do Jev usadas nas análises
+!cache/jev*.json
+
+__pycache__/
+*.pyc
+.venv/
+.vscode/
+.idea/

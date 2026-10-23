@@ -1,0 +1,1900 @@
+{
+  "95460cfc71a8a7ff1e01f202ed38e9b10d679de8": {
+    "ticker": "TRXF11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.96,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.98,
+      "RENDIMENTO_ATENCAO": 0.02
+    },
+    "p_extraordinario": 0.95,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.89
+  },
+  "24280177554c80ff72fe83d05879a2c79a899dc8": {
+    "ticker": "MXRF11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.83,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.89,
+      "RENDIMENTO_FRAGIL": 0.11,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.8,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.9
+  },
+  "30c3f0be9750913e2632ecdfbddb704e6db85eff": {
+    "ticker": "KNCR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.96,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.02,
+      "RENDIMENTO_ATENCAO": 0.98,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.72,
+    "tipo": "papel",
+    "tipo_confianca": 0.59
+  },
+  "4b393d8e538b64b8b39b5a0c39c327715eb27206": {
+    "ticker": "HGLG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.89,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.07,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.93
+    },
+    "p_extraordinario": 0.45,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.96
+  },
+  "3a2bb8d93526aad3ff46c1e12a6279f7e632c40c": {
+    "ticker": "XPML11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.96,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.97,
+      "RENDIMENTO_FRAGIL": 0.01,
+      "RENDIMENTO_SUSTENTAVEL": 0.02
+    },
+    "p_extraordinario": 0.7,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "6d2844f2d443122043728efcb001cf62e247f9cf": {
+    "ticker": "BTLG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.02,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.59,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.96
+  },
+  "cf2ef3c95dd077ad15be61e91cf5f3725b61a13e": {
+    "ticker": "GGRC11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.88,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.92,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.08
+    },
+    "p_extraordinario": 0.92,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.86
+  },
+  "79329fce0ca9bbfbc0799f8a7ec3060614e14083": {
+    "ticker": "BTRU11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.79,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.14,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.86
+    },
+    "p_extraordinario": 0.92,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.89
+  },
+  "59f2b51a70ac363538c3fee95abbdaf47eddc1d5": {
+    "ticker": "HGRU11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.86,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.91,
+      "RENDIMENTO_FRAGIL": 0.09
+    },
+    "p_extraordinario": 0.83,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.9
+  },
+  "c848ad0eeef76f01122d2577605918afd9d4eadb": {
+    "ticker": "KNIP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.64,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.22,
+      "RENDIMENTO_ATENCAO": 0.76,
+      "RENDIMENTO_FRAGIL": 0.02
+    },
+    "p_extraordinario": 0.39,
+    "tipo": "papel",
+    "tipo_confianca": 0.76
+  },
+  "4b8a8343b483765a020fff2f62aeadd04f5a43f5": {
+    "ticker": "XPLG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.94,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.04,
+      "RENDIMENTO_ATENCAO": 0.96,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.5,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "65955a3f5c446a4cc5c80f6aaf0415ffef97eccd": {
+    "ticker": "KNRI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.96,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_FRAGIL": 0.02,
+      "RENDIMENTO_ATENCAO": 0.97
+    },
+    "p_extraordinario": 0.76,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.88
+  },
+  "8067685fe68c0fe44bfda578064d4984ac7974b3": {
+    "ticker": "TRXB11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.97,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.98,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.02
+    },
+    "p_extraordinario": 0.94,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.87
+  },
+  "41c55af6b9ab69bf31cff839aa74893aaa967007": {
+    "ticker": "GARE11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.43,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.62,
+      "RENDIMENTO_ATENCAO": 0.38
+    },
+    "p_extraordinario": 0.89,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.87
+  },
+  "5432d82e93e36b0fab6e0bf2a00ac1dcb54b48be": {
+    "ticker": "SNEL11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.91,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.06,
+      "RENDIMENTO_FRAGIL": 0.94,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.93,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.49
+  },
+  "3eb4a51511bab81708062f719083e774a81af010": {
+    "ticker": "CPTS11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.01,
+      "RENDIMENTO_FRAGIL": 0.99,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.94,
+    "tipo": "papel",
+    "tipo_confianca": 0.49
+  },
+  "65c9f7e2f1e4d553d64181ee1300d3f04d0011c4": {
+    "ticker": "PQDP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.99,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_ATENCAO": 0.99
+    },
+    "p_extraordinario": 0.51,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "da06966953d315a91daeea4dba67a59ead8faa2d": {
+    "ticker": "VISC11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.63,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.24,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.76
+    },
+    "p_extraordinario": 0.81,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "3eede9441714bc54a97f230c46a34a589f90ead9": {
+    "ticker": "MCCI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.9,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.07,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.93
+    },
+    "p_extraordinario": 0.76,
+    "tipo": "papel",
+    "tipo_confianca": 1
+  },
+  "54d558cf5fbbbaf50b38018974f269e06802dca9": {
+    "ticker": "BRCO11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.73,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.18,
+      "RENDIMENTO_ATENCAO": 0.82
+    },
+    "p_extraordinario": 0.86,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "22aff53cb56e4af42c55a2a26138b063d8ea3566": {
+    "ticker": "ALZR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.85,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.1,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.9
+    },
+    "p_extraordinario": 0.33,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.92
+  },
+  "2109e16a36cdb34a574c1a7e52e216e732bff5a8": {
+    "ticker": "HGBS11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.94,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.03,
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_ATENCAO": 0.96
+    },
+    "p_extraordinario": 0.72,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "6777457c11b18c6923db03d94c06b1d9a66221b4": {
+    "ticker": "KNSC11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.6,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.06,
+      "RENDIMENTO_SUSTENTAVEL": 0.21,
+      "RENDIMENTO_ATENCAO": 0.73
+    },
+    "p_extraordinario": 0.2,
+    "tipo": "papel",
+    "tipo_confianca": 0.55
+  },
+  "7a54f28956f9ec0885718b5d601742b6144bff55": {
+    "ticker": "KNHY11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.85,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.91,
+      "RENDIMENTO_SUSTENTAVEL": 0.09,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.19,
+    "tipo": "papel",
+    "tipo_confianca": 0.9
+  },
+  "36e02c9a3bf0c0e6af34f8cbedc45b17734cddd6": {
+    "ticker": "KNUQ11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.96,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.98,
+      "RENDIMENTO_SUSTENTAVEL": 0.02,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.3,
+    "tipo": "papel",
+    "tipo_confianca": 0.85
+  },
+  "88261d5e3e4f3ce5db43d8054f3c68319f8ab1d9": {
+    "ticker": "KNHF11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.39,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.6,
+      "RENDIMENTO_FRAGIL": 0.01,
+      "RENDIMENTO_SUSTENTAVEL": 0.39
+    },
+    "p_extraordinario": 0.3,
+    "tipo": "papel",
+    "tipo_confianca": 0.43
+  },
+  "ccf53cbfa722b84ce00058533cbdc758b838ac42": {
+    "ticker": "RBRR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.4,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.6,
+      "RENDIMENTO_FRAGIL": 0.4,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.89,
+    "tipo": "papel",
+    "tipo_confianca": 0.73
+  },
+  "709944ee0e0532dd9c54fd75e2a9828b3cc2363c": {
+    "ticker": "LVBI11",
+    "classe": "RENDIMENTO_SUSTENTAVEL",
+    "confianca": 0.55,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.3,
+      "RENDIMENTO_SUSTENTAVEL": 0.7
+    },
+    "p_extraordinario": 0.15,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "3948b6ef5716c1213b7987bbaaead7ca0bc68971": {
+    "ticker": "VGIR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.83,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.11,
+      "RENDIMENTO_ATENCAO": 0.89
+    },
+    "p_extraordinario": 0.74,
+    "tipo": "papel",
+    "tipo_confianca": 0.99
+  },
+  "0231d45113f488b7fa4bd772237c24d7e94fa192": {
+    "ticker": "HSML11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.01,
+      "RENDIMENTO_FRAGIL": 0.99
+    },
+    "p_extraordinario": 0.94,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.98
+  },
+  "d06dc5a24e795f083d447fbab3f46bd3337a15ba": {
+    "ticker": "CPUR11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.51,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.68,
+      "RENDIMENTO_ATENCAO": 0.32
+    },
+    "p_extraordinario": 0.91,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.94
+  },
+  "b658717a949ab0d6aa0cec3f856b7d1d8a07a1ac": {
+    "ticker": "BTHF11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.82,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.11,
+      "RENDIMENTO_ATENCAO": 0.89,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.83,
+    "tipo": "outro",
+    "tipo_confianca": 0.45
+  },
+  "c34dbc4ba64a64e779bdbf0cc7d5826441ec3dfa": {
+    "ticker": "CPSH11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.99,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.01
+    },
+    "p_extraordinario": 0.95,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.99
+  },
+  "c4a12a28b7a697efa0981bbcf397eac174125efb": {
+    "ticker": "RBRY11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.27,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.51,
+      "RENDIMENTO_FRAGIL": 0.49
+    },
+    "p_extraordinario": 0.85,
+    "tipo": "papel",
+    "tipo_confianca": 0.99
+  },
+  "bc1841783764ad9adcdd73e36ab90f10c779cce8": {
+    "ticker": "TGAR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.61,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_FRAGIL": 0.25,
+      "RENDIMENTO_ATENCAO": 0.74
+    },
+    "p_extraordinario": 0.75,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.9
+  },
+  "0a0895a3b9b5c05fa2ad77169dbfe84720ee3773": {
+    "ticker": "PMLL11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.02,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.7,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "0d7252682193d42af2304feaf4f9a59069e8a25e": {
+    "ticker": "BTCI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.73,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.14,
+      "RENDIMENTO_SUSTENTAVEL": 0.04,
+      "RENDIMENTO_ATENCAO": 0.82
+    },
+    "p_extraordinario": 0.36,
+    "tipo": "papel",
+    "tipo_confianca": 1
+  },
+  "7d6bfea9a7a5991b0bde8b8c47af4e591398678b": {
+    "ticker": "HGCR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.99,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.99,
+      "RENDIMENTO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.6,
+    "tipo": "papel",
+    "tipo_confianca": 1
+  },
+  "5e71772da88d74c31a01895fad2651d06764823a": {
+    "ticker": "VCJR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.95,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_FRAGIL": 0.03,
+      "RENDIMENTO_ATENCAO": 0.96
+    },
+    "p_extraordinario": 0.76,
+    "tipo": "papel",
+    "tipo_confianca": 0.97
+  },
+  "51bf22afd0b63839759e5b7bd681c9754183da04": {
+    "ticker": "MCRE11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.46,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.64,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.36
+    },
+    "p_extraordinario": 0.89,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.65
+  },
+  "87bcf1bae47f12dd22aafac319ada69acb1a7b7a": {
+    "ticker": "MCLO11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.95,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.97,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.03
+    },
+    "p_extraordinario": 0.73,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "e3e8caf84ad355dd6e218958b8f75c8c13125d42": {
+    "ticker": "CVBI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.62,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.75,
+      "RENDIMENTO_FRAGIL": 0.22,
+      "RENDIMENTO_SUSTENTAVEL": 0.03
+    },
+    "p_extraordinario": 0.22,
+    "tipo": "papel",
+    "tipo_confianca": 0.91
+  },
+  "b2af128364b5dd3f898924b0dd75642a42712b05": {
+    "ticker": "RECR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.85,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.06,
+      "RENDIMENTO_FRAGIL": 0.04,
+      "RENDIMENTO_ATENCAO": 0.9
+    },
+    "p_extraordinario": 0.39,
+    "tipo": "papel",
+    "tipo_confianca": 0.97
+  },
+  "39d6c73f4e7bf0ea0ca952bbbca99f75c52c78b1": {
+    "ticker": "PCIP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.56,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.71,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.29
+    },
+    "p_extraordinario": 0.2,
+    "tipo": "papel",
+    "tipo_confianca": 0.97
+  },
+  "544b38fbf8e20c67b24fa887886eb52c31e89b2c": {
+    "ticker": "RZTR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.27,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.48,
+      "RENDIMENTO_ATENCAO": 0.52
+    },
+    "p_extraordinario": 0.88,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.88
+  },
+  "08ef93a38f4919ecad9d5286d5fb11424e9a1200": {
+    "ticker": "IRIM11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.89,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.07,
+      "RENDIMENTO_FRAGIL": 0.93
+    },
+    "p_extraordinario": 0.92,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.61
+  },
+  "8c4d327d84b8ccc53ff4cde4601e1e923a35315e": {
+    "ticker": "JSRE11",
+    "classe": "RENDIMENTO_SUSTENTAVEL",
+    "confianca": 0.38,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.59,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.41
+    },
+    "p_extraordinario": 0.15,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.78
+  },
+  "827911e246a3add1b138b5f1b0fe303907412258": {
+    "ticker": "VGHF11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.88,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.08,
+      "RENDIMENTO_FRAGIL": 0.92,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.93,
+    "tipo": "outro",
+    "tipo_confianca": 0.52
+  },
+  "93a515500ffaef10a8845f2ccaf50573ac499f34": {
+    "ticker": "TEPP11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.95,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.97,
+      "RENDIMENTO_ATENCAO": 0.03,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.93,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.95
+  },
+  "9aefa90a50c39d1743f3baba18617c3da95e0e01": {
+    "ticker": "VILG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.99,
+      "RENDIMENTO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.67,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "3c7d8b3cb084adb61016ddb0fdc50efca962031d": {
+    "ticker": "HGRE11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.79,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.14,
+      "RENDIMENTO_ATENCAO": 0.86
+    },
+    "p_extraordinario": 0.85,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "6d2b92e7daed01f1b02fcc7785dda7bd819e3e55": {
+    "ticker": "RBRX11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.94,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.04,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.96
+    },
+    "p_extraordinario": 0.93,
+    "tipo": "hibrido",
+    "tipo_confianca": 0.35
+  },
+  "5346b163f03ff0b95cd91cbcb5f2515fb10f9433": {
+    "ticker": "KORE11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.69,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.15,
+      "RENDIMENTO_SUSTENTAVEL": 0.05,
+      "RENDIMENTO_ATENCAO": 0.8
+    },
+    "p_extraordinario": 0.39,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.85
+  },
+  "ad28c8208e80f4c1137d3ec922138655ce935fa3": {
+    "ticker": "HBCR11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.86,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.91,
+      "RENDIMENTO_ATENCAO": 0.09
+    },
+    "p_extraordinario": 0.9,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.92
+  },
+  "cd2ecea82605cdd72f932657aded880620759acd": {
+    "ticker": "RZLC11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.41,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.39,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.61
+    },
+    "p_extraordinario": 0.86,
+    "tipo": "papel",
+    "tipo_confianca": 0.49
+  },
+  "b2a3e59239144e4def883d23eb22dd24c9db0d6c": {
+    "ticker": "PSEC11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.89,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.93,
+      "RENDIMENTO_FRAGIL": 0.07
+    },
+    "p_extraordinario": 0.69,
+    "tipo": "papel",
+    "tipo_confianca": 0.7
+  },
+  "4d23744e275786e0715bb6b73fdd2130ee5c1c93": {
+    "ticker": "XPCI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.39,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.4,
+      "RENDIMENTO_ATENCAO": 0.6
+    },
+    "p_extraordinario": 0.21,
+    "tipo": "papel",
+    "tipo_confianca": 0.99
+  },
+  "b32938f55ae6150e8cee7ae0b76fd8af56a3e0d9": {
+    "ticker": "FATN11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.63,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.75,
+      "RENDIMENTO_ATENCAO": 0.25
+    },
+    "p_extraordinario": 0.9,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.84
+  },
+  "acf7b5eca72fa1864246e5180c560b4a6a21f77f": {
+    "ticker": "HFOF11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.45,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.36,
+      "RENDIMENTO_FRAGIL": 0.01,
+      "RENDIMENTO_ATENCAO": 0.63
+    },
+    "p_extraordinario": 0.16,
+    "tipo": "fundo_de_fundos",
+    "tipo_confianca": 1
+  },
+  "7ceaa29ec2aec1605a96487b5750eae17739ba42": {
+    "ticker": "RBVA11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.65,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.76,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.24
+    },
+    "p_extraordinario": 0.92,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "2eeb447a8ac9ee15730b293cb0e67a62f184e76d": {
+    "ticker": "VRTA11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.61,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.74,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.26
+    },
+    "p_extraordinario": 0.15,
+    "tipo": "outro",
+    "tipo_confianca": 0.38
+  },
+  "00f9d3eb45afb9f485b6e83a35e5b713207f82b8": {
+    "ticker": "BRCR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.81,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.88,
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_FRAGIL": 0.11
+    },
+    "p_extraordinario": 0.16,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.97
+  },
+  "4f8723f78cda412b830d7f4207e90904e8e55238": {
+    "ticker": "MALL11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.46,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.09,
+      "RENDIMENTO_FRAGIL": 0.27,
+      "RENDIMENTO_ATENCAO": 0.64
+    },
+    "p_extraordinario": 0.38,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "9adfee7ba93d8f285cee5eba8efda5f875f1e8ff": {
+    "ticker": "VGIP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.88,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.08,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.92
+    },
+    "p_extraordinario": 0.81,
+    "tipo": "papel",
+    "tipo_confianca": 0.98
+  },
+  "0702cc913155f3e0f6d186e488add58a6ffa1b63": {
+    "ticker": "JSAF11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.91,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.94,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.06
+    },
+    "p_extraordinario": 0.23,
+    "tipo": "papel",
+    "tipo_confianca": 0.96
+  },
+  "104a8db32cb1412efcf5726ecff331623f6faba6": {
+    "ticker": "RBRP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.02,
+      "RENDIMENTO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.67,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.9
+  },
+  "09105fb865ccd075699e7d0091885e9b9d00ee78": {
+    "ticker": "RZAK11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.99,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.99,
+      "RENDIMENTO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.57,
+    "tipo": "papel",
+    "tipo_confianca": 0.5
+  },
+  "d0d76f087c454504005a3eaded89284ff3fcb16f": {
+    "ticker": "PQAG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.82,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.12,
+      "RENDIMENTO_ATENCAO": 0.88
+    },
+    "p_extraordinario": 0.09,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "844102b61880e2f1299f06ead828834ac02e959d": {
+    "ticker": "CPLG11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.99,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 1,
+      "RENDIMENTO_ATENCAO": 0
+    },
+    "p_extraordinario": 0.96,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.98
+  },
+  "f30d7bd5973c6fbf5d6e42404fc31d5d3f8adbd0": {
+    "ticker": "TRBL11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.85,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.9,
+      "RENDIMENTO_ATENCAO": 0.1
+    },
+    "p_extraordinario": 0.94,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "318b09eaf16560bf2a408cd4e52bf3186de249ca": {
+    "ticker": "MANA11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.67,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.22,
+      "RENDIMENTO_FRAGIL": 0.78
+    },
+    "p_extraordinario": 0.92,
+    "tipo": "outro",
+    "tipo_confianca": 0.44
+  },
+  "5211d5c693fa33182fd07f936ad78c984287c950": {
+    "ticker": "HSLG11",
+    "classe": "RENDIMENTO_SUSTENTAVEL",
+    "confianca": 0.62,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.75,
+      "RENDIMENTO_ATENCAO": 0.25,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.11,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "c7316ae0f41a657099fbe58bc60937bccf7c7984": {
+    "ticker": "MFII11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.99,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 1,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0
+    },
+    "p_extraordinario": 0.96,
+    "tipo": "desenvolvimento",
+    "tipo_confianca": 0.79
+  },
+  "c8cc570a5d160a53130b85a3dc576099e81e37c9": {
+    "ticker": "HABT11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.94,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.03,
+      "RENDIMENTO_FRAGIL": 0.01,
+      "RENDIMENTO_ATENCAO": 0.96
+    },
+    "p_extraordinario": 0.44,
+    "tipo": "papel",
+    "tipo_confianca": 1
+  },
+  "29ae70fe7cda648d0f2f9f52c926528d989be314": {
+    "ticker": "ITRI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.87,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.91,
+      "RENDIMENTO_FRAGIL": 0.03,
+      "RENDIMENTO_SUSTENTAVEL": 0.06
+    },
+    "p_extraordinario": 0.25,
+    "tipo": "papel",
+    "tipo_confianca": 0.49
+  },
+  "c08308eb09fe64ffc4d00360bfbdce455c7f9423": {
+    "ticker": "RBRL11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.01,
+      "RENDIMENTO_ATENCAO": 0.98,
+      "RENDIMENTO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.59,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.52
+  },
+  "97498881b85949d5252b7d859e7fdfc0bc98db2f": {
+    "ticker": "TRXF11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.96,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.03,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.97
+    },
+    "p_extraordinario": 0.95,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.87
+  },
+  "5df5e00a6650926e257811c40fd4a87857264d3a": {
+    "ticker": "MXRF11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.83,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.11,
+      "RENDIMENTO_ATENCAO": 0.89,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.81,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.93
+  },
+  "55190743468ef714249a004e8d744edb2275fc32": {
+    "ticker": "KNCR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.99,
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.47,
+    "tipo": "papel",
+    "tipo_confianca": 0.55
+  },
+  "151384753d65a7f0ae897bdf8c99adbb7efc3803": {
+    "ticker": "HGLG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.43,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.38,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.62
+    },
+    "p_extraordinario": 0.32,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.96
+  },
+  "47d65270195d8cd9c963b98b582b614ccdf0b0da": {
+    "ticker": "XPML11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.01,
+      "RENDIMENTO_ATENCAO": 0.98,
+      "RENDIMENTO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.73,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "51ed9d2510ab304dbb67468b416b9547780e51d3": {
+    "ticker": "BTLG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.02,
+      "RENDIMENTO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.61,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.95
+  },
+  "2feac074da549093267e8b4c0108dc581cae4397": {
+    "ticker": "GGRC11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.89,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.07,
+      "RENDIMENTO_FRAGIL": 0.93,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.92,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.9
+  },
+  "caca045f41a86a779ffaa67e807eb60c68e2e011": {
+    "ticker": "BTRU11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.63,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.75,
+      "RENDIMENTO_ATENCAO": 0.25
+    },
+    "p_extraordinario": 0.91,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.9
+  },
+  "f6d7154d4c89d718122c6a4689bd0afc4f4603c9": {
+    "ticker": "KNIP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.5,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.67,
+      "RENDIMENTO_SUSTENTAVEL": 0.32,
+      "RENDIMENTO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.26,
+    "tipo": "papel",
+    "tipo_confianca": 0.79
+  },
+  "b7d96803377ea0b60e95fd4e75b11052fe77971f": {
+    "ticker": "HGRU11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_ATENCAO": 0.98,
+      "RENDIMENTO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.74,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.91
+  },
+  "f62f7605ed5428d6e16b6d96ab79b7457b5ad227": {
+    "ticker": "XPLG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.72,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.81,
+      "RENDIMENTO_SUSTENTAVEL": 0.19
+    },
+    "p_extraordinario": 0.34,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "79ce37d61ab4017f9fa83262a8eb007a7cc4c9ab": {
+    "ticker": "TRXB11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.96,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.97,
+      "RENDIMENTO_ATENCAO": 0.03,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.95,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.88
+  },
+  "3479c34f7254d760fdce3a65031621e8add7e75d": {
+    "ticker": "SNEL11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.92,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.05,
+      "RENDIMENTO_FRAGIL": 0.95,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.93,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.47
+  },
+  "d07d0a5a68a6bc8a1fc1165ec2ff5bc5acf125c9": {
+    "ticker": "CPTS11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.99,
+      "RENDIMENTO_ATENCAO": 0.01,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.94,
+    "tipo": "papel",
+    "tipo_confianca": 0.52
+  },
+  "1c0ca2ddf481ab780529af2818ff6013f8e2092c": {
+    "ticker": "GARE11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.38,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.41,
+      "RENDIMENTO_ATENCAO": 0.59,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.87,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.87
+  },
+  "62f251e3ef9607de92492b4d2375be008900227c": {
+    "ticker": "PQDP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.99,
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.35,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "de274324f998081d043855e0770d9e0217dccef2": {
+    "ticker": "VISC11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.84,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.89,
+      "RENDIMENTO_FRAGIL": 0.11,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.76,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "a7b96570e80523372b6efc64e4bba8186b18453c": {
+    "ticker": "BRCO11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.93,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.96,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.04
+    },
+    "p_extraordinario": 0.78,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "4b798fce475654738e9e1e9abbc9cd8919707d21": {
+    "ticker": "MCCI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.91,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.06,
+      "RENDIMENTO_ATENCAO": 0.94,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.77,
+    "tipo": "papel",
+    "tipo_confianca": 1
+  },
+  "efd396e354f28fe1dd791f7008593e504d04a0a2": {
+    "ticker": "HGBS11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.91,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.05,
+      "RENDIMENTO_ATENCAO": 0.95,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.6,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "703cc67d7b11666056fa0c19ca2b0f632531f3d0": {
+    "ticker": "KNSC11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.53,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.69,
+      "RENDIMENTO_FRAGIL": 0.06,
+      "RENDIMENTO_SUSTENTAVEL": 0.25
+    },
+    "p_extraordinario": 0.18,
+    "tipo": "papel",
+    "tipo_confianca": 0.54
+  },
+  "d276459de081e0c64f5614b3e9a6269f5c2a24f7": {
+    "ticker": "ALZR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.85,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.9,
+      "RENDIMENTO_SUSTENTAVEL": 0.1,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.31,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.92
+  },
+  "972229cda84d9b2870823a91fd9e8df1087ef335": {
+    "ticker": "KNHF11",
+    "classe": "RENDIMENTO_SUSTENTAVEL",
+    "confianca": 0.27,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.01,
+      "RENDIMENTO_ATENCAO": 0.48,
+      "RENDIMENTO_SUSTENTAVEL": 0.51
+    },
+    "p_extraordinario": 0.24,
+    "tipo": "papel",
+    "tipo_confianca": 0.46
+  },
+  "da085012f1f4c7938965219596fb92f66769f47e": {
+    "ticker": "KNHY11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.78,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.86,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.14
+    },
+    "p_extraordinario": 0.17,
+    "tipo": "papel",
+    "tipo_confianca": 0.86
+  },
+  "abd53b206fc70f878c85125c21113e272ed6b618": {
+    "ticker": "KNUQ11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.66,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.01,
+      "RENDIMENTO_SUSTENTAVEL": 0.22,
+      "RENDIMENTO_ATENCAO": 0.77
+    },
+    "p_extraordinario": 0.16,
+    "tipo": "papel",
+    "tipo_confianca": 0.86
+  },
+  "1c5a5a7b3b96a1feabc96994a0bd1f2e83086652": {
+    "ticker": "RBRR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.44,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.37,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.63
+    },
+    "p_extraordinario": 0.89,
+    "tipo": "papel",
+    "tipo_confianca": 0.68
+  },
+  "ffb1c9a993d7c1abb67d2a3bbce8f58a1a7f72d6": {
+    "ticker": "LVBI11",
+    "classe": "RENDIMENTO_SUSTENTAVEL",
+    "confianca": 0.76,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.16,
+      "RENDIMENTO_SUSTENTAVEL": 0.84
+    },
+    "p_extraordinario": 0.16,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "8220d79e9f24bfe4f0f1a6a2f1cb36739e275a3b": {
+    "ticker": "CPUR11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.55,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.7,
+      "RENDIMENTO_ATENCAO": 0.3,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.91,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.93
+  },
+  "b17056e8a25cec1e8cea647436cb2081ca27bc53": {
+    "ticker": "VGIR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.8,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.13,
+      "RENDIMENTO_ATENCAO": 0.87,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.73,
+    "tipo": "papel",
+    "tipo_confianca": 0.98
+  },
+  "5d8e3be7b0a3e697930c54933b31b2ceb9ad323d": {
+    "ticker": "HSML11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.99,
+      "RENDIMENTO_ATENCAO": 0.01,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.93,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.99
+  },
+  "fb778d850eaa9d259730cc27ae57f9452f0766f3": {
+    "ticker": "BTHF11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.8,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.13,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.87
+    },
+    "p_extraordinario": 0.82,
+    "tipo": "outro",
+    "tipo_confianca": 0.44
+  },
+  "83d53e6e18e8cc8076ff1f8baa40e8482a85dc2d": {
+    "ticker": "RBRY11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.25,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.5,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.5
+    },
+    "p_extraordinario": 0.85,
+    "tipo": "papel",
+    "tipo_confianca": 0.99
+  },
+  "9bdd314a6341ab45f2c6443876b6edfd96b484ac": {
+    "ticker": "CPSH11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.99,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.01,
+      "RENDIMENTO_FRAGIL": 0.99
+    },
+    "p_extraordinario": 0.95,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "50e5d7ab5a75fd749c15bafa47508410ac7d3831": {
+    "ticker": "TGAR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.77,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.85,
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_FRAGIL": 0.14
+    },
+    "p_extraordinario": 0.75,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.91
+  },
+  "6726250729424d210bea1a9aa0422e758e354da7": {
+    "ticker": "HGCR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.72,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.82,
+      "RENDIMENTO_SUSTENTAVEL": 0.18
+    },
+    "p_extraordinario": 0.23,
+    "tipo": "papel",
+    "tipo_confianca": 1
+  },
+  "b788f8b7f874d7fee7d3a501edffbc39482ed7bc": {
+    "ticker": "PMLL11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.72,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_ATENCAO": 0.82,
+      "RENDIMENTO_SUSTENTAVEL": 0.18
+    },
+    "p_extraordinario": 0.41,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "fad0959e52fc756144d50fd510a6f608fde3f5ee": {
+    "ticker": "VCJR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.91,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.94,
+      "RENDIMENTO_FRAGIL": 0.01,
+      "RENDIMENTO_SUSTENTAVEL": 0.05
+    },
+    "p_extraordinario": 0.48,
+    "tipo": "papel",
+    "tipo_confianca": 0.97
+  },
+  "2041e34379a735b22c852a116e11068ef0c743fc": {
+    "ticker": "MCRE11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.58,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.28,
+      "RENDIMENTO_FRAGIL": 0.72
+    },
+    "p_extraordinario": 0.9,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.68
+  },
+  "95e2042f330c5fd98dd642dfccfd7f38194c0080": {
+    "ticker": "BTCI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.72,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.81,
+      "RENDIMENTO_SUSTENTAVEL": 0.09,
+      "RENDIMENTO_FRAGIL": 0.1
+    },
+    "p_extraordinario": 0.33,
+    "tipo": "papel",
+    "tipo_confianca": 1
+  },
+  "c61c0984bd774913bbe3b3d57676d07b472f22dc": {
+    "ticker": "RECR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.86,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.91,
+      "RENDIMENTO_FRAGIL": 0.03,
+      "RENDIMENTO_SUSTENTAVEL": 0.06
+    },
+    "p_extraordinario": 0.37,
+    "tipo": "papel",
+    "tipo_confianca": 0.97
+  },
+  "11dc3be9877097b3bf3993de6238a776464a1854": {
+    "ticker": "PCIP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.52,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.69,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.31
+    },
+    "p_extraordinario": 0.23,
+    "tipo": "papel",
+    "tipo_confianca": 0.96
+  },
+  "12737c689c18b5b6fef69dfc2a7f47eac144c14e": {
+    "ticker": "RZTR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.5,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.67,
+      "RENDIMENTO_FRAGIL": 0.33
+    },
+    "p_extraordinario": 0.86,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.89
+  },
+  "be65acfbfcb3467d25491ed6adb2ab58069f69d6": {
+    "ticker": "IRIM11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.88,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.92,
+      "RENDIMENTO_ATENCAO": 0.08,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.92,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.65
+  },
+  "71e1b5744f92e3ece8c7f42ac7431e3bae8743c1": {
+    "ticker": "JSRE11",
+    "classe": "RENDIMENTO_SUSTENTAVEL",
+    "confianca": 0.53,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.31,
+      "RENDIMENTO_SUSTENTAVEL": 0.69,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.14,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.83
+  },
+  "d36ba28bd6067839d26c5087a2ff9617540570a0": {
+    "ticker": "VGHF11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.66,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.78,
+      "RENDIMENTO_ATENCAO": 0.22,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.92,
+    "tipo": "outro",
+    "tipo_confianca": 0.44
+  },
+  "9001ffd3d128cdfcb3b781242e5ed9a4ecbfd66f": {
+    "ticker": "TEPP11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.94,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.96,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.04
+    },
+    "p_extraordinario": 0.92,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.95
+  },
+  "2d99bd1d4231cf955c05f27ec6ad51eb2c537fb7": {
+    "ticker": "VILG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.62,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.25,
+      "RENDIMENTO_ATENCAO": 0.75,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.38,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "2f7a1c1b44d1ee30a64f4a9bd15b4d0d6c04fe94": {
+    "ticker": "RBRX11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.95,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.04,
+      "RENDIMENTO_FRAGIL": 0.96,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.93,
+    "tipo": "hibrido",
+    "tipo_confianca": 0.32
+  },
+  "b268181759b444fabccc9fa86adafb2b652c9cdd": {
+    "ticker": "MCLO11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.92,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.95,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.05
+    },
+    "p_extraordinario": 0.58,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "7376e12ae33f41d759ac988a1daea981718565d2": {
+    "ticker": "HGRE11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.93,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.96,
+      "RENDIMENTO_FRAGIL": 0.04
+    },
+    "p_extraordinario": 0.8,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "3e9b1026290e7781dcc6f48815039725736333cd": {
+    "ticker": "RBRP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.02,
+      "RENDIMENTO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.7,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.9
+  },
+  "63cf48fec89b92439da23451e8442fb2c39b00c1": {
+    "ticker": "KORE11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.75,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.84,
+      "RENDIMENTO_SUSTENTAVEL": 0.05,
+      "RENDIMENTO_FRAGIL": 0.11
+    },
+    "p_extraordinario": 0.42,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.86
+  },
+  "7367cb2244f6a913cf5ba2cd141a579b7abcd5e0": {
+    "ticker": "RZLC11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.39,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.41,
+      "RENDIMENTO_ATENCAO": 0.59
+    },
+    "p_extraordinario": 0.87,
+    "tipo": "papel",
+    "tipo_confianca": 0.54
+  },
+  "1bb866a6a3201630fe150fe4d122edace7bd2a16": {
+    "ticker": "PSEC11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.91,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.94,
+      "RENDIMENTO_FRAGIL": 0.06,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.64,
+    "tipo": "papel",
+    "tipo_confianca": 0.71
+  },
+  "6381e153a3c040546d5717fba37d6e67b9dca3ca": {
+    "ticker": "XPCI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.49,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.66,
+      "RENDIMENTO_FRAGIL": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0.34
+    },
+    "p_extraordinario": 0.25,
+    "tipo": "papel",
+    "tipo_confianca": 0.99
+  },
+  "e290c279a833038caae8bdf479ba45dbfcae5644": {
+    "ticker": "BRCR11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.82,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.11,
+      "RENDIMENTO_ATENCAO": 0.88,
+      "RENDIMENTO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.15,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.97
+  },
+  "1080f72705ee75ad9dacb0c0ad48052a59b5c626": {
+    "ticker": "HFOF11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.56,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.28,
+      "RENDIMENTO_FRAGIL": 0.02,
+      "RENDIMENTO_ATENCAO": 0.7
+    },
+    "p_extraordinario": 0.2,
+    "tipo": "fundo_de_fundos",
+    "tipo_confianca": 1
+  },
+  "ef2610dd35bb80b4ac543dd5a7671b9446b4e1b1": {
+    "ticker": "FATN11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.58,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.28,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_FRAGIL": 0.72
+    },
+    "p_extraordinario": 0.89,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.79
+  },
+  "79449bd53fb79813a2d79a6ae12890b6bb5f9cb3": {
+    "ticker": "RBVA11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.43,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.62,
+      "RENDIMENTO_ATENCAO": 0.38,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.91,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "1a5d3e81eff3d3bb7440f273a742ec088629bd6c": {
+    "ticker": "VGIP11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.85,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.1,
+      "RENDIMENTO_ATENCAO": 0.9,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.81,
+    "tipo": "papel",
+    "tipo_confianca": 0.98
+  },
+  "fd1e9d5e6517b2d484847b5d9720ed570993dd7b": {
+    "ticker": "VRTA11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.58,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.71,
+      "RENDIMENTO_SUSTENTAVEL": 0.28,
+      "RENDIMENTO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.18,
+    "tipo": "outro",
+    "tipo_confianca": 0.42
+  },
+  "dbe787fdc7315914002e68b60b73429fca352265": {
+    "ticker": "JSAF11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.62,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.75,
+      "RENDIMENTO_SUSTENTAVEL": 0.25,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.2,
+    "tipo": "papel",
+    "tipo_confianca": 0.96
+  },
+  "ee74837b59325437c51210e412048528c23a179e": {
+    "ticker": "RZAK11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.98,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.98,
+      "RENDIMENTO_SUSTENTAVEL": 0.01,
+      "RENDIMENTO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.54,
+    "tipo": "papel",
+    "tipo_confianca": 0.57
+  },
+  "97f0631296f31f7c993e58d494b5ef9e940bfd0d": {
+    "ticker": "PQAG11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.78,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.15,
+      "RENDIMENTO_ATENCAO": 0.85,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.11,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "688458d0340479ef8d21c822f3c0d49a528b5746": {
+    "ticker": "CPLG11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 1,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0,
+      "RENDIMENTO_FRAGIL": 1
+    },
+    "p_extraordinario": 0.96,
+    "tipo": "tijolo",
+    "tipo_confianca": 0.98
+  },
+  "0792da2ce012e0f12087a29383098af51168918f": {
+    "ticker": "TRBL11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.7,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.8,
+      "RENDIMENTO_SUSTENTAVEL": 0,
+      "RENDIMENTO_ATENCAO": 0.2
+    },
+    "p_extraordinario": 0.93,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "e1ddf6cc2bcb073efbeb50b06f64373cae57848e": {
+    "ticker": "HSLG11",
+    "classe": "RENDIMENTO_SUSTENTAVEL",
+    "confianca": 0.58,
+    "probabilidades": {
+      "RENDIMENTO_SUSTENTAVEL": 0.72,
+      "RENDIMENTO_ATENCAO": 0.28,
+      "RENDIMENTO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.11,
+    "tipo": "tijolo",
+    "tipo_confianca": 1
+  },
+  "146d9a3a537f9b08c7e0f90529ae962f4f89b2fe": {
+    "ticker": "MANA11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.63,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 0.75,
+      "RENDIMENTO_ATENCAO": 0.25,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.9,
+    "tipo": "outro",
+    "tipo_confianca": 0.44
+  },
+  "c6eafe507f8a2f5d7ac7ce6df994613bb334231f": {
+    "ticker": "ITRI11",
+    "classe": "RENDIMENTO_ATENCAO",
+    "confianca": 0.81,
+    "probabilidades": {
+      "RENDIMENTO_ATENCAO": 0.88,
+      "RENDIMENTO_SUSTENTAVEL": 0.08,
+      "RENDIMENTO_FRAGIL": 0.04
+    },
+    "p_extraordinario": 0.31,
+    "tipo": "papel",
+    "tipo_confianca": 0.56
+  },
+  "583ae774ba59e8be235bd4ac335142a4c2507f82": {
+    "ticker": "MFII11",
+    "classe": "RENDIMENTO_FRAGIL",
+    "confianca": 0.99,
+    "probabilidades": {
+      "RENDIMENTO_FRAGIL": 1,
+      "RENDIMENTO_ATENCAO": 0,
+      "RENDIMENTO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.95,
+    "tipo": "desenvolvimento",
+    "tipo_confianca": 0.76
+  }
+}

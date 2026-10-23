@@ -1,0 +1,2565 @@
+{
+  "c7fa479aa4c04f8887b79a91e7981a7b2f14846f": {
+    "ticker": "PETR4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.37
+  },
+  "d6e34a6d1e1b6bdabe6eb55959a97cf81a15b9da": {
+    "ticker": "VALE3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.56,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.71,
+      "DIVIDENDO_ATENCAO": 0.29,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.76
+  },
+  "00a60bff1a14a82cafa002c984255918ce4bcbf3": {
+    "ticker": "ITUB4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.33,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.26,
+      "DIVIDENDO_FRAGIL": 0.18,
+      "DIVIDENDO_ATENCAO": 0.56
+    },
+    "p_extraordinario": 0.75
+  },
+  "40c4dd27d4a7e08db5d956239df117ad7ac0792a": {
+    "ticker": "BBDC4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.41,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.39,
+      "DIVIDENDO_ATENCAO": 0.61
+    },
+    "p_extraordinario": 0.41
+  },
+  "ff3ae8229adbb8fb33976cb3a6777b4714e90dac": {
+    "ticker": "B3SA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.9,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.94,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.06
+    },
+    "p_extraordinario": 0.42
+  },
+  "375cb444266915eb82a1378d117b88a906dfbde0": {
+    "ticker": "ABEV3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.39,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.59,
+      "DIVIDENDO_SUSTENTAVEL": 0.4
+    },
+    "p_extraordinario": 0.59
+  },
+  "b843217a48be99ea3722f053c4802a926d4d6d76": {
+    "ticker": "RENT3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.62,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.25,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.74
+    },
+    "p_extraordinario": 0.3
+  },
+  "89d3e3b5092a75e083207c84ac1c5bdfd17032ee": {
+    "ticker": "VBBR3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.33,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.55,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.45
+    },
+    "p_extraordinario": 0.25
+  },
+  "907d620870e7769bfb4cc2c21cf0bb7b8be471c2": {
+    "ticker": "UGPA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.64,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.1,
+      "DIVIDENDO_SUSTENTAVEL": 0.14,
+      "DIVIDENDO_ATENCAO": 0.76
+    },
+    "p_extraordinario": 0.7
+  },
+  "a305499db1f49e50af07a344a003051aebda3f04": {
+    "ticker": "ITSA4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.4,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.14,
+      "DIVIDENDO_ATENCAO": 0.6,
+      "DIVIDENDO_FRAGIL": 0.26
+    },
+    "p_extraordinario": 0.8
+  },
+  "a266607bb031d144441252eb06fbff90ed6f4fcf": {
+    "ticker": "CPLE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.43,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.38,
+      "DIVIDENDO_ATENCAO": 0.62
+    },
+    "p_extraordinario": 0.73
+  },
+  "63d688240dfae9d5992a350934334132f747673a": {
+    "ticker": "RDOR3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.07,
+      "DIVIDENDO_FRAGIL": 0.93
+    },
+    "p_extraordinario": 0.92
+  },
+  "fc2430fd1b4cddbd459ca09fdfa97d8bf781db5c": {
+    "ticker": "BBSE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.86,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.04,
+      "DIVIDENDO_ATENCAO": 0.91,
+      "DIVIDENDO_FRAGIL": 0.05
+    },
+    "p_extraordinario": 0.65
+  },
+  "bc91f817c58dbb3ee7d9497a307aaa5be32c0447": {
+    "ticker": "LREN3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.81,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.13,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.87
+    },
+    "p_extraordinario": 0.59
+  },
+  "c47c4d85ede0b91b1c2416dd9cf316fce0d4072c": {
+    "ticker": "MOTV3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.81,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.87,
+      "DIVIDENDO_SUSTENTAVEL": 0.12,
+      "DIVIDENDO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.33
+  },
+  "5ef5937c78a4788dbb0a0e06cce941ee7c2f90b3": {
+    "ticker": "CYRE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.52,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.68,
+      "DIVIDENDO_FRAGIL": 0.29,
+      "DIVIDENDO_SUSTENTAVEL": 0.03
+    },
+    "p_extraordinario": 0.83
+  },
+  "6df84d9ea6eec97f7f87f8877169c39693e79b4a": {
+    "ticker": "CMIG4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.39,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.6,
+      "DIVIDENDO_SUSTENTAVEL": 0.4,
+      "DIVIDENDO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.22
+  },
+  "af493f6a8ac5edcd40bdfd17b497dac1024a71b8": {
+    "ticker": "VIVT3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.55,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.7,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.3
+    },
+    "p_extraordinario": 0.58
+  },
+  "82df0d6681084ef91af1f14cc9d74d865b24c2f1": {
+    "ticker": "SMFT3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.8,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.13,
+      "DIVIDENDO_ATENCAO": 0.87,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.86
+  },
+  "713b00f93b627d15088337e3a52a0e9e9a5de3d4": {
+    "ticker": "TIMS3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.02,
+      "DIVIDENDO_FRAGIL": 0.98
+    },
+    "p_extraordinario": 0.94
+  },
+  "f3754174aa8e43dabe4df39a008ba9f94cb4e7fb": {
+    "ticker": "SANB11",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.28
+  },
+  "b86bdc7601506fe211793352af9c40b8a874f302": {
+    "ticker": "ALOS3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.59,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.73,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.27
+    },
+    "p_extraordinario": 0.86
+  },
+  "1f74708bc3eb7dabbd97dd40ef467f884dde885c": {
+    "ticker": "CURY3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.54,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.31,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.69
+    },
+    "p_extraordinario": 0.88
+  },
+  "1417bacafef6e205057e4d1ec486d96935e26c4c": {
+    "ticker": "CXSE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.84,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.07,
+      "DIVIDENDO_SUSTENTAVEL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.9
+    },
+    "p_extraordinario": 0.5
+  },
+  "4cc5919430c38c294656bd753023ced6393a7678": {
+    "ticker": "TEND3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.82,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.88,
+      "DIVIDENDO_FRAGIL": 0.11
+    },
+    "p_extraordinario": 0.77
+  },
+  "b6ee5e57fb1102050aec84f0cd2211a533d5c5ed": {
+    "ticker": "DIRR3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.81,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.88,
+      "DIVIDENDO_FRAGIL": 0.11
+    },
+    "p_extraordinario": 0.85
+  },
+  "24de9e53f4a77edf35b194ad205de25ae3ba5656": {
+    "ticker": "ISAE4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.95,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.96,
+      "DIVIDENDO_SUSTENTAVEL": 0.03
+    },
+    "p_extraordinario": 0.47
+  },
+  "12408768a0b884878303173a7e3e58260f70c372": {
+    "ticker": "KLBN11",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.91,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.06,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.94
+    },
+    "p_extraordinario": 0.84
+  },
+  "5f83c81e1e9a0d98493058cd49b71dac25f48267": {
+    "ticker": "CEAB3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.02,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.85
+  },
+  "c322c2b1896ab47dbe149788339ee29a2d243d6a": {
+    "ticker": "PSSA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.36,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.57,
+      "DIVIDENDO_SUSTENTAVEL": 0.43
+    },
+    "p_extraordinario": 0.26
+  },
+  "7bf2c1ff5ee5fd648c1dc4a66db5bdd5726c8fef": {
+    "ticker": "FLRY3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.93,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.95,
+      "DIVIDENDO_FRAGIL": 0.04
+    },
+    "p_extraordinario": 0.63
+  },
+  "35eeacc3779e5a2d73106e98919152c3b423d6c4": {
+    "ticker": "CPFE3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.59,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.27,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.73
+    },
+    "p_extraordinario": 0.29
+  },
+  "891c61f11bbb424bc8b7e783e4cf088bdcfd2e7b": {
+    "ticker": "TAEE11",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.67,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.22,
+      "DIVIDENDO_ATENCAO": 0.78
+    },
+    "p_extraordinario": 0.2
+  },
+  "2d4f093198995cfec1110ac97ece24239b0cbc22": {
+    "ticker": "POMO4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.81,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.02,
+      "DIVIDENDO_ATENCAO": 0.87,
+      "DIVIDENDO_FRAGIL": 0.11
+    },
+    "p_extraordinario": 0.88
+  },
+  "afee7e70a525b5335bb55e7bf1bd1bc8c232d957": {
+    "ticker": "COGN3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.68,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.22,
+      "DIVIDENDO_ATENCAO": 0.78,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.88
+  },
+  "1156100c05d32276a7d4667cd59689b44dbe751c": {
+    "ticker": "AZZA3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.66,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.23,
+      "DIVIDENDO_FRAGIL": 0.77
+    },
+    "p_extraordinario": 0.88
+  },
+  "568cfdb695a962db85002fc696d38f57708dfd73": {
+    "ticker": "YDUQ3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.07,
+      "DIVIDENDO_FRAGIL": 0.93,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.91
+  },
+  "87e53fb80fd239c31ae1de9e139b26a84b5ccf14": {
+    "ticker": "MOVI3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.88,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.07,
+      "DIVIDENDO_ATENCAO": 0.92,
+      "DIVIDENDO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.5
+  },
+  "ccc6960cdaf19b9b1b8bbaa59098713671130fe5": {
+    "ticker": "CMIN3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.7,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.8,
+      "DIVIDENDO_ATENCAO": 0.2
+    },
+    "p_extraordinario": 0.73
+  },
+  "35c6ee6c0d88bb10ee75633a8adba3e2f7173383": {
+    "ticker": "BRAP4",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.94,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.04,
+      "DIVIDENDO_FRAGIL": 0.96,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.78
+  },
+  "9e028d23e630acf5637653236e454b6c23bc9f54": {
+    "ticker": "JHSF3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.69,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.2,
+      "DIVIDENDO_SUSTENTAVEL": 0.79
+    },
+    "p_extraordinario": 0.28
+  },
+  "845d1ab0e1f8161f22e92fab3e1a7dadfdd42067": {
+    "ticker": "EZTC3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.36,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.57,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.42
+    },
+    "p_extraordinario": 0.52
+  },
+  "f296cf7240810c72cc43d6213bd7ce1c8b42218e": {
+    "ticker": "BRSR6",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.37,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.09,
+      "DIVIDENDO_SUSTENTAVEL": 0.58,
+      "DIVIDENDO_ATENCAO": 0.33
+    },
+    "p_extraordinario": 0.7
+  },
+  "28e791d87222df57fc3a788abc1dd0a355b36490": {
+    "ticker": "MDNE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.71,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.81,
+      "DIVIDENDO_FRAGIL": 0.19
+    },
+    "p_extraordinario": 0.87
+  },
+  "de63ba856de34a8d9592b383dc45c75857ea3962": {
+    "ticker": "PASS3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.61,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.74,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.26
+    },
+    "p_extraordinario": 0.87
+  },
+  "20dfe7fa1a2816537385e21664d0b939b02d434d": {
+    "ticker": "ALPA4",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.91,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.06,
+      "DIVIDENDO_FRAGIL": 0.94
+    },
+    "p_extraordinario": 0.92
+  },
+  "afbd3487d7b56ed8d6b9ffcdc56f2148e56ec2c3": {
+    "ticker": "VULC3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.82,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.87,
+      "DIVIDENDO_FRAGIL": 0.12
+    },
+    "p_extraordinario": 0.85
+  },
+  "baba61691148b70162e6c630a95e3979cca9950d": {
+    "ticker": "SBFG3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.59,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.72,
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0.27
+    },
+    "p_extraordinario": 0.88
+  },
+  "f1e3175dcf00cdcfa96e001ddda801fdd998a9dc": {
+    "ticker": "RECV3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.62,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.75,
+      "DIVIDENDO_FRAGIL": 0.25,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.8
+  },
+  "76c4be1539f101401bb8d6d39ef6ac03a779fd5e": {
+    "ticker": "PGMN3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.98,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.98,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.62
+  },
+  "7974d170a32e3252db26431075a11739f754e842": {
+    "ticker": "INTB3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.64,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.18,
+      "DIVIDENDO_FRAGIL": 0.06,
+      "DIVIDENDO_ATENCAO": 0.76
+    },
+    "p_extraordinario": 0.74
+  },
+  "1164a8de0c2536e452cf9f3b63b86479a1eecae5": {
+    "ticker": "PLPL3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.54,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.15,
+      "DIVIDENDO_FRAGIL": 0.16,
+      "DIVIDENDO_ATENCAO": 0.69
+    },
+    "p_extraordinario": 0.86
+  },
+  "247a570027ce09591d78b919ad44a4926c6dca39": {
+    "ticker": "BMOB3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.29,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.47,
+      "DIVIDENDO_FRAGIL": 0.53
+    },
+    "p_extraordinario": 0.87
+  },
+  "9d340f5be0bc109410e9eb7b12440b80ebb421a6": {
+    "ticker": "SEER3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.93,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.95,
+      "DIVIDENDO_FRAGIL": 0.05,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.7
+  },
+  "3e7fd20d09fbbf2fb0731ec65faa5ad6a8790742": {
+    "ticker": "UNIP6",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.93,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.95,
+      "DIVIDENDO_ATENCAO": 0.05,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.9
+  },
+  "672577955632c3fcbae9f94b6b56ae601dbe2485": {
+    "ticker": "MDIA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.87,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.92,
+      "DIVIDENDO_FRAGIL": 0.05,
+      "DIVIDENDO_SUSTENTAVEL": 0.03
+    },
+    "p_extraordinario": 0.81
+  },
+  "a4c06645b016f4c870de4b9b641e764b17f5feb0": {
+    "ticker": "ABCB4",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.33,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.05,
+      "DIVIDENDO_ATENCAO": 0.39,
+      "DIVIDENDO_SUSTENTAVEL": 0.55
+    },
+    "p_extraordinario": 0.58
+  },
+  "62c816c1e11283e9484a5a4a46212cf8f15732df": {
+    "ticker": "LOGG3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.77,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.85,
+      "DIVIDENDO_ATENCAO": 0.15
+    },
+    "p_extraordinario": 0.89
+  },
+  "ba7db30571287581bd7e0f8ac776eb4a21f988f6": {
+    "ticker": "GRND3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.83,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.11,
+      "DIVIDENDO_FRAGIL": 0.89
+    },
+    "p_extraordinario": 0.88
+  },
+  "b0006190a6e22d6aea8bf354b522bc8ff01f3e39": {
+    "ticker": "PINE4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.91,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.94,
+      "DIVIDENDO_FRAGIL": 0.03,
+      "DIVIDENDO_SUSTENTAVEL": 0.03
+    },
+    "p_extraordinario": 0.67
+  },
+  "345163fc4f98f6bb90f424bbf096851601f24446": {
+    "ticker": "RIAA3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.76,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.16,
+      "DIVIDENDO_FRAGIL": 0.84,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.93
+  },
+  "c49602a71d5cab31dbfa1a56acb63a95053c9b41": {
+    "ticker": "TGMA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.83,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.08,
+      "DIVIDENDO_ATENCAO": 0.88,
+      "DIVIDENDO_FRAGIL": 0.04
+    },
+    "p_extraordinario": 0.63
+  },
+  "bab79c823586ca6684f6930a9554bf06f361ea9f": {
+    "ticker": "MILS3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.73,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.82,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.18
+    },
+    "p_extraordinario": 0.48
+  },
+  "8c06c37f68628938c38f4b90380b11833eeaffbc": {
+    "ticker": "LEVE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.7,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.8,
+      "DIVIDENDO_SUSTENTAVEL": 0.17
+    },
+    "p_extraordinario": 0.67
+  },
+  "d9be3fe35e848327cb3ed218f45e28d0c7e8c17d": {
+    "ticker": "FESA4",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.91,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.06,
+      "DIVIDENDO_FRAGIL": 0.94
+    },
+    "p_extraordinario": 0.87
+  },
+  "75f22e07b5c79365409711b9472a38cddf9f5907": {
+    "ticker": "BMGB4",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.46,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.64,
+      "DIVIDENDO_FRAGIL": 0.02,
+      "DIVIDENDO_ATENCAO": 0.34
+    },
+    "p_extraordinario": 0.42
+  },
+  "62f8a3a8f10b581f5c291583aab93791b914cdd7": {
+    "ticker": "LAVV3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.73,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.82,
+      "DIVIDENDO_ATENCAO": 0.18,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.92
+  },
+  "54f0da1d5341899e9e78a19a7bee3a201f4d53fb": {
+    "ticker": "EVEN3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.74,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.83,
+      "DIVIDENDO_FRAGIL": 0.17
+    },
+    "p_extraordinario": 0.83
+  },
+  "c40db3596a3c3863e3082041965893a7fdb887b6": {
+    "ticker": "BRBI11",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.93,
+      "DIVIDENDO_FRAGIL": 0.06
+    },
+    "p_extraordinario": 0.66
+  },
+  "1d7afebc1c25fdab2a678c3969508d9af514a30d": {
+    "ticker": "RANI3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.34
+  },
+  "e1003fd2c7680597f68188ce855f6d7710a44086": {
+    "ticker": "FIQE3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.4,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.4,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.6
+    },
+    "p_extraordinario": 0.9
+  },
+  "721a8754ae3454cbc78abe920af6ad068984992d": {
+    "ticker": "ARML3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.98,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.01,
+      "DIVIDENDO_FRAGIL": 0.99,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.82
+  },
+  "6502947bcbbab3ee0f3fa0adc6c97129ecb6c449": {
+    "ticker": "CAML3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.25,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.5,
+      "DIVIDENDO_ATENCAO": 0.5,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.49
+  },
+  "69b839cd4ba7f32b71317aa8bcb69445aefaa14c": {
+    "ticker": "VLID3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.05,
+      "DIVIDENDO_FRAGIL": 0.02,
+      "DIVIDENDO_ATENCAO": 0.93
+    },
+    "p_extraordinario": 0.72
+  },
+  "1790ca429a78da8d5d4e9ca94fec519f4aef6be7": {
+    "ticker": "ALLD3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.59,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.19,
+      "DIVIDENDO_ATENCAO": 0.72,
+      "DIVIDENDO_SUSTENTAVEL": 0.09
+    },
+    "p_extraordinario": 0.86
+  },
+  "f845533f608bef802e51547f8289f5d39582b9ec": {
+    "ticker": "WIZC3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.93,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.95,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.04
+    },
+    "p_extraordinario": 0.31
+  },
+  "78e54d7ccff7a6aa5acb25b1fc5c7534a89b751b": {
+    "ticker": "BLAU3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.94,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.04,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.96
+    },
+    "p_extraordinario": 0.57
+  },
+  "2f733e8ff99105e1c21717304c6e658c094de895": {
+    "ticker": "SHUL4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.04,
+      "DIVIDENDO_SUSTENTAVEL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.93
+    },
+    "p_extraordinario": 0.72
+  },
+  "e3c7c47c150aeebb2f45be030e09073df7201886": {
+    "ticker": "MTRE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.84,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.1,
+      "DIVIDENDO_ATENCAO": 0.9,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.41
+  },
+  "ab48869cd9a17a81cdbf95078e16beb7e527ef6e": {
+    "ticker": "PETR4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.96,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.41
+  },
+  "5086a15db97af31033cb6136d25609f5c5541b20": {
+    "ticker": "VALE3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.45,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.64,
+      "DIVIDENDO_ATENCAO": 0.36
+    },
+    "p_extraordinario": 0.73
+  },
+  "70ab9d6224e4391a759b3b13c1be7762cbbcdca7": {
+    "ticker": "ITUB4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.33,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.17,
+      "DIVIDENDO_ATENCAO": 0.55,
+      "DIVIDENDO_SUSTENTAVEL": 0.28
+    },
+    "p_extraordinario": 0.76
+  },
+  "00696475312f9ea5c6d0cb6fad130cb32504e307": {
+    "ticker": "BBDC4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.42,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.38,
+      "DIVIDENDO_ATENCAO": 0.62,
+      "DIVIDENDO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.4
+  },
+  "45c3ef045804caac3a19b66f50a10d3415d82ca6": {
+    "ticker": "RENT3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.59,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.27,
+      "DIVIDENDO_ATENCAO": 0.73,
+      "DIVIDENDO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.31
+  },
+  "579772cbabf5f544ab2dd68207b7784337b1a5dd": {
+    "ticker": "ABEV3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.52,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.31,
+      "DIVIDENDO_ATENCAO": 0.68
+    },
+    "p_extraordinario": 0.62
+  },
+  "e4320cdf8aef9a82e72b23d9dcb9aea4bf2c1166": {
+    "ticker": "VBBR3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.39,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.4,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.6
+    },
+    "p_extraordinario": 0.25
+  },
+  "b734d5f3bf10e3da72df56c30397be0e6a6605c8": {
+    "ticker": "UGPA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.64,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.17,
+      "DIVIDENDO_ATENCAO": 0.76,
+      "DIVIDENDO_FRAGIL": 0.07
+    },
+    "p_extraordinario": 0.71
+  },
+  "ae739034e08b2eeb09f8933a5ad4fa0f9cb17017": {
+    "ticker": "ITSA4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.36,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.28,
+      "DIVIDENDO_ATENCAO": 0.57,
+      "DIVIDENDO_SUSTENTAVEL": 0.15
+    },
+    "p_extraordinario": 0.79
+  },
+  "8142944fc525192c35c5a5f940bf57fb532f0715": {
+    "ticker": "CPLE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.5,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.67,
+      "DIVIDENDO_FRAGIL": 0.33,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.71
+  },
+  "2f8a80599b5e28cfcc18fea8431d50b31a477d3c": {
+    "ticker": "RDOR3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.93,
+      "DIVIDENDO_ATENCAO": 0.07
+    },
+    "p_extraordinario": 0.92
+  },
+  "6f1c461571e66707746c2e1b64f3e61fa6952515": {
+    "ticker": "BBSE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.86,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.04,
+      "DIVIDENDO_ATENCAO": 0.9,
+      "DIVIDENDO_FRAGIL": 0.06
+    },
+    "p_extraordinario": 0.63
+  },
+  "dc0afe0b3ed283a876b0490b613a01f2cfab1e68": {
+    "ticker": "LREN3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.81,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.88,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.12
+    },
+    "p_extraordinario": 0.5
+  },
+  "d2e0b331cf9fc1fbee7991a9463e4bb02e607c38": {
+    "ticker": "MOTV3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.82,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.88,
+      "DIVIDENDO_SUSTENTAVEL": 0.12
+    },
+    "p_extraordinario": 0.34
+  },
+  "57d0f61f8c9d543585fb42d4b0efbe23f5475bb3": {
+    "ticker": "CYRE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.54,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.7,
+      "DIVIDENDO_FRAGIL": 0.27,
+      "DIVIDENDO_SUSTENTAVEL": 0.03
+    },
+    "p_extraordinario": 0.82
+  },
+  "c8914b375b1ff7919ea438d2e3fcaef8052d8dec": {
+    "ticker": "CMIG4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.32,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.55,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.45
+    },
+    "p_extraordinario": 0.22
+  },
+  "0817144ae88d324cedb0d37cdb0437ba5bef8280": {
+    "ticker": "VIVT3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.49,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.66,
+      "DIVIDENDO_FRAGIL": 0.34,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.54
+  },
+  "9f7ededb7971ddca219e5fd283e31554b21b2de9": {
+    "ticker": "SMFT3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.86,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.91,
+      "DIVIDENDO_FRAGIL": 0.09,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.85
+  },
+  "06d314c05099163c0c6f51f8eef8121ae01b359e": {
+    "ticker": "TIMS3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.98,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.01,
+      "DIVIDENDO_FRAGIL": 0.99
+    },
+    "p_extraordinario": 0.94
+  },
+  "72017d3423d8c1d8ff81eea4c64576eaf1aaf4fb": {
+    "ticker": "ALOS3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.58,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.28,
+      "DIVIDENDO_FRAGIL": 0.72
+    },
+    "p_extraordinario": 0.87
+  },
+  "da5808870f0d9e953ad3901cc06af188db5b5ece": {
+    "ticker": "CURY3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.45,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.64,
+      "DIVIDENDO_ATENCAO": 0.36
+    },
+    "p_extraordinario": 0.88
+  },
+  "a2b2ee55a91e748c26374f72cc3650362344f0af": {
+    "ticker": "SANB11",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.97,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.02
+    },
+    "p_extraordinario": 0.27
+  },
+  "2434ba47b68c4860cdcd441be58e4791eac054d3": {
+    "ticker": "CXSE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.86,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.9,
+      "DIVIDENDO_SUSTENTAVEL": 0.03,
+      "DIVIDENDO_FRAGIL": 0.07
+    },
+    "p_extraordinario": 0.44
+  },
+  "e7b6df9d029c5f6bb0fbc13f7eea9659851e4a56": {
+    "ticker": "TEND3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.83,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0.11,
+      "DIVIDENDO_ATENCAO": 0.88
+    },
+    "p_extraordinario": 0.77
+  },
+  "5625f2b51240f022ae6a58dd8f065cff025e6c0f": {
+    "ticker": "DIRR3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.8,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.87,
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0.12
+    },
+    "p_extraordinario": 0.84
+  },
+  "96f3175c48538abadb4a27be282c07fe61156584": {
+    "ticker": "ISAE4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.94,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.96,
+      "DIVIDENDO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.5
+  },
+  "47dfe792ff9dba72134aa35d1b70bac101b3173a": {
+    "ticker": "KLBN11",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.07,
+      "DIVIDENDO_FRAGIL": 0.93,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.85
+  },
+  "03deb8f68d792d333cbced5393a6e134ba879a89": {
+    "ticker": "CEAB3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.96,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.98,
+      "DIVIDENDO_FRAGIL": 0.02
+    },
+    "p_extraordinario": 0.84
+  },
+  "04f86901c2bc22de3aff852943294310769c135e": {
+    "ticker": "PSSA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.28,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.48,
+      "DIVIDENDO_ATENCAO": 0.52,
+      "DIVIDENDO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.27
+  },
+  "8af3f24c423f14df2e81a2742b090d74f1451f17": {
+    "ticker": "CPFE3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.63,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.76,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.24
+    },
+    "p_extraordinario": 0.29
+  },
+  "840dea2b1e43e600a15a29ea1e4f9521f8cdb872": {
+    "ticker": "TAEE11",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.68,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.21,
+      "DIVIDENDO_ATENCAO": 0.79,
+      "DIVIDENDO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.2
+  },
+  "5eca62ffacc9c1bb95e8346227917a68e7de5c46": {
+    "ticker": "BEEF3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.31,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.46,
+      "DIVIDENDO_FRAGIL": 0.54,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.74
+  },
+  "988bdbedf279ed25f10014948cbdc1eec01a98b1": {
+    "ticker": "POMO4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.79,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.12,
+      "DIVIDENDO_ATENCAO": 0.86,
+      "DIVIDENDO_SUSTENTAVEL": 0.02
+    },
+    "p_extraordinario": 0.88
+  },
+  "b8c2b49a445914c09086e5617a495278501859e7": {
+    "ticker": "MOVI3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.93,
+      "DIVIDENDO_FRAGIL": 0.06
+    },
+    "p_extraordinario": 0.52
+  },
+  "e51a122884a63f115064deb79d0ee1b0d5d1cef9": {
+    "ticker": "AZZA3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.62,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.25,
+      "DIVIDENDO_FRAGIL": 0.75,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.86
+  },
+  "ec6742e424e0d885e100d00e0d2cf34f30ffae05": {
+    "ticker": "YDUQ3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.85,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.9,
+      "DIVIDENDO_ATENCAO": 0.1
+    },
+    "p_extraordinario": 0.9
+  },
+  "2db5c7ecd199565956470746ff74c61a17f6e24c": {
+    "ticker": "BRAP4",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.94,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.04,
+      "DIVIDENDO_FRAGIL": 0.96,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.78
+  },
+  "cccee51fc73b1c456c44b0078018debcee86f49a": {
+    "ticker": "CMIN3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.72,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.19,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.81
+    },
+    "p_extraordinario": 0.71
+  },
+  "3eeefcbb0cb72952166122bf50823c13dd9dc027": {
+    "ticker": "JHSF3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.68,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.79,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.2
+    },
+    "p_extraordinario": 0.27
+  },
+  "968b730b1d55371eaa9db65f786641b29e81680e": {
+    "ticker": "EZTC3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.27,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.48,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.51
+    },
+    "p_extraordinario": 0.51
+  },
+  "552f38c67106d241ee3b1cbcd7b179fd6a5be41d": {
+    "ticker": "BRSR6",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.43,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.63,
+      "DIVIDENDO_FRAGIL": 0.07,
+      "DIVIDENDO_ATENCAO": 0.3
+    },
+    "p_extraordinario": 0.66
+  },
+  "17b15771b01fd2b45c026cd3ec41d06c2b441743": {
+    "ticker": "MDNE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.75,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.17,
+      "DIVIDENDO_ATENCAO": 0.83,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.86
+  },
+  "fe20c6f4a3f5f425f33e8a906abfdfad4a2bb01d": {
+    "ticker": "PASS3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.59,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.73,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.27
+    },
+    "p_extraordinario": 0.87
+  },
+  "3dc589ec098369b38958ded866b2f83aec9cf512": {
+    "ticker": "ALPA4",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.91,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.94,
+      "DIVIDENDO_ATENCAO": 0.06,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.92
+  },
+  "0b73d791dbdf65a90a4cbc39f35e63fe68965e08": {
+    "ticker": "VULC3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.78,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.14,
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.85
+    },
+    "p_extraordinario": 0.85
+  },
+  "8ab6168cc24762a1dcd41fe6e801efe432f42ca4": {
+    "ticker": "SBFG3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.63,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0.24,
+      "DIVIDENDO_ATENCAO": 0.75
+    },
+    "p_extraordinario": 0.87
+  },
+  "c974dc55ca94b2fe15186e7eff51f89bd8c88e8f": {
+    "ticker": "RECV3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.57,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.28,
+      "DIVIDENDO_ATENCAO": 0.72
+    },
+    "p_extraordinario": 0.81
+  },
+  "a78c77dc46f55fdf272e34a299aadc5699a01c78": {
+    "ticker": "PGMN3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.99,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.99
+    },
+    "p_extraordinario": 0.59
+  },
+  "7530720a9c42f02ade0ea4247d0e51938faebd71": {
+    "ticker": "INTB3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.71,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.81,
+      "DIVIDENDO_FRAGIL": 0.05,
+      "DIVIDENDO_SUSTENTAVEL": 0.14
+    },
+    "p_extraordinario": 0.75
+  },
+  "cba4eb0182ed7d655d927a7c72182e29d4383308": {
+    "ticker": "PLPL3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.51,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.18,
+      "DIVIDENDO_SUSTENTAVEL": 0.14,
+      "DIVIDENDO_ATENCAO": 0.68
+    },
+    "p_extraordinario": 0.88
+  },
+  "63a44468dd3f6d380fe1dabf7624e247bd0f405c": {
+    "ticker": "BMOB3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.43,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.38,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.62
+    },
+    "p_extraordinario": 0.88
+  },
+  "ba93e9f3b39462758e6e336819b994503b680edc": {
+    "ticker": "SEER3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.94,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.96,
+      "DIVIDENDO_FRAGIL": 0.04
+    },
+    "p_extraordinario": 0.69
+  },
+  "0554fe0bb276bf5c5d56d2489603b450aa367deb": {
+    "ticker": "UNIP6",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.93,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.95,
+      "DIVIDENDO_ATENCAO": 0.05
+    },
+    "p_extraordinario": 0.89
+  },
+  "2db9d0f87311b79072b829a63cb8684e3a861928": {
+    "ticker": "MDIA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.9,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.04,
+      "DIVIDENDO_ATENCAO": 0.93,
+      "DIVIDENDO_FRAGIL": 0.03
+    },
+    "p_extraordinario": 0.79
+  },
+  "67c0b9228fd07774a401d37d40a3ee8333fc4d93": {
+    "ticker": "ABCB4",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.33,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.55,
+      "DIVIDENDO_FRAGIL": 0.06,
+      "DIVIDENDO_ATENCAO": 0.39
+    },
+    "p_extraordinario": 0.6
+  },
+  "61d79a163f2c8840f57a090f24cd1e58bda47e28": {
+    "ticker": "LOGG3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.79,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.87,
+      "DIVIDENDO_ATENCAO": 0.13
+    },
+    "p_extraordinario": 0.88
+  },
+  "a896d9b7572c7bb0903b11dadd8effbaf44c03a6": {
+    "ticker": "RIAA3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.81,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.12,
+      "DIVIDENDO_FRAGIL": 0.88
+    },
+    "p_extraordinario": 0.93
+  },
+  "87d4e444b58042fbe5c99bf563a44a94237e52d3": {
+    "ticker": "GRND3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.79,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.87,
+      "DIVIDENDO_ATENCAO": 0.13
+    },
+    "p_extraordinario": 0.87
+  },
+  "c3918addb7622ee800f3069ea1c0c1193ee9a84f": {
+    "ticker": "PINE4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.9,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.94,
+      "DIVIDENDO_FRAGIL": 0.02,
+      "DIVIDENDO_SUSTENTAVEL": 0.04
+    },
+    "p_extraordinario": 0.66
+  },
+  "6cb8fa6ff80e68a49a33c60c05d5224551d89030": {
+    "ticker": "TGMA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.85,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.06,
+      "DIVIDENDO_ATENCAO": 0.9,
+      "DIVIDENDO_FRAGIL": 0.04
+    },
+    "p_extraordinario": 0.64
+  },
+  "63289303f42fdd79357da8ece9683c62d616ddcf": {
+    "ticker": "MILS3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.67,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.22,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.78
+    },
+    "p_extraordinario": 0.47
+  },
+  "898b12b73d70c2d22de2d0d8841ccd4d50374e97": {
+    "ticker": "LEVE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.69,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.79,
+      "DIVIDENDO_SUSTENTAVEL": 0.18
+    },
+    "p_extraordinario": 0.68
+  },
+  "b3b1d81018dbcf7a761c070ee01584c3620d97bb": {
+    "ticker": "FESA4",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.9,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.06,
+      "DIVIDENDO_FRAGIL": 0.94,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.85
+  },
+  "2de691a0d94d655e33837a1dd8b202a77f658343": {
+    "ticker": "BMGB4",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.43,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.62,
+      "DIVIDENDO_FRAGIL": 0.02,
+      "DIVIDENDO_ATENCAO": 0.36
+    },
+    "p_extraordinario": 0.45
+  },
+  "30c7aeb9f057e48f9955f68f11c927d0c98805c1": {
+    "ticker": "LAVV3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.68,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.79,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.21
+    },
+    "p_extraordinario": 0.91
+  },
+  "5bec0a126bdd63290bad04c31570729f49321fae": {
+    "ticker": "EVEN3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.78,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.14,
+      "DIVIDENDO_ATENCAO": 0.86,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.82
+  },
+  "29ebf4ab8d0346f916376b6a651afff182964776": {
+    "ticker": "BRBI11",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.07,
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.92
+    },
+    "p_extraordinario": 0.64
+  },
+  "bcd13e73d1d48e7704ac2ab63392aab254871df2": {
+    "ticker": "RANI3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.96,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.02,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.97
+    },
+    "p_extraordinario": 0.37
+  },
+  "b9ce013a7b8742adf11388b71a7b244a6fda5bad": {
+    "ticker": "FIQE3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.39,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.6,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.4
+    },
+    "p_extraordinario": 0.91
+  },
+  "51c5d059db958c10df3d75bcd654fd4edbf4517d": {
+    "ticker": "ARML3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.98,
+      "DIVIDENDO_ATENCAO": 0.02,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.8
+  },
+  "fec6a539c22f75e544b6ae05152c5951364f191e": {
+    "ticker": "CAML3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.36,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.42,
+      "DIVIDENDO_FRAGIL": 0.58
+    },
+    "p_extraordinario": 0.49
+  },
+  "10ebabb718abcbb57fbc50744147a0a99077939e": {
+    "ticker": "VLID3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.9,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.93,
+      "DIVIDENDO_SUSTENTAVEL": 0.05,
+      "DIVIDENDO_FRAGIL": 0.02
+    },
+    "p_extraordinario": 0.67
+  },
+  "7e05c1a4d9cfa94a45b6ee541551566d62a8a5d4": {
+    "ticker": "ALLD3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.62,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.75,
+      "DIVIDENDO_FRAGIL": 0.18,
+      "DIVIDENDO_SUSTENTAVEL": 0.07
+    },
+    "p_extraordinario": 0.85
+  },
+  "feca750e6e0b616ba761ac26d1292994a92a09b1": {
+    "ticker": "WIZC3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.93,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.95,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.04
+    },
+    "p_extraordinario": 0.3
+  },
+  "b739b816baab3edc076c6552299d0f52c61b06be": {
+    "ticker": "SHUL4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.9,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.03,
+      "DIVIDENDO_SUSTENTAVEL": 0.04,
+      "DIVIDENDO_ATENCAO": 0.93
+    },
+    "p_extraordinario": 0.69
+  },
+  "8c12487e357e6cdedf2bb41e6319f8e357cda7e0": {
+    "ticker": "BLAU3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.96,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.02,
+      "DIVIDENDO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.59
+  },
+  "1298ecc3239578c6a188502c84faf323095434ce": {
+    "ticker": "MTRE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.81,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.87,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.13
+    },
+    "p_extraordinario": 0.37
+  },
+  "e03414bb016839f01215eb9385fe0829ee40ee31": {
+    "ticker": "PETR4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.98,
+      "DIVIDENDO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.38
+  },
+  "e6f5bfdfd8d93df1bc9408f460ecca9ee4910177": {
+    "ticker": "VALE3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.43,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.38,
+      "DIVIDENDO_FRAGIL": 0.62
+    },
+    "p_extraordinario": 0.73
+  },
+  "356441792ea2131cf72ce6523973eba361d5f847": {
+    "ticker": "ITUB4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.23,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.49,
+      "DIVIDENDO_FRAGIL": 0.13,
+      "DIVIDENDO_SUSTENTAVEL": 0.38
+    },
+    "p_extraordinario": 0.74
+  },
+  "dda9653bcf0dc6759ceec038701d26681dbcbb53": {
+    "ticker": "BBDC4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.4,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.6,
+      "DIVIDENDO_SUSTENTAVEL": 0.4
+    },
+    "p_extraordinario": 0.37
+  },
+  "bddff31075ee055038326e59a3d2d788cc878930": {
+    "ticker": "RENT3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.57,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.72,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.28
+    },
+    "p_extraordinario": 0.36
+  },
+  "5039807a87f1f1f174dec4f7d19f63b2b6fdf78a": {
+    "ticker": "ABEV3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.35,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.56,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.43
+    },
+    "p_extraordinario": 0.55
+  },
+  "7aaeb9d97c783d66344d1a7deb7f18083339a6b2": {
+    "ticker": "VBBR3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.3,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.47,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.53
+    },
+    "p_extraordinario": 0.27
+  },
+  "6b3c37cb3abf4d023b76f1b6e4d1fcc2a414f9d4": {
+    "ticker": "UGPA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.56,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.07,
+      "DIVIDENDO_ATENCAO": 0.71,
+      "DIVIDENDO_SUSTENTAVEL": 0.22
+    },
+    "p_extraordinario": 0.7
+  },
+  "b1457c8ece8b8c1bd099f93f1de0942f0f7e1017": {
+    "ticker": "ITSA4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.47,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.65,
+      "DIVIDENDO_SUSTENTAVEL": 0.09,
+      "DIVIDENDO_FRAGIL": 0.26
+    },
+    "p_extraordinario": 0.78
+  },
+  "efa13e452d4523e98e934c4f6e3e0b9fcb0c4162": {
+    "ticker": "CPLE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.53,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.31,
+      "DIVIDENDO_ATENCAO": 0.69,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.75
+  },
+  "5a91570bc7e595ecef0edc3e4b2b5b3fc9fb285c": {
+    "ticker": "RDOR3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.88,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.92,
+      "DIVIDENDO_ATENCAO": 0.08,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.93
+  },
+  "301c2d6488351150623422f98a8117f4cc9cff75": {
+    "ticker": "BBSE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.88,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.92,
+      "DIVIDENDO_FRAGIL": 0.04,
+      "DIVIDENDO_SUSTENTAVEL": 0.04
+    },
+    "p_extraordinario": 0.62
+  },
+  "56036cf648a8b32ac3f5ed6c369d7f8dfdc4a2b7": {
+    "ticker": "LREN3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.85,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.9,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.1
+    },
+    "p_extraordinario": 0.48
+  },
+  "eadc46e87fa4e939c6c5d357628f7518e8bcf463": {
+    "ticker": "MOTV3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.82,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.88,
+      "DIVIDENDO_SUSTENTAVEL": 0.12,
+      "DIVIDENDO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.33
+  },
+  "7c06a57f77e1f98b787d2c72d4daa7453ae845c2": {
+    "ticker": "CYRE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.62,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.22,
+      "DIVIDENDO_SUSTENTAVEL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.75
+    },
+    "p_extraordinario": 0.83
+  },
+  "bf7dc112bfcff512234b5b7a8f78aefe7bf55067": {
+    "ticker": "CMIG4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.37,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.42,
+      "DIVIDENDO_ATENCAO": 0.58,
+      "DIVIDENDO_FRAGIL": 0
+    },
+    "p_extraordinario": 0.21
+  },
+  "fe5643c5744711804984e653e8afa55151babed6": {
+    "ticker": "VIVT3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.59,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.72,
+      "DIVIDENDO_FRAGIL": 0.28
+    },
+    "p_extraordinario": 0.58
+  },
+  "5f2209ff4fe9bc630967140ff2903eda39c638ed": {
+    "ticker": "SMFT3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.77,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.85,
+      "DIVIDENDO_FRAGIL": 0.15,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.86
+  },
+  "8210e4ed6b6cce701f2badfb8d10964ae6d11f41": {
+    "ticker": "TIMS3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.98,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.02
+    },
+    "p_extraordinario": 0.94
+  },
+  "3a2f2afae94273911cf3d13342a9133094bb65fd": {
+    "ticker": "ALOS3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.55,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.69,
+      "DIVIDENDO_ATENCAO": 0.3,
+      "DIVIDENDO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.88
+  },
+  "8f1855b5c400a683fc85326728e2f2842ab01d52": {
+    "ticker": "CURY3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.4,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.6,
+      "DIVIDENDO_ATENCAO": 0.39,
+      "DIVIDENDO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.88
+  },
+  "6b0721b851fd1a9f6ecdccc58679f2cb33ab15e3": {
+    "ticker": "SANB11",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.97,
+      "DIVIDENDO_SUSTENTAVEL": 0.02,
+      "DIVIDENDO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.22
+  },
+  "582ddd3ba507653696c83a6fd80f55d4a671505f": {
+    "ticker": "CXSE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.84,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.04,
+      "DIVIDENDO_FRAGIL": 0.07,
+      "DIVIDENDO_ATENCAO": 0.89
+    },
+    "p_extraordinario": 0.46
+  },
+  "aa62792b307d2a8e5658a696070cd6165f59a207": {
+    "ticker": "TEND3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.84,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.1,
+      "DIVIDENDO_ATENCAO": 0.9
+    },
+    "p_extraordinario": 0.78
+  },
+  "cd247c15b70c8fa8a6be307a49632acaebd2345c": {
+    "ticker": "DIRR3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.78,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.86,
+      "DIVIDENDO_FRAGIL": 0.13
+    },
+    "p_extraordinario": 0.86
+  },
+  "e6b1267ab79205139330e44eec9b909fbd191b12": {
+    "ticker": "ISAE4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.89,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.07,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.92
+    },
+    "p_extraordinario": 0.51
+  },
+  "7c3760c3540460f1ce0c644bc03d2ed325c0e6bd": {
+    "ticker": "KLBN11",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.9,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.07,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.93
+    },
+    "p_extraordinario": 0.84
+  },
+  "d235d583e97a489e04be56d24af2540591f41b93": {
+    "ticker": "CEAB3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.97,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.02,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.98
+    },
+    "p_extraordinario": 0.84
+  },
+  "021354b1ef9ca7733bb649df108cdc1cd6c016c5": {
+    "ticker": "PSSA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.37,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.58,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.42
+    },
+    "p_extraordinario": 0.28
+  },
+  "cc88eeeb8afa07d9afdd965fb8eee8dc69aebb63": {
+    "ticker": "CPFE3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.62,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.25,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.75
+    },
+    "p_extraordinario": 0.29
+  },
+  "1dcd464773260fca49c0eac08aef1d5278517899": {
+    "ticker": "TAEE11",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.65,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.77,
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_SUSTENTAVEL": 0.23
+    },
+    "p_extraordinario": 0.18
+  },
+  "6b16a86f1d660666aeb1105c1151a1cc5d0b4a8a": {
+    "ticker": "BEEF3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.32,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.55,
+      "DIVIDENDO_FRAGIL": 0.45
+    },
+    "p_extraordinario": 0.77
+  },
+  "c63955c94d4077c490724041300915d1d887a1fb": {
+    "ticker": "POMO4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.82,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.88,
+      "DIVIDENDO_SUSTENTAVEL": 0.02,
+      "DIVIDENDO_FRAGIL": 0.1
+    },
+    "p_extraordinario": 0.87
+  },
+  "f068e518ea45a7ee11542b5cafc4e51f036f42ed": {
+    "ticker": "MOVI3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.88,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0.07,
+      "DIVIDENDO_ATENCAO": 0.92
+    },
+    "p_extraordinario": 0.5
+  },
+  "c72eb89b21246591e8ad552d4d3ee3f5873328e2": {
+    "ticker": "AZZA3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.72,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.81,
+      "DIVIDENDO_ATENCAO": 0.19
+    },
+    "p_extraordinario": 0.86
+  },
+  "9c4d1d28c10c0248731f927a9bca23078701d9c7": {
+    "ticker": "YDUQ3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.85,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.9,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.1
+    },
+    "p_extraordinario": 0.9
+  },
+  "bf900eb18443205a75a61314aaf329e22873eee7": {
+    "ticker": "BRAP4",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.87,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.09,
+      "DIVIDENDO_FRAGIL": 0.91,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.75
+  },
+  "911b2d841feffbe49cb2fd245e446f21784f05c9": {
+    "ticker": "CMIN3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.63,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.24,
+      "DIVIDENDO_FRAGIL": 0.76
+    },
+    "p_extraordinario": 0.75
+  },
+  "7d82e1e3be63dcfc4ee1497b9cfb0fa11945eda9": {
+    "ticker": "JHSF3",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.57,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.27,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_SUSTENTAVEL": 0.72
+    },
+    "p_extraordinario": 0.29
+  },
+  "643acb7f6237f0b310dc41063fdfba3d791703ef": {
+    "ticker": "EZTC3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.38,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.4,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.59
+    },
+    "p_extraordinario": 0.5
+  },
+  "18d0fa2b6cbbaf8ddfb1f6deaf45de95a8e660fc": {
+    "ticker": "BRSR6",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.44,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.63,
+      "DIVIDENDO_ATENCAO": 0.28,
+      "DIVIDENDO_FRAGIL": 0.09
+    },
+    "p_extraordinario": 0.65
+  },
+  "b5f0b5729fd323c96b5c8205ebe161df754e0f97": {
+    "ticker": "MDNE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.67,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.78,
+      "DIVIDENDO_FRAGIL": 0.22
+    },
+    "p_extraordinario": 0.87
+  },
+  "021a7ddf540bd367f8c1f6d6643b10e7f8bf9c73": {
+    "ticker": "PASS3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.69,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.8,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.2
+    },
+    "p_extraordinario": 0.85
+  },
+  "c98b4ab99f78c110c2794bb05eccbb1de13a1a55": {
+    "ticker": "ALPA4",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.86,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.09,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.91
+    },
+    "p_extraordinario": 0.92
+  },
+  "c28b1b05a6e3308ef7888495b6ec718461159a15": {
+    "ticker": "VULC3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.77,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.85,
+      "DIVIDENDO_FRAGIL": 0.14,
+      "DIVIDENDO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.86
+  },
+  "3a8c9d75cb909d478fb7008d8dcdddadd330bad4": {
+    "ticker": "SBFG3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.56,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.7,
+      "DIVIDENDO_FRAGIL": 0.29,
+      "DIVIDENDO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.88
+  },
+  "77af8efeb0cefde74285a1b5abe6cb0373d91542": {
+    "ticker": "RECV3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.65,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.77,
+      "DIVIDENDO_FRAGIL": 0.23
+    },
+    "p_extraordinario": 0.79
+  },
+  "e2bbda3a41b55be3e8e7e2535f81e1e32e9c7290": {
+    "ticker": "PGMN3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.98,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.98,
+      "DIVIDENDO_SUSTENTAVEL": 0.01
+    },
+    "p_extraordinario": 0.63
+  },
+  "4d8ffcbeae5345f085f2239539d7d35dd91697fa": {
+    "ticker": "INTB3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.68,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.05,
+      "DIVIDENDO_SUSTENTAVEL": 0.16,
+      "DIVIDENDO_ATENCAO": 0.79
+    },
+    "p_extraordinario": 0.75
+  },
+  "b3f8e13f86bd296be6c51d31afab9b9be12f8621": {
+    "ticker": "PLPL3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.56,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.16,
+      "DIVIDENDO_ATENCAO": 0.7,
+      "DIVIDENDO_SUSTENTAVEL": 0.14
+    },
+    "p_extraordinario": 0.87
+  },
+  "262b24be749e6263e0bc19d5421bda6be876168f": {
+    "ticker": "BMOB3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.41,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.61,
+      "DIVIDENDO_ATENCAO": 0.39
+    },
+    "p_extraordinario": 0.86
+  },
+  "1080348812bf7b7b577981710ca76390f397b5d4": {
+    "ticker": "SEER3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.93,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.95,
+      "DIVIDENDO_FRAGIL": 0.05
+    },
+    "p_extraordinario": 0.7
+  },
+  "1134e49faf7de876507bf358a1b130a0c563eac5": {
+    "ticker": "UNIP6",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.88,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.92,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.08
+    },
+    "p_extraordinario": 0.89
+  },
+  "8b445395c27e4d3853881672ae7de8be0354f1da": {
+    "ticker": "MDIA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.88,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.92,
+      "DIVIDENDO_SUSTENTAVEL": 0.03,
+      "DIVIDENDO_FRAGIL": 0.05
+    },
+    "p_extraordinario": 0.82
+  },
+  "be96e2ef88ad632dff23c12ce21caf8e75a1825a": {
+    "ticker": "ABCB4",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.42,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.33,
+      "DIVIDENDO_SUSTENTAVEL": 0.62,
+      "DIVIDENDO_FRAGIL": 0.05
+    },
+    "p_extraordinario": 0.59
+  },
+  "e028327702cf66f0f5c6a47871615724f1c717d3": {
+    "ticker": "LOGG3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.74,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.17,
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0.82
+    },
+    "p_extraordinario": 0.88
+  },
+  "b08731ecc535d09ef204c8c6c7987145ebc20ef5": {
+    "ticker": "RIAA3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.81,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.87,
+      "DIVIDENDO_ATENCAO": 0.13
+    },
+    "p_extraordinario": 0.93
+  },
+  "90f1329d0605304939f0c22e95e67daae22a5bb9": {
+    "ticker": "GRND3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.82,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.88,
+      "DIVIDENDO_ATENCAO": 0.12
+    },
+    "p_extraordinario": 0.89
+  },
+  "b400bc3fe76a62497ac41eec9b1b532ba463daa7": {
+    "ticker": "PINE4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.94,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.02,
+      "DIVIDENDO_SUSTENTAVEL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.95
+    },
+    "p_extraordinario": 0.64
+  },
+  "741d29c99935b99615a1d82171b2bcca287aa845": {
+    "ticker": "TGMA3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.84,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.89,
+      "DIVIDENDO_SUSTENTAVEL": 0.06,
+      "DIVIDENDO_FRAGIL": 0.05
+    },
+    "p_extraordinario": 0.66
+  },
+  "e4e80978c7070ad5d32d4d50cc0e7b03f6e0b824": {
+    "ticker": "MILS3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.76,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0,
+      "DIVIDENDO_ATENCAO": 0.84,
+      "DIVIDENDO_SUSTENTAVEL": 0.16
+    },
+    "p_extraordinario": 0.5
+  },
+  "dd14147f82cfa932100322c1e5c96d7d667b4ef9": {
+    "ticker": "LEVE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.78,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.85,
+      "DIVIDENDO_SUSTENTAVEL": 0.12
+    },
+    "p_extraordinario": 0.68
+  },
+  "5c8bcc11cb9ab83fe210ebbff02d5e80c9770b8c": {
+    "ticker": "FESA4",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.92,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.05,
+      "DIVIDENDO_FRAGIL": 0.95
+    },
+    "p_extraordinario": 0.86
+  },
+  "45dd0aa36af505c13d0000a5d6f705ab2425deb5": {
+    "ticker": "BMGB4",
+    "classe": "DIVIDENDO_SUSTENTAVEL",
+    "confianca": 0.55,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.71,
+      "DIVIDENDO_ATENCAO": 0.28,
+      "DIVIDENDO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.46
+  },
+  "e13f5c78fd7f6e84ca3e724bbe57fd3c30e36d09": {
+    "ticker": "LAVV3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.68,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.21,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.79
+    },
+    "p_extraordinario": 0.92
+  },
+  "4ef7104f0528e0c5e52d1454c32d68e2c3ceb863": {
+    "ticker": "EVEN3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.79,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.86,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.14
+    },
+    "p_extraordinario": 0.82
+  },
+  "da624bee54f4a74a05de9647f5460f68ad0e5687": {
+    "ticker": "BRBI11",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.9,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.01,
+      "DIVIDENDO_FRAGIL": 0.06,
+      "DIVIDENDO_ATENCAO": 0.93
+    },
+    "p_extraordinario": 0.64
+  },
+  "878f8e3c837e8e357a079262767d05c99271ae0b": {
+    "ticker": "RANI3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.96,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.02,
+      "DIVIDENDO_ATENCAO": 0.97,
+      "DIVIDENDO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.36
+  },
+  "474f1657278ff1b51d415f17751c58f4de871c3c": {
+    "ticker": "FIQE3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.48,
+    "probabilidades": {
+      "DIVIDENDO_ATENCAO": 0.34,
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_FRAGIL": 0.66
+    },
+    "p_extraordinario": 0.9
+  },
+  "008e15d897718cf69efcb2a99587f2cc8a4084dd": {
+    "ticker": "ARML3",
+    "classe": "DIVIDENDO_FRAGIL",
+    "confianca": 0.96,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0,
+      "DIVIDENDO_ATENCAO": 0.02,
+      "DIVIDENDO_FRAGIL": 0.98
+    },
+    "p_extraordinario": 0.82
+  },
+  "23372043c8a445264e50d497a5f2b128471e8d30": {
+    "ticker": "CAML3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.35,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.43,
+      "DIVIDENDO_ATENCAO": 0.57,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.48
+  },
+  "72eac6c55dbd4772799ddef1eb2129aa70d2cfc0": {
+    "ticker": "VLID3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.86,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.06,
+      "DIVIDENDO_ATENCAO": 0.91,
+      "DIVIDENDO_FRAGIL": 0.03
+    },
+    "p_extraordinario": 0.68
+  },
+  "51e89ac135136daa591e8cfaf3d3a0b523505ff0": {
+    "ticker": "ALLD3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.56,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.11,
+      "DIVIDENDO_FRAGIL": 0.19,
+      "DIVIDENDO_ATENCAO": 0.7
+    },
+    "p_extraordinario": 0.84
+  },
+  "9e30469bd057dd3f5a02ed95888297325bdd848e": {
+    "ticker": "WIZC3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.92,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.05,
+      "DIVIDENDO_FRAGIL": 0.01,
+      "DIVIDENDO_ATENCAO": 0.94
+    },
+    "p_extraordinario": 0.31
+  },
+  "8801802051ee24816a3b70a90281a2fa529b2043": {
+    "ticker": "SHUL4",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.9,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.93,
+      "DIVIDENDO_SUSTENTAVEL": 0.04
+    },
+    "p_extraordinario": 0.7
+  },
+  "6b60123841c60ab1758105fffe56795ebb9f26b6": {
+    "ticker": "BLAU3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.94,
+    "probabilidades": {
+      "DIVIDENDO_SUSTENTAVEL": 0.03,
+      "DIVIDENDO_ATENCAO": 0.96,
+      "DIVIDENDO_FRAGIL": 0.01
+    },
+    "p_extraordinario": 0.59
+  },
+  "f30241627d38e895af56f5c4904c8154babbb3f7": {
+    "ticker": "MTRE3",
+    "classe": "DIVIDENDO_ATENCAO",
+    "confianca": 0.83,
+    "probabilidades": {
+      "DIVIDENDO_FRAGIL": 0.11,
+      "DIVIDENDO_ATENCAO": 0.89,
+      "DIVIDENDO_SUSTENTAVEL": 0
+    },
+    "p_extraordinario": 0.4
+  }
+}
