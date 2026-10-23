@@ -1,5 +1,9 @@
 # Dividendos, FIIs e eleição 2026 na B3 — score determinístico + Jev
 
+[![Painel pós-eleição: acumulado de Ibovespa, small caps, média das ações analisadas e dólar de 02/10 a 22/10/2026](docs/img/painel_pos_eleicao.png)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html)
+
+<sub>Painel pós-eleição — clique na imagem para abrir o dashboard interativo.</sub>
+
 Análise da qualidade dos dividendos de ações e dos rendimentos de fundos imobiliários (FIIs) listados na B3, seguida
 de um acompanhamento diário do mercado entre o 1º turno (04/10/2026) e o 2º turno (25/10/2026) da eleição
 presidencial.
