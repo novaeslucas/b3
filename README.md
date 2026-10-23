@@ -17,10 +17,27 @@ O Jev não calcula nada e não vê preço-alvo: ele classifica a partir dos núm
 
 > ⚠️ **Não é recomendação de investimento.** É um estudo de metodologia com dados públicos, que podem conter erros.
 
+## Dashboards
+
+Os dashboards são HTML estáticos; os links abaixo abrem cada um renderizado pelo htmlpreview.
+
+**[Página inicial com todos os dashboards](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/index.html)**
+
+| Dashboard | Conteúdo |
+|---|---|
+| [Painel pós-eleição](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html) | Acumulado de 02/10 a 22/10 por ativo, setor e fator eleitoral |
+| [Ações — dividendos](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html) | Snapshot de 05/10: score + classificação do Jev |
+| [FIIs — rendimentos](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_fiis.html) | Snapshot de 05/10: score, tipo do fundo e classificação do Jev |
+| [Leitura pós-1º turno (05/10)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_eleicao.html) | Primeiro pregão após o 1º turno × fatores eleitorais |
+| [Ações com setores da B3 (06/10)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard.html) | Reexecução com a classificação setorial oficial da B3 |
+
+**Leituras diárias:** [06/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard_eleicao.html) · [07/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_07/dashboard_eleicao.html) · [08/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_08/dashboard_eleicao.html) · [09/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_09/dashboard_eleicao.html) · [13/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_13/dashboard_eleicao.html) · [14/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_14/dashboard_eleicao.html) · [15/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_15/dashboard_eleicao.html) · [16/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_16/dashboard_eleicao.html) · [19/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_19/dashboard_eleicao.html) · [20/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_20/dashboard_eleicao.html) · [21/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_21/dashboard_eleicao.html) · [22/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_22/dashboard_eleicao.html)
+
 ---
 
 ## Sumário
 
+- [Dashboards](#dashboards)
 - [Estrutura do repositório](#estrutura-do-repositório)
 - [Fontes de dados](#fontes-de-dados)
 - [Metodologia](#metodologia)
@@ -40,6 +57,7 @@ O Jev não calcula nada e não vê preço-alvo: ele classifica a partir dos núm
 
 ```
 .
+├── index.html                 # página que reúne todos os dashboards
 ├── dividendos.py              # ações: coleta, score, Jev, conferência com a B3 → resultados/
 ├── fiis.py                    # FIIs: idem, adaptado a fundos imobiliários   → resultados/
 ├── leitura_pos_eleicao.py     # 1ª leitura do pregão pós-1º turno (05/10)   → resultados/
@@ -165,7 +183,7 @@ ajustá-la manualmente e recalcula a exposição esperada de cada ativo.
 [`painel_pos_eleicao.py`](painel_pos_eleicao.py) junta tudo o que as leituras diárias produziram e reconstrói a
 série completa de cada ativo de 02/10 até o último pregão: acumulado por ativo, por setor da B3 e por fator, contra
 Ibovespa, small caps (SMAL11), FIIs (XFIX11, aproximação do IFIX) e dólar. Saída:
-[`resultados/dashboard_pos_eleicao.html`](resultados/dashboard_pos_eleicao.html).
+[`resultados/dashboard_pos_eleicao.html`](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html).
 
 ## Onde o Jev foi aplicado
 
@@ -200,7 +218,7 @@ estado + perguntas: rodar de novo com os mesmos dados não chama a API, e mudar 
 Snapshot de **05/10/2026** (cotações de 02/10, último pregão antes do 1º turno).
 
 **Ações** — 77 empresas após os filtros
-([CSV](resultados/resultado_dividendos.csv) · [dashboard](resultados/dashboard.html)):
+([CSV](resultados/resultado_dividendos.csv) · [dashboard](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html)):
 
 | Jev | Qtde |  | Decisão | Qtde |
 |---|---:|---|---|---:|
@@ -212,7 +230,7 @@ Snapshot de **05/10/2026** (cotações de 02/10, último pregão antes do 1º tu
 Conferência com a B3: 69 conferem, 4 divergem em algum ano, 4 são units (não comparáveis).
 
 **FIIs** — 70 fundos após os filtros
-([CSV](resultados/resultado_fiis.csv) · [dashboard](resultados/dashboard_fiis.html)):
+([CSV](resultados/resultado_fiis.csv) · [dashboard](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_fiis.html)):
 
 | Jev | Qtde |  | Decisão | Qtde |
 |---|---:|---|---|---:|
@@ -225,7 +243,7 @@ Conferência com a B3: 69 conferem, 4 divergem em algum ano, 4 são units (não 
 **Pós-eleição** — 145 ativos acompanhados em 13 pregões (05/10 na raiz, 06/10 a 22/10 em `leituras/`). Mediana do acumulado de 02/10 a 22/10:
 **+10,6% nas ações** e **+4,6% nos FIIs**, contra **+6,25% do Ibovespa**. Leitura dia a dia em
 [`leituras/`](leituras/) e visão consolidada em
-[`resultados/dashboard_pos_eleicao.html`](resultados/dashboard_pos_eleicao.html).
+[`resultados/dashboard_pos_eleicao.html`](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html).
 
 ## Como executar
 

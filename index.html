@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboards B3 + Jev</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e3e2dd;
+    --accent: #1f5fbf; --pos: #1a7f45; --neg: #b3261e; --chip: #eef2fa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161615; --card: #1f1f1d; --text: #ecebe6; --muted: #a09f99; --line: #33332f;
+      --accent: #7aa7ee; --pos: #5cc28a; --neg: #ef7b72; --chip: #232a38;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 980px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { font-size: 1.6rem; margin: 0 0 6px; }
+  h2 { font-size: 1.1rem; margin: 36px 0 12px; }
+  p { margin: 0 0 10px; }
+  .muted { color: var(--muted); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .aviso {
+    font-size: .85rem; color: var(--muted); border-left: 3px solid var(--line);
+    padding: 2px 0 2px 10px; margin-top: 12px;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+  .card {
+    display: block; background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; color: inherit;
+  }
+  a.card:hover { border-color: var(--accent); text-decoration: none; }
+  .card strong { display: block; color: var(--accent); margin-bottom: 4px; }
+  .card span { font-size: .9rem; color: var(--muted); }
+  .destaque { border-color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line);
+          border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pos { color: var(--pos); } .neg { color: var(--neg); }
+  td.data { white-space: nowrap; }
+  td.resumo { font-size: .9rem; }
+  .links a { white-space: nowrap; }
+  .tabela { overflow-x: auto; }
+  @media (max-width: 640px) {
+    td.resumo, th.resumo { display: none; }
+  }
+  footer { margin-top: 40px; font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Dividendos, FIIs e eleição 2026 na B3</h1>
+  <p class="muted">Score determinístico + Jev. Todos os dashboards da análise reunidos aqui. A metodologia completa
+    está no <a href="https://github.com/novaeslucas/b3#readme">README do repositório</a>.</p>
+  <p class="aviso">Não é recomendação de investimento.</p>
+
+  <h2>Panorama</h2>
+  <div class="grid">
+    <a class="card destaque" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html">
+      <strong>Painel pós-eleição</strong>
+      <span>Acumulado de 02/10 a 22/10 por ativo, setor da B3 e fator eleitoral, contra Ibovespa, small caps, FIIs e dólar.</span>
+    </a>
+  </div>
+
+  <h2>Snapshot de 05/10/2026</h2>
+  <div class="grid">
+    <a class="card" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html">
+      <strong>Ações — qualidade dos dividendos</strong>
+      <span>77 empresas, Dividend Quality Score e classificação do Jev. Estudar: JHSF3, CPFE3, BMGB4.</span>
+    </a>
+    <a class="card" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_fiis.html">
+      <strong>FIIs — qualidade do rendimento</strong>
+      <span>70 fundos, score, tipo do fundo e classificação do Jev. Estudar: LVBI11, HSLG11, KNHF11, JSRE11.</span>
+    </a>
+    <a class="card" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_eleicao.html">
+      <strong>Leitura pós-1º turno (05/10)</strong>
+      <span>Primeiro pregão após o 1º turno: Ibovespa +7,70%, cruzado com os fatores eleitorais do Jev.</span>
+    </a>
+    <a class="card" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard.html">
+      <strong>Ações com setores da B3 (06/10)</strong>
+      <span>Reexecução da análise de dividendos com a classificação setorial oficial da B3.</span>
+    </a>
+  </div>
+
+  <h2>Leituras diárias</h2>
+  <p class="muted">Variação do Ibovespa no dia e acumulada desde 02/10, último pregão antes do 1º turno.</p>
+  <div class="tabela">
+  <table>
+    <thead>
+      <tr><th>Pregão</th><th class="num">Ibov dia</th><th class="num">Acum.</th><th class="resumo">Destaques</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_eleicao.html">05/10</a></td>
+        <td class="num pos">+7,70%</td><td class="num pos">+7,70%</td>
+        <td class="resumo">Maior alta desde 2020 após o 1º turno; dólar −4,12% a R$ 5,00, juros futuros em forte queda.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard_eleicao.html">06/10</a></td>
+        <td class="num neg">−0,52%</td><td class="num pos">+7,14%</td>
+        <td class="resumo">Realização de lucros; dólar abaixo de R$ 5; BBAS3 −6,42% após rebaixamento.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_07/dashboard_eleicao.html">07/10</a></td>
+        <td class="num neg">−0,74%</td><td class="num pos">+6,34%</td>
+        <td class="resumo">Mercado cobra sinais fiscais; petróleo acima de US$ 100; bancos caem.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_08/dashboard_eleicao.html">08/10</a></td>
+        <td class="num pos">+0,94%</td><td class="num pos">+7,34%</td>
+        <td class="resumo">PoderData: Flávio 53% × Lula 47% dos válidos; small caps e varejo sobem.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_09/dashboard_eleicao.html">09/10</a></td>
+        <td class="num pos">+1,38%</td><td class="num pos">+8,82%</td>
+        <td class="resumo">Maior fechamento da história (209.067); Datafolha 49% × 45%; varejo dispara.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_13/dashboard_eleicao.html">13/10</a></td>
+        <td class="num neg">−1,04%</td><td class="num pos">+7,69%</td>
+        <td class="resumo">DIs em alta; small caps −3,28%; varejo e educação caem.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_14/dashboard_eleicao.html">14/10</a></td>
+        <td class="num neg">−0,18%</td><td class="num pos">+7,49%</td>
+        <td class="resumo">Pacote de benefícios do governo chega a R$ 260 bi; BHIA3 −24,31%.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_15/dashboard_eleicao.html">15/10</a></td>
+        <td class="num neg">−1,06%</td><td class="num pos">+6,36%</td>
+        <td class="resumo">3ª queda seguida; Quaest 46% × 44%; Senado aprova fim da escala 6x1.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_16/dashboard_eleicao.html">16/10</a></td>
+        <td class="num pos">+0,54%</td><td class="num pos">+6,93%</td>
+        <td class="resumo">Datafolha 47% × 45% (vantagem cai para 2 pontos); Brent a US$ 109,86.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_19/dashboard_eleicao.html">19/10</a></td>
+        <td class="num neg">−0,17%</td><td class="num pos">+6,75%</td>
+        <td class="resumo">Bolsa Família reajustado antes do 2º turno; varejo e construção sobem.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_20/dashboard_eleicao.html">20/10</a></td>
+        <td class="num pos">+1,57%</td><td class="num pos">+8,42%</td>
+        <td class="resumo">Real Time Big Data: 52% × 48% dos válidos; varejo dispara.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_21/dashboard_eleicao.html">21/10</a></td>
+        <td class="num neg">−0,86%</td><td class="num pos">+7,49%</td>
+        <td class="resumo">Quaest 45% × 44%; Fitch espera aperto fiscal em 2027; WEGE3 −7,34% após o 3T26.</td></tr>
+      <tr><td class="data"><a href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_22/dashboard_eleicao.html">22/10</a></td>
+        <td class="num neg">−1,15%</td><td class="num pos">+6,25%</td>
+        <td class="resumo">DIs em alta; Brent a US$ 113,17; siderurgia e mineração caem.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <footer>
+    Fontes: Fundamentus, B3, Yahoo Finance e institutos de pesquisa. Classificações do Jev (TypeSafe).
+    Código e dados em <a href="https://github.com/novaeslucas/b3">github.com/novaeslucas/b3</a>.
+  </footer>
+</main>
+</body>
+</html>
