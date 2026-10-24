@@ -41,13 +41,14 @@ def serie(simbolo):
     try:
         r = json.loads(fetch(None, YAHOO.format(simbolo), "utf-8", f"yahoo3m_{simbolo}"))["chart"]["result"][0]
         # Data em UTC − 2h. Barras da B3 vêm às 13h UTC do próprio dia. As de câmbio (BRL=X) vêm às 23h UTC e, conferidas
-        # com o fechamento do dólar comercial, correspondem ao dia em UTC; a de domingo traz o fechamento de sexta. A
+        # com o fechamento do dólar comercial, correspondem ao dia em UTC; barras de sábado (cotação ao vivo
+        # lida no fim de semana) e de domingo trazem o fechamento de sexta. A
         # cotação ao vivo da noite chega com hora de 0h–1h UTC do dia seguinte: o −2h a mantém no pregão de hoje.
         out = {}
         for t, c in zip(r["timestamp"], r["indicators"]["quote"][0]["close"]):
             d = dt.datetime.fromtimestamp(t - 7200, dt.timezone.utc).date()
             if c is not None:
-                out[d - dt.timedelta(days=2) if d.weekday() == 6 else d] = c
+                out[d - dt.timedelta(days=max(0, d.weekday() - 4))] = c  # sáb −1, dom −2
         return out
     except Exception:
         return {}

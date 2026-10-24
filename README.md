@@ -1,6 +1,6 @@
 # Dividendos, FIIs e eleição 2026 na B3 — score determinístico + Jev
 
-[![Painel pós-eleição: acumulado de Ibovespa, small caps, média das ações analisadas e dólar de 02/10 a 22/10/2026](docs/img/painel_pos_eleicao.png)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html)
+[![Painel pós-eleição: acumulado de Ibovespa, small caps, média das ações analisadas e dólar de 02/10 a 23/10/2026](docs/img/painel_pos_eleicao.png)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html)
 
 <sub>Painel pós-eleição — clique na imagem para abrir o dashboard interativo.</sub>
 
@@ -29,13 +29,13 @@ Os dashboards são HTML estáticos; os links abaixo abrem cada um renderizado pe
 
 | Dashboard | Conteúdo |
 |---|---|
-| [Painel pós-eleição](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html) | Acumulado de 02/10 a 22/10 por ativo, setor e fator eleitoral |
+| [Painel pós-eleição](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html) | Acumulado de 02/10 a 23/10 por ativo, setor e fator eleitoral |
 | [Ações — dividendos](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html) | Snapshot de 05/10: score + classificação do Jev |
 | [FIIs — rendimentos](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_fiis.html) | Snapshot de 05/10: score, tipo do fundo e classificação do Jev |
 | [Leitura pós-1º turno (05/10)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_eleicao.html) | Primeiro pregão após o 1º turno × fatores eleitorais |
 | [Ações com setores da B3 (06/10)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard.html) | Reexecução com a classificação setorial oficial da B3 |
 
-**Leituras diárias:** [06/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard_eleicao.html) · [07/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_07/dashboard_eleicao.html) · [08/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_08/dashboard_eleicao.html) · [09/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_09/dashboard_eleicao.html) · [13/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_13/dashboard_eleicao.html) · [14/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_14/dashboard_eleicao.html) · [15/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_15/dashboard_eleicao.html) · [16/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_16/dashboard_eleicao.html) · [19/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_19/dashboard_eleicao.html) · [20/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_20/dashboard_eleicao.html) · [21/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_21/dashboard_eleicao.html) · [22/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_22/dashboard_eleicao.html)
+**Leituras diárias:** [06/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard_eleicao.html) · [07/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_07/dashboard_eleicao.html) · [08/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_08/dashboard_eleicao.html) · [09/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_09/dashboard_eleicao.html) · [13/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_13/dashboard_eleicao.html) · [14/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_14/dashboard_eleicao.html) · [15/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_15/dashboard_eleicao.html) · [16/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_16/dashboard_eleicao.html) · [19/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_19/dashboard_eleicao.html) · [20/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_20/dashboard_eleicao.html) · [21/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_21/dashboard_eleicao.html) · [22/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_22/dashboard_eleicao.html) · [23/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_23/dashboard_eleicao.html)
 
 ---
 
@@ -72,7 +72,7 @@ Os dashboards são HTML estáticos; os links abaixo abrem cada um renderizado pe
 │   ├── resultado_fiis.csv       / dashboard_fiis.html
 │   ├── leitura_pos_eleicao.csv  / dashboard_eleicao.html
 │   └── dashboard_pos_eleicao.html          ← painel geral, bom ponto de partida
-├── leituras/AAAA_MM_DD/       # uma pasta por pregão (06/10 a 22/10): scripts do dia + CSV + dashboard
+├── leituras/AAAA_MM_DD/       # uma pasta por pregão (06/10 a 23/10): scripts do dia + CSV + dashboard
 ├── cache/jev*.json            # respostas do Jev usadas nas análises (chave = hash do estado + perguntas)
 └── docs/pesquisa_endpoint_b3.md  # levantamento das fontes gratuitas de proventos da B3
 ```
@@ -163,13 +163,13 @@ Base congelada: dados do Fundamentus e respostas do Jev do **snapshot de 05/10**
    refeita.
 4. Cruza as variações com os fatores eleitorais do Jev, com a decisão e com o tipo de FII.
 5. Setor oficial da B3 (Setor Econômico / Subsetor / Segmento, via `GetDetail`); quando diverge do Fundamentus,
-   vale a B3 ([`setores_b3.py`](leituras/2026_10_22/setores_b3.py)).
+   vale a B3 ([`setores_b3.py`](leituras/2026_10_23/setores_b3.py)).
 
 Cada dashboard diário traz no topo o contexto do pregão (notícias, com link da fonte).
 
 ### 4. Fatores do 2º turno
 
-[`fatores_2turno.py`](leituras/2026_10_22/fatores_2turno.py), a partir de 09/10.
+[`fatores_2turno.py`](leituras/2026_10_23/fatores_2turno.py), a partir de 09/10.
 
 Os fatores da etapa 3 medem **exposição** (o quanto a empresa depende do governo, do dólar, dos juros), mas não o
 **sentido** do efeito. Esta etapa acrescenta perguntas direcionais, com o contexto do 2º turno no estado:
@@ -244,8 +244,8 @@ Conferência com a B3: 69 conferem, 4 divergem em algum ano, 4 são units (não 
 
 `estudar`: **LVBI11** (96,2), **HSLG11** (95,0), **KNHF11** (91,3), **JSRE11** (88,9).
 
-**Pós-eleição** — 145 ativos acompanhados em 13 pregões (05/10 na raiz, 06/10 a 22/10 em `leituras/`). Mediana do acumulado de 02/10 a 22/10:
-**+10,6% nas ações** e **+4,6% nos FIIs**, contra **+6,25% do Ibovespa**. Leitura dia a dia em
+**Pós-eleição** — 146 ativos acompanhados em 14 pregões (05/10 na raiz, 06/10 a 23/10 em `leituras/`). Mediana do acumulado de 02/10 a 23/10:
+**+14,0% nas ações** e **+5,4% nos FIIs**, contra **+6,75% do Ibovespa**. Leitura dia a dia em
 [`leituras/`](leituras/) e visão consolidada em
 [`resultados/dashboard_pos_eleicao.html`](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html).
 
@@ -266,7 +266,7 @@ python fiis.py                  # [--dy-min 8] [--liq-min 1000000] [--limite 80]
 ```
 
 ```bash
-python leituras/2026_10_22/leitura_pos_eleicao.py    # leitura de um pregão (usa o snapshot de 05/10)
+python leituras/2026_10_23/leitura_pos_eleicao.py    # leitura de um pregão (usa o snapshot de 05/10)
 ```
 
 ```bash
