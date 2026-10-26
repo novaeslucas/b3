@@ -87,7 +87,7 @@ def classificacao(ticker, setor_fundamentus, subsetor_fundamentus):
 
 def main():
     os.chdir(RAIZ)
-    linhas = list(csv.DictReader(open(acoes.SAIDA_CSV, encoding="utf-8-sig"), delimiter=";"))
+    linhas = list(csv.DictReader(open(acoes.csv_da_analise(acoes.HOJE), encoding="utf-8-sig"), delimiter=";"))
     fund = {r["ticker"]: acoes.detalhes(r["ticker"]) for r in linhas}
     with ThreadPoolExecutor(max_workers=4) as pool:
         res = dict(zip(fund, pool.map(lambda t: classificacao(t, fund[t]["setor"], fund[t]["subsetor"]), fund)))

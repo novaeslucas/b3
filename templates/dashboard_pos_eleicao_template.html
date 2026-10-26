@@ -49,6 +49,8 @@ button, select, input { font: inherit; color: var(--text); }
 @media (max-width: 900px) { .grid2, .grid32 { grid-template-columns: 1fr; } }
 .full { margin-top: 12px; }
 .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.andamento { margin-top: 12px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--neg);
+  color: var(--neg-txt); font-weight: 600; font-size: 14px; }
 select, input[type="search"], input[type="text"] { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 6px 10px; }
 
 /* seletor de pregão */
@@ -141,6 +143,7 @@ footer { margin-top: 18px; font-size: 12px; color: var(--muted); }
     </div>
     <button class="btn" id="tema" type="button">Tema</button>
   </header>
+  <div class="andamento" id="andamento" hidden></div>
 
   <div class="dayctl">
     <div class="dayrow">
@@ -318,7 +321,7 @@ function linhas(el, series, { H = 300, fmtY = v => sp(v, 0), fmtTip = v => sp(v)
     const i = idx(ev), r = svg.getBoundingClientRect();
     xh.setAttribute("x1", X(i)); xh.setAttribute("x2", X(i)); xh.style.display = "";
     const linhasTip = series.map(s => ({ s, v: s.vals[i] })).filter(o => o.v != null).sort((a, b) => b.v - a.v);
-    const c = ctx && CTX[DIAS[i]];
+    const c = ctx && CTX[DIAS[i].slice(0, 5)];
     tip.innerHTML = `<div class="h">${DIAS[i]}${i === 0 ? " · base" : ""}</div>` +
       linhasTip.map(o => `<div class="r" style="--c:var(${o.s.cor})"><span>${esc(o.s.curto || o.s.nome)}</span><b>${fmtTip(o.v)}</b></div>`).join("") +
       (c ? `<div class="ctx">${esc(c.texto.length > 220 ? c.texto.slice(0, 217) + "…" : c.texto)}</div>` : "");
@@ -367,7 +370,7 @@ function legenda() {
 function principal() {
   const s = SERIES.filter(x => x.on).map(x => ({ ...x, curto: x.nome.replace(/^Média d[oa]s \d+ /, "Média ").replace(" analisadas", "") }));
   linhas($("#cLinha"), s, { H: 320, ctx: true, onClick: i => selDia(i) });
-  const c = CTX[DIAS[estado.i]];
+  const c = CTX[DIAS[estado.i].slice(0, 5)];
   $("#ctx").innerHTML = c ? `<b>${esc(DIAS[estado.i])}</b> · ${esc(c.texto.replace(/^[^:]*:\s*/, ""))} · <a href="${esc(c.url)}" target="_blank" rel="noopener">fonte</a>`
     : `<span class="muted">Sem nota de contexto para ${esc(DIAS[estado.i])}.</span>`;
 }
@@ -545,6 +548,13 @@ $("#classeR").addEventListener("input", e => { estado.classeR = e.target.value; 
 function render() {
   $("#diaV").textContent = DIAS[estado.i];
   chips(); kpis(); principal(); barrasDia(); pesquisas(); heat(); ranking(); comparador(); tabela();
+}
+if (DADOS.em_andamento) {  // painel com o pregão ainda não finalizado (gerado com --em-andamento)
+  document.title = "Painel Pós-Eleição Parcial";
+  $("h1").textContent = "Painel pós-eleição — B3 · pregão em andamento";
+  $("#andamento").hidden = false;
+  $("#andamento").textContent = `PREGÃO NÃO FINALIZADO — o último ponto (${DADOS.em_andamento.data.slice(0, 5)}) usa preços parciais ` +
+    `de ${DADOS.em_andamento.horario}, não o fechamento. Este painel fica separado do painel dos pregões finalizados.`;
 }
 $("#sub").textContent = `${N - 1} pregões desde a véspera da eleição (${DADOS.data_base}) · ${ACOES.length} ações e ${FIIS.length} FIIs já analisados · gerado em ${DADOS.gerado_em}` +
   (DADOS.sem_serie.length ? ` · sem cotação: ${DADOS.sem_serie.join(", ")}` : "");

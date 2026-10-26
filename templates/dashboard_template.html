@@ -178,7 +178,8 @@ $("#theme").onclick = () => {
 
 const estado = { decisao: "", sort: "score", dir: -1, sel: null };
 const empresas = DADOS.empresas;
-$("#sub").textContent = `${empresas.length} empresas · gerado em ${DADOS.gerado_em} · histórico ${DADOS.anos[0]}–${DADOS.anos.at(-1)}`;
+$("#sub").textContent = `${empresas.length} empresas · gerado em ${DADOS.gerado_em} · histórico ${DADOS.anos[0]}–${DADOS.anos.at(-1)}` +
+  (DADOS.precos_em ? ` · cotações: ${DADOS.precos_em}` : "");
 
 for (const s of [...new Set(empresas.map(e => e.setor).filter(Boolean))].sort())
   $("#fSetor").insertAdjacentHTML("beforeend", `<option>${esc(s)}</option>`);

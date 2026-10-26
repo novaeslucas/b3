@@ -8,7 +8,12 @@ Acumulado = fechamento do dia ÷ fechamento de --data-base − 1. Referências: 
 FIIs (ETF XFIX11, aproximação do IFIX, que não tem série no Yahoo) e dólar (BRL=X).
 
 Saída: dashboard_pos_eleicao.html (de dashboard_pos_eleicao_template.html), em resultados/.
-Uso:  python painel_pos_eleicao.py [--data-base 2026-10-02]
+
+Com --em-andamento AAAA-MM-DD, inclui também o pregão ainda não finalizado daquela data (pasta
+leituras/AAAA_MM_DD_pregao_em_andamento): o último ponto é o preço parcial do Yahoo no horário da execução, e a saída
+vai para outro diretório (resultados_pregao_em_andamento/), para não misturar com o painel dos pregões finalizados.
+
+Uso:  python painel_pos_eleicao.py [--data-base 2026-10-02] [--em-andamento 2026-10-26]
 Não é recomendação de investimento.
 """
 import argparse
@@ -32,21 +37,32 @@ from dividendos import fetch  # noqa: E402
 YAHOO = "https://query1.finance.yahoo.com/v8/finance/chart/{}?range=3mo&interval=1d"
 TEMPLATE_HTML = os.path.join(RAIZ, "templates", "dashboard_pos_eleicao_template.html")
 SAIDA_HTML = os.path.join(RAIZ, "resultados", "dashboard_pos_eleicao.html")
+SAIDA_EM_ANDAMENTO = os.path.join(RAIZ, "resultados_pregao_em_andamento", "dashboard_pos_eleicao_{:%Y_%m_%d}.html")
+AGORA = dt.datetime.now()
+SEGUNDO_TURNO = dt.date(2026, 10, 25)
 REFERENCIAS = [("ibov", "Ibovespa", "^BVSP"), ("smll", "Small caps (SMAL11)", "SMAL11.SA"),
                ("ifix", "FIIs (XFIX11)", "XFIX11.SA"), ("dolar", "Dólar (R$/US$)", "BRL=X")]
 
 
-def serie(simbolo):
-    """{data: fechamento} do Yahoo Finance; {} se não houver."""
+def serie(simbolo, parcial=False):
+    """{data: fechamento} do Yahoo Finance; {} se não houver. parcial=True: cache só desta execução (por minuto)."""
     try:
-        r = json.loads(fetch(None, YAHOO.format(simbolo), "utf-8", f"yahoo3m_{simbolo}"))["chart"]["result"][0]
+        nome = f"yahoo3m_{simbolo}" + (f"_{AGORA:%H%M}" if parcial else "")
+        r = json.loads(fetch(None, YAHOO.format(simbolo), "utf-8", nome))["chart"]["result"][0]
         # Data em UTC − 2h. Barras da B3 vêm às 13h UTC do próprio dia. As de câmbio (BRL=X) vêm às 23h UTC e, conferidas
         # com o fechamento do dólar comercial, correspondem ao dia em UTC; barras de sábado (cotação ao vivo
         # lida no fim de semana) e de domingo trazem o fechamento de sexta. A
         # cotação ao vivo da noite chega com hora de 0h–1h UTC do dia seguinte: o −2h a mantém no pregão de hoje.
+        # A última barra é a cotação corrente e pode vir com hora de outro dia (BRL=X na segunda à noite chega como
+        # domingo 0h UTC, o que a jogaria sobre a sexta): ela vale para o dia de meta.regularMarketTime, em Brasília.
         out = {}
-        for t, c in zip(r["timestamp"], r["indicators"]["quote"][0]["close"]):
-            d = dt.datetime.fromtimestamp(t - 7200, dt.timezone.utc).date()
+        tss, closes = r["timestamp"], r["indicators"]["quote"][0]["close"]
+        ult = r["meta"].get("regularMarketTime")
+        for k, (t, c) in enumerate(zip(tss, closes)):
+            if k == len(tss) - 1 and ult:
+                d = dt.datetime.fromtimestamp(ult, dt.timezone(dt.timedelta(hours=-3))).date()
+            else:
+                d = dt.datetime.fromtimestamp(t - 7200, dt.timezone.utc).date()
             if c is not None:
                 out[d - dt.timedelta(days=max(0, d.weekday() - 4))] = c  # sáb −1, dom −2
         return out
@@ -55,7 +71,10 @@ def serie(simbolo):
 
 
 def pastas_diarias():
-    return sorted(p for p in glob.glob(os.path.join(RAIZ, "leituras", "2026_*")) if os.path.isdir(p))
+    # Só pregões finalizados (pastas AAAA_MM_DD); leituras de pregão em andamento (AAAA_MM_DD_pregao_em_andamento)
+    # ficam fora do painel.
+    return sorted(p for p in glob.glob(os.path.join(RAIZ, "leituras", "2026_*"))
+                  if os.path.isdir(p) and re.fullmatch(r"\d{4}_\d{2}_\d{2}", os.path.basename(p)))
 
 
 def literal(arquivo, nome):
@@ -77,23 +96,46 @@ def p_vitoria(pesquisas, erro):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--data-base", default="2026-10-02", help="pregão pré-eleição (base do acumulado)")
-    base = dt.date.fromisoformat(ap.parse_args().data_base)
+    ap.add_argument("--em-andamento", help="inclui o pregão não finalizado desta data (saída em outro diretório)")
+    args = ap.parse_args()
+    base = dt.date.fromisoformat(args.data_base)
+    andamento = dt.date.fromisoformat(args.em_andamento) if args.em_andamento else None
 
     pastas = pastas_diarias()
     ultima = pastas[-1]
+    if andamento:  # cadastro e contexto vêm da leitura parcial; pesquisas seguem só das pastas finalizadas
+        ultima = os.path.join(RAIZ, "leituras", f"{andamento:%Y_%m_%d}_pregao_em_andamento")
+        if not os.path.isdir(ultima):
+            sys.exit(f"Pasta {os.path.relpath(ultima)} não encontrada: rode antes a leitura do pregão em andamento.")
     html = open(os.path.join(ultima, "dashboard_eleicao.html"), encoding="utf-8").read()
     cad = json.loads(re.search(r"const DADOS = (\{.*?\});\n", html, re.S).group(1).replace("<\\/", "</"))
 
     ativos = [("acao", a) for a in cad["acoes"]] + [("fii", f) for f in cad["fiis"]]
     simbolos = [s for _, _, s in REFERENCIAS] + [f"{a['ticker']}.SA" for _, a in ativos]
     with ThreadPoolExecutor(max_workers=8) as pool:
-        series = dict(zip(simbolos, pool.map(serie, simbolos)))
+        series = dict(zip(simbolos, pool.map(lambda s: serie(s, parcial=bool(andamento)), simbolos)))
+    if os.path.exists(SAIDA_HTML):
+        # O Yahoo pode trocar a barra do último fechamento pela cotação ao vivo (acontece com BRL=X): dias finalizados
+        # que faltarem vêm do painel dos pregões finalizados gerado antes.
+        fin = json.loads(re.search(r"const DADOS = (\{.*?\});\n", open(SAIDA_HTML, encoding="utf-8").read(), re.S)
+                         .group(1).replace("<\\/", "</"))
+        dias_fin = [dt.datetime.strptime(f"{r}/{base.year}", "%d/%m/%Y").date() for r in fin["dias"]]
+        pares = [(s, r["nivel"]) for (i, _, s), r in zip(REFERENCIAS, fin["referencias"])]
+        pares += [(f"{a['ticker']}.SA", a["fech"]) for a in fin["ativos"]]
+        for simbolo, valores in pares:
+            if simbolo in series:
+                for d, v in zip(dias_fin, valores):
+                    if v is not None:
+                        series[simbolo].setdefault(d, v)
 
     ibov = series["^BVSP"]
     if base not in ibov:
         sys.exit(f"Sem fechamento do Ibovespa em {base:%d/%m/%Y}.")
-    dias = sorted(d for d in ibov if d >= base)
-    rotulos = [f"{d:%d/%m}" for d in dias]
+    fim = andamento or dt.datetime.strptime(os.path.basename(ultima), "%Y_%m_%d").date()  # último pregão finalizado
+    if andamento and andamento not in ibov:
+        sys.exit(f"Sem preço do Ibovespa em {andamento:%d/%m/%Y} no Yahoo.")
+    dias = sorted(d for d in ibov if base <= d <= fim)
+    rotulos = [f"{d:%d/%m}" + (" (parcial)" if d == andamento else "") for d in dias]
 
     def acumulado(s):
         p0 = s.get(base)
@@ -123,7 +165,7 @@ def main():
     for p in pastas:
         d = dt.date(*map(int, os.path.basename(p).split("_")))
         q = literal(os.path.join(p, "fatores_2turno.py"), "PESQUISAS")
-        if q:
+        if q and d < SEGUNDO_TURNO:  # depois da eleição não há mais probabilidade a calcular
             validos, prob = p_vitoria(q, literal(os.path.join(p, "fatores_2turno.py"), "ERRO_PESQUISA") or 0.03)
             pesquisas[f"{d:%d/%m}"] = {"validos": validos, "p": prob, "n": len(q),
                                        "lista": [{"instituto": i, "data": x, "flavio": f, "lula": l} for i, x, f, l in q]}
@@ -139,14 +181,20 @@ def main():
         "dias": rotulos, "referencias": refs, "ativos": saida_ativos, "sem_serie": sem_serie,
         "pesquisas": pesquisas, "contexto": contexto, "fonte_cadastro": os.path.basename(ultima),
     }
+    saida = SAIDA_HTML
+    if andamento:
+        dados["gerado_em"] = AGORA.strftime("%d/%m/%Y %H:%M")
+        dados["em_andamento"] = {"data": f"{andamento:%d/%m/%Y}", "horario": AGORA.strftime("%H:%M")}
+        saida = SAIDA_EM_ANDAMENTO.format(andamento)
+        os.makedirs(os.path.dirname(saida), exist_ok=True)
     template = open(TEMPLATE_HTML, encoding="utf-8").read()
-    with open(SAIDA_HTML, "w", encoding="utf-8") as f:
+    with open(saida, "w", encoding="utf-8") as f:
         f.write(template.replace("/*__DADOS__*/null", json.dumps(dados, ensure_ascii=False).replace("</", "<\\/")))
 
     ib = refs[0]["acum"]
     print(f"{len(dias)} pregões ({rotulos[0]} a {rotulos[-1]}); Ibovespa acumulado {100 * ib[-1]:+.2f}%; "
           f"{len(saida_ativos)} ativos" + (f"; sem série: {', '.join(sem_serie)}" if sem_serie else ""))
-    print(f"Painel em {os.path.relpath(SAIDA_HTML)}. Não é recomendação de investimento.")
+    print(f"Painel em {os.path.relpath(saida)}. Não é recomendação de investimento.")
 
 
 if __name__ == "__main__":

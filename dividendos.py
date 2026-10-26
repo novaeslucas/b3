@@ -15,6 +15,10 @@ O Jev não calcula nada: recebe os indicadores já calculados e devolve julgamen
 Downloads ficam em cache/ (válidos no dia) e respostas do Jev em cache/jev.json (por conteúdo).
 
 Uso:  python dividendos.py [--dy-min 5] [--liq-min 2000000] [--limite 80] [--sem-jev] [--sem-b3]
+                          [--precos-yahoo AAAA-MM-DD]
+Com --precos-yahoo, a cotação de cada ação é trocada pelo fechamento do Yahoo Finance naquela data antes dos filtros, e
+os indicadores que dependem do preço (DY, P/L, P/VP, EV/EBITDA aproximado, oscilação de 12 meses) são reajustados.
+Serve para analisar depois de um pregão que o Fundamentus ainda não incorporou (ele atualiza de madrugada).
 Usa o Jev via OpenRouter (OPENROUTER_API_KEY) ou direto na TypeSafe (TYPESAFE_API_KEY), conforme o .env.
 Não é recomendação de investimento.
 """
@@ -48,6 +52,8 @@ SAIDA_CSV = os.path.join("resultados", "resultado_dividendos.csv")
 SAIDA_HTML = os.path.join("resultados", "dashboard.html")
 TEMPLATE_HTML = os.path.join("templates", "dashboard_template.html")
 HOJE = dt.date.today()
+YAHOO = "https://query1.finance.yahoo.com/v8/finance/chart/{}.SA?range=1mo&interval=1d"
+PRECOS_EM = None  # texto sobre a origem das cotações (só com --precos-yahoo)
 ANOS_HIST = 6  # anos completos de proventos considerados (exclui o ano corrente, ainda parcial)
 
 # Pesos do Dividend Quality Score; cada pilar é a média dos sub-indicadores disponíveis.
@@ -139,6 +145,53 @@ def carregar_mercado():
         ticker = re.sub(r"<[^>]+>", "", tds[0]).strip()
         rows.append({"ticker": ticker, **{c: num(re.sub(r"<[^>]+>", "", v)) for c, v in zip(cols[1:], tds[1:])}})
     return rows
+
+
+def csv_da_analise(data):
+    """CSV da análise feita com os dados do Fundamentus de `data`: resultados/snapshot_AAAA_MM_DD/ se a análise
+    daquele dia foi arquivada (as leituras diárias usam o snapshot de 05/10), senão o resultado atual."""
+    arquivado = os.path.join("resultados", f"snapshot_{data:%Y_%m_%d}", "resultado_dividendos.csv")
+    return arquivado if os.path.exists(arquivado) else SAIDA_CSV
+
+
+def fechamento_yahoo(ticker, data):
+    """(fechamento na data, fechamento do pregão anterior) no Yahoo Finance; (None, None) se não houver."""
+    try:
+        r = json.loads(fetch(None, YAHOO.format(ticker), "utf-8", f"yahoo_div_{ticker}_{data:%Y%m%d}"))["chart"]["result"][0]
+        fech = {dt.datetime.fromtimestamp(t, dt.timezone(dt.timedelta(hours=-3))).date(): c
+                for t, c in zip(r["timestamp"], r["indicators"]["quote"][0]["close"]) if c is not None}
+        antes = [d for d in fech if d < data]
+        return fech.get(data), fech[max(antes)] if antes else None
+    except Exception:
+        return None, None
+
+
+def reprecificar(rows, data, liq_min):
+    """Troca a cotação do Fundamentus pelo fechamento do Yahoo em `data` e reajusta os indicadores de preço.
+
+    Só para os tickers com liquidez suficiente (os demais nem passam no filtro). O fator é preço novo ÷ cotação do
+    Fundamentus; avisa quando a cotação do Fundamentus não bate com o pregão anterior do Yahoo (> 2%)."""
+    alvo = [r for r in rows if (r["liq_2m"] or 0) >= liq_min and r["cotacao"]]
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        precos = list(pool.map(lambda r: fechamento_yahoo(r["ticker"], data), alvo))
+    sem = []
+    for r, (novo, anterior) in zip(alvo, precos):
+        if not novo:
+            sem.append(r["ticker"])
+            continue
+        if anterior and abs(anterior / r["cotacao"] - 1) > 0.02:
+            print(f"  aviso: {r['ticker']} Fundamentus {r['cotacao']:.2f} x Yahoo do pregão anterior {anterior:.2f}")
+        f = novo / r["cotacao"]
+        r["fator_preco"], r["cotacao"] = f, novo
+        r["dy"] = r["dy"] / f if r["dy"] is not None else None
+        for c in ("pl", "pvp", "psr", "p_ativo", "p_capgiro", "p_ebit", "p_acl"):
+            r[c] = r[c] * f if r[c] is not None else None
+        # EV = valor de mercado + dívida líquida; sem o valor de mercado separado, escala o múltiplo inteiro
+        # (superestima a variação em empresas muito alavancadas). Mesma aproximação das leituras diárias.
+        for c in ("ev_ebit", "ev_ebitda"):
+            r[c] = r[c] * f if r[c] else r[c]
+    print(f"Cotações de {data:%d/%m/%Y} (Yahoo) aplicadas a {len(alvo) - len(sem)} tickers"
+          + (f"; sem cotação, mantêm o Fundamentus: {', '.join(sem)}" if sem else ""))
 
 
 def filtrar(rows, dy_min, liq_min, limite):
@@ -438,7 +491,7 @@ def gerar_dashboard(candidatas):
     """Grava dashboard.html a partir do template, embutindo os dados desta execução."""
     anos = candidatas[0]["m"]["anos_completos"] if candidatas else []
     dados = {
-        "gerado_em": dt.datetime.now().strftime("%d/%m/%Y %H:%M"),
+        "gerado_em": dt.datetime.now().strftime("%d/%m/%Y %H:%M"), "precos_em": PRECOS_EM,
         "anos": anos, "ano_corrente": HOJE.year, "pesos": PESOS,
         "empresas": [{
             "ticker": r["ticker"], "empresa": r.get("empresa"), "setor": r.get("setor"),
@@ -467,17 +520,25 @@ def main():
     ap.add_argument("--limite", type=int, default=80, help="máximo de empresas analisadas (mais líquidas)")
     ap.add_argument("--sem-jev", action="store_true", help="só o score determinístico")
     ap.add_argument("--sem-b3", action="store_true", help="não confere os proventos com a B3")
+    ap.add_argument("--precos-yahoo", help="usa o fechamento do Yahoo desta data (AAAA-MM-DD) no lugar da cotação")
     args = ap.parse_args()
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     load_env()
 
+    global PRECOS_EM
     mercado = carregar_mercado()
+    if args.precos_yahoo:
+        data = dt.date.fromisoformat(args.precos_yahoo)
+        reprecificar(mercado, data, args.liq_min)
+        PRECOS_EM = f"fechamento de {data:%d/%m/%Y} (Yahoo Finance) sobre indicadores do Fundamentus baixados em {HOJE:%d/%m/%Y}"
     candidatas = filtrar(mercado, args.dy_min / 100, args.liq_min, args.limite)
     print(f"{len(mercado)} tickers no Fundamentus; {len(candidatas)} empresas passaram nos filtros "
           f"(DY >= {args.dy_min:g}%, liquidez >= R$ {args.liq_min:,.0f}, P/L > 0).")
 
     def enriquecer(r):
         r.update(detalhes(r["ticker"]))
+        if r.get("fator_preco") and r.get("oscil_12m") is not None:
+            r["oscil_12m"] = (1 + r["oscil_12m"]) * r["fator_preco"] - 1
         r["proventos_ano"] = proventos_por_ano(r["ticker"])
         return r
     with ThreadPoolExecutor(max_workers=4) as pool:

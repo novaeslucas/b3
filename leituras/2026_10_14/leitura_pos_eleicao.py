@@ -136,7 +136,7 @@ def fechamentos(ticker, datas, pregao):
 
 def carregar_acoes():
     mercado = acoes.carregar_mercado()
-    lidos = {r["ticker"] for r in csv.DictReader(open(acoes.SAIDA_CSV, encoding="utf-8-sig"), delimiter=";")}
+    lidos = {r["ticker"] for r in csv.DictReader(open(acoes.csv_da_analise(acoes.HOJE), encoding="utf-8-sig"), delimiter=";")}
     cands = [r for r in mercado if r["ticker"] in lidos]
     for r in cands:
         r.update(acoes.detalhes(r["ticker"]))

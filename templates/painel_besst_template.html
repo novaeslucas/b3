@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel BESST B3</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f9f9f7; --surface: #fcfcfb; --surface-2: #f0efec; --border: rgba(11, 11, 11, .10);
+  --text: #0b0b0b; --text-2: #52514e; --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
+  --pos: #256abf; --neg: #d03b3b; --pos-txt: #1c5cab; --neg-txt: #b8312f;
+  --accent: #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
+    --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+    --pos: #3987e5; --neg: #e66767; --pos-txt: #86b6ef; --neg-txt: #f08c8b;
+    --accent: #3987e5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
+  --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+  --pos: #3987e5; --neg: #e66767; --pos-txt: #86b6ef; --neg-txt: #f08c8b;
+  --accent: #3987e5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 20px 16px 40px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -.01em; }
+h2 { font-size: 15px; margin: 0; font-weight: 650; }
+.sub, .muted { color: var(--muted); }
+.sub { font-size: 13px; }
+button { font: inherit; color: var(--text); }
+.btn { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { background: var(--surface-2); }
+.andamento { margin-top: 12px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--neg); color: var(--neg-txt); font-weight: 600; }
+.ctxbox { font-size: 13px; color: var(--text-2); margin-top: 10px; padding: 10px 12px; background: var(--surface-2); border-radius: 8px; display: grid; gap: 6px; }
+.ctxbox a { color: var(--accent); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.cardhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+.full { margin-top: 12px; }
+.note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
+.kpi .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.kpi .v { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.kpi .d { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.pos { color: var(--pos-txt); } .neg { color: var(--neg-txt); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+.chip { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 3px 11px; font-size: 13px; cursor: pointer; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
+.chip i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.chip.on { background: var(--text); color: var(--surface); border-color: var(--text); }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart text.lab { fill: var(--text); font-size: 12px; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); min-width: 170px; max-width: 280px; display: none; z-index: 3; }
+.tip .h { font-weight: 650; margin-bottom: 4px; }
+.tip .r { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--text-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); }
+.rank { display: grid; gap: 3px; font-size: 12px; }
+.rank .r { display: grid; grid-template-columns: 62px 1fr 62px; gap: 8px; align-items: center; }
+.rank .trk { position: relative; height: 12px; }
+.rank .trk i { position: absolute; top: 0; height: 100%; border-radius: 3px; background: var(--c); }
+.rank .trk .z { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--axis); }
+.rank .trk .ref { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed var(--text-2); opacity: .6; }
+.rank .n { text-align: right; font-variant-numeric: tabular-nums; }
+.rank .tk { font-weight: 650; }
+.tablebox { overflow-x: auto; }
+table.t { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+table.t th { position: sticky; top: 0; background: var(--surface); text-align: right; font-weight: 600; color: var(--text-2); padding: 7px 8px; border-bottom: 1px solid var(--border); cursor: pointer; white-space: nowrap; user-select: none; }
+table.t td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.t .l { text-align: left; }
+table.t tr:hover td { background: var(--surface-2); }
+table.t td.nm { max-width: 220px; overflow: hidden; text-overflow: ellipsis; color: var(--text-2); }
+.tk { font-weight: 650; }
+.badge { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 11px; background: var(--surface-2); color: var(--text-2); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--c); margin-right: 6px; }
+footer { margin-top: 18px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Painel BESST — bancos, energia, saneamento, seguros e telecom</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <button class="btn" id="tema" type="button">Tema</button>
+  </header>
+  <div class="andamento" id="andamento"></div>
+  <div class="ctxbox" id="contexto"></div>
+
+  <div class="chips" id="chips"></div>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="cardhead"><h2>Variação do dia por subsetor</h2></div>
+      <div class="chart" id="barras"></div>
+      <div class="note" id="notaBarras">Média simples das empresas de cada subsetor: preço de agora ÷ fechamento do último pregão finalizado. Tracejado = Ibovespa.</div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2>Acumulado desde a véspera da eleição</h2><div class="legend" id="legenda"></div></div>
+      <div class="chart" id="linhas"></div>
+      <div class="note" id="notaLinhas">Média simples por subsetor; o último ponto é o preço de agora (pregão em andamento).</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="cardhead"><h2>Empresas — variação do dia</h2></div>
+      <div class="rank" id="rank"></div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2 id="tituloDisp">DY de agora × variação do dia</h2></div>
+      <div class="chart" id="disp"></div>
+      <div class="note" id="notaDisp">DY de agora = DY do snapshot do Fundamentus ajustado pelo preço de agora (proventos dos últimos 12 meses, sem projeção). Queda de preço eleva o DY sem mudar o provento.</div>
+    </div>
+  </div>
+
+  <div class="card full">
+    <div class="cardhead"><h2>Tabela</h2><span class="muted" id="ntab"></span></div>
+    <div class="tablebox"><table class="t"><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table></div>
+    <div class="note">Score, decisão e fatores do Jev só existem para as empresas que passaram nos filtros de dividendos.py (marcadas como “analisada”). Governo = P(decisões do governo federal determinam os resultados); Flávio = efeito de uma vitória da oposição no lucro e valuation (−2..+2), julgado antes do 2º turno.</div>
+  </div>
+
+  <footer id="rodape"></footer>
+</div>
+<script>
+const DADOS = /*__DADOS__*/null;
+// Mesmo painel para o pregão em andamento (padrão) e para o pregão fechado (painel_besst.py --finalizado).
+const FIN = DADOS.finalizado;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const sp = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(100 * v).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }) + "%";
+const pct = (v, d = 1) => v == null ? "–" : (100 * v).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }) + "%";
+const num = (v, d = 2) => v == null ? "–" : v.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const cls = v => v == null || v === 0 ? "" : v > 0 ? "pos" : "neg";
+const media = a => { a = a.filter(x => x != null); return a.length ? a.reduce((s, x) => s + x, 0) / a.length : null; };
+const mediana = a => { a = a.filter(x => x != null).sort((x, y) => x - y); if (!a.length) return null; const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
+
+// tema
+const root = document.documentElement;
+try { const t = localStorage.getItem("tema-painel"); if (t) root.dataset.theme = t; } catch (_) {}
+$("#tema").onclick = () => {
+  const escuro = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = escuro ? "light" : "dark";
+  try { localStorage.setItem("tema-painel", root.dataset.theme); } catch (_) {}
+  render();
+};
+
+const SUBS = ["Bancos", "Energia", "Saneamento", "Seguros", "Telecom"];
+const COR = { Bancos: "var(--s1)", Energia: "var(--s4)", Saneamento: "var(--s3)", Seguros: "var(--s2)", Telecom: "var(--s5)" };
+const EMP = DADOS.empresas;
+const IB = DADOS.referencias.find(r => r.id === "ibov");
+const DOL = DADOS.referencias.find(r => r.id === "dolar");
+const N = DADOS.dias.length;
+const estado = { sub: null, ord: "dia", asc: true };
+const visiveis = () => EMP.filter(e => !estado.sub || e.subsetor === estado.sub);
+const subsPresentes = SUBS.filter(s => EMP.some(e => e.subsetor === s));
+
+$("#sub").textContent = `${EMP.length} empresas · ${FIN ? "fechamento de" : "preços de"} ${DADOS.data_pregao}${FIN ? "" : ` às ${DADOS.horario_precos || "?"}`} · ` +
+  `dia vs ${DADOS.data_anterior} · acumulado vs ${DADOS.data_base} · gerado em ${DADOS.gerado_em}` +
+  (DADOS.sem_preco.length ? ` · sem cotação: ${DADOS.sem_preco.join(", ")}` : "");
+if (FIN) {
+  document.title = "Painel BESST Fechamento";
+  $("#andamento").hidden = true;
+  $("#notaBarras").textContent = "Média simples das empresas de cada subsetor: fechamento do pregão ÷ fechamento do pregão anterior. Tracejado = Ibovespa.";
+  $("#notaLinhas").textContent = "Média simples por subsetor, fechamentos diários.";
+  $("#tituloDisp").textContent = "DY no fechamento × variação do dia";
+  $("#notaDisp").textContent = "DY no fechamento = DY do snapshot do Fundamentus ajustado pelo preço de fechamento (proventos dos últimos 12 meses, sem projeção). Queda de preço eleva o DY sem mudar o provento.";
+}
+$("#andamento").textContent = `PREGÃO NÃO FINALIZADO — cotações de agora (${DADOS.horario_precos || DADOS.gerado_em}), não de fechamento. ` +
+  "Os números vão mudar até o fim do pregão; este painel fica separado dos painéis de pregões finalizados.";
+$("#contexto").innerHTML = DADOS.contexto.map(c => `<div>${esc(c.texto)} · <a href="${esc(c.url)}" target="_blank" rel="noopener">fonte</a></div>`).join("");
+$("#rodape").innerHTML = `BESST: bancos, energia, saneamento, seguros e telecomunicações. Preços: Yahoo Finance (último negócio no horário indicado; fechamentos diários desde ${esc(DADOS.data_base)}).
+  DY, P/L e P/VP: snapshot do Fundamentus de ${esc(DADOS.snapshot)} reajustado pelo preço ${FIN ? "de fechamento" : "de agora"}. Score, decisão e fatores do Jev (TypeSafe): leitura de ${esc(DADOS.fonte_cadastro)}.
+  Itaúsa entra em Bancos por ser holding do Itaú. Não é recomendação de investimento.`;
+
+function chips() {
+  $("#chips").innerHTML = `<button class="chip ${estado.sub ? "" : "on"}" data-s="">Todos</button>` +
+    subsPresentes.map(s => `<button class="chip ${estado.sub === s ? "on" : ""}" data-s="${s}" style="--c:${COR[s]}"><i></i>${s} <span class="muted">${EMP.filter(e => e.subsetor === s).length}</span></button>`).join("");
+  $("#chips").querySelectorAll("button").forEach(b => b.onclick = () => { estado.sub = b.dataset.s || null; render(); });
+}
+
+function kpis() {
+  const v = visiveis();
+  const porSub = subsPresentes.map(s => [s, media(EMP.filter(e => e.subsetor === s).map(e => e.dia))]).sort((a, b) => b[1] - a[1]);
+  const dyMed = mediana(v.map(e => e.dy_agora)), dyAntes = mediana(v.map(e => e.dy_snapshot));
+  const acima = v.filter(e => e.dia != null && e.dia > IB.dia).length;
+  const it = [
+    ["Ibovespa no dia", sp(IB.dia, 2), cls(IB.dia), `${num(IB.nivel[N - 1], 0)} pontos · acumulado ${sp(IB.acum[N - 1])}`],
+    [`${estado.sub || "BESST"} no dia`, sp(media(v.map(e => e.dia)), 2), cls(media(v.map(e => e.dia))), `mediana ${sp(mediana(v.map(e => e.dia)))} · ${v.length} empresas`],
+    [`${estado.sub || "BESST"} acumulado`, sp(media(v.map(e => e.acum[N - 1]))), cls(media(v.map(e => e.acum[N - 1]))), `desde ${DADOS.data_base.slice(0, 5)}`],
+    ["Acima do Ibovespa hoje", `${acima} de ${v.length}`, "", pct(acima / Math.max(1, v.length), 0) + " caíram menos que o índice"],
+    [FIN ? "DY mediano no fechamento" : "DY mediano agora", pct(dyMed), "", `era ${pct(dyAntes)} com o preço de ${DADOS.data_base.slice(0, 5)}`],
+    ["Dólar", DOL.nivel[N - 1] ? `R$ ${num(DOL.nivel[N - 1], 3)}` : "–", "", `dia ${sp(DOL.dia, 2)} · melhor subsetor: ${porSub[0][0]} ${sp(porSub[0][1])}`],
+  ];
+  $("#kpis").innerHTML = it.map(([l, v, c, d]) => `<div class="card kpi"><div class="l">${esc(l)}</div><div class="v ${c}">${v}</div><div class="d">${esc(d)}</div></div>`).join("");
+}
+
+function escala(vals, extra = []) {
+  const all = vals.concat(extra).filter(x => x != null);
+  let lo = Math.min(0, ...all), hi = Math.max(0, ...all);
+  const pad = (hi - lo) * .08 || .01; return [lo - pad, hi + pad];
+}
+
+function barras() {
+  const linhas = subsPresentes.map(s => ({ s, v: media(EMP.filter(e => e.subsetor === s).map(e => e.dia)), n: EMP.filter(e => e.subsetor === s).length }));
+  const W = 560, rowH = 34, m = { l: 96, r: 64, t: 8, b: 22 }, H = m.t + m.b + rowH * linhas.length;
+  const [lo, hi] = escala(linhas.map(x => x.v), [IB.dia]);
+  const x = v => m.l + (v - lo) / (hi - lo) * (W - m.l - m.r);
+  const ticks = []; for (let t = Math.ceil(lo * 20) / 20; t <= hi; t += .05) ticks.push(t);
+  $("#barras").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Variação do dia por subsetor">
+    ${ticks.map(t => `<line x1="${x(t)}" x2="${x(t)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--grid)"/><text x="${x(t)}" y="${H - 6}" text-anchor="middle">${sp(t, 0)}</text>`).join("")}
+    <line x1="${x(0)}" x2="${x(0)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--axis)"/>
+    ${linhas.map((r, i) => {
+      const y = m.t + i * rowH + 6, h = rowH - 12, x0 = Math.min(x(0), x(r.v)), w = Math.abs(x(r.v) - x(0));
+      const sel = !estado.sub || estado.sub === r.s;
+      return `<g style="cursor:pointer" data-s="${r.s}" opacity="${sel ? 1 : .35}">
+        <text class="lab" x="${m.l - 8}" y="${y + h / 2 + 4}" text-anchor="end">${r.s}</text>
+        <rect x="${x0}" y="${y}" width="${Math.max(1, w)}" height="${h}" rx="4" fill="${COR[r.s]}"><title>${r.s}: ${sp(r.v, 2)} (${r.n} empresas)</title></rect>
+        <text x="${r.v < 0 ? x0 - 6 : x0 + w + 6}" y="${y + h / 2 + 4}" text-anchor="${r.v < 0 ? "end" : "start"}" style="fill:var(--text)">${sp(r.v)}</text></g>`;
+    }).join("")}
+    <line x1="${x(IB.dia)}" x2="${x(IB.dia)}" y1="${m.t - 4}" y2="${H - m.b}" stroke="var(--text-2)" stroke-dasharray="4 3" stroke-width="2" opacity=".7"/>
+    <text x="${x(IB.dia)}" y="${m.t + 2}" text-anchor="middle" dy="-2">Ibov ${sp(IB.dia)}</text>
+  </svg>`;
+  $("#barras").querySelectorAll("g[data-s]").forEach(g => g.onclick = () => { estado.sub = estado.sub === g.dataset.s ? null : g.dataset.s; render(); });
+}
+
+function linhas() {
+  const series = subsPresentes.map(s => ({ nome: s, cor: COR[s], v: DADOS.dias.map((_, i) => media(EMP.filter(e => e.subsetor === s).map(e => e.acum[i]))) }));
+  series.push({ nome: "Ibovespa", cor: "var(--text-2)", v: IB.acum, tracejado: true });
+  $("#legenda").innerHTML = series.map(s => `<span style="--c:${s.cor}"><i></i>${s.nome}</span>`).join("");
+  const W = 560, H = 260, m = { l: 44, r: 12, t: 10, b: 26 };
+  const [lo, hi] = escala(series.flatMap(s => s.v));
+  const x = i => m.l + i / (N - 1) * (W - m.l - m.r), y = v => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
+  const ticks = []; for (let t = Math.ceil(lo * 20) / 20; t <= hi; t += .05) ticks.push(t);
+  const path = v => v.map((p, i) => p == null ? "" : `${i && v[i - 1] != null ? "L" : "M"}${x(i).toFixed(1)},${y(p).toFixed(1)}`).join("");
+  const passo = Math.ceil(N / 7);
+  $("#linhas").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Acumulado por subsetor">
+    ${ticks.map(t => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${sp(t, 0)}</text>`).join("")}
+    <line x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}" stroke="var(--axis)"/>
+    <rect x="${x(N - 2)}" y="${m.t}" width="${x(N - 1) - x(N - 2)}" height="${H - m.t - m.b}" fill="var(--neg)" opacity=".06"/>
+    ${DADOS.dias.map((d, i) => i % passo === 0 || i === N - 1 ? `<text x="${x(i)}" y="${H - 8}" text-anchor="${i === N - 1 ? "end" : "middle"}">${esc(d)}</text>` : "").join("")}
+    ${series.map(s => {
+      const sel = s.tracejado || !estado.sub || estado.sub === s.nome;
+      return `<path d="${path(s.v)}" fill="none" stroke="${s.cor}" stroke-width="${s.tracejado ? 2 : 2.4}" ${s.tracejado ? 'stroke-dasharray="5 4"' : ""} opacity="${sel ? 1 : .25}" stroke-linejoin="round"/>`;
+    }).join("")}
+    <line id="cursor" y1="${m.t}" y2="${H - m.b}" stroke="var(--axis)" style="display:none"/>
+    <rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent" id="hover"/>
+  </svg><div class="tip" id="tipL"></div>`;
+  const svg = $("#linhas svg"), tip = $("#tipL"), cur = $("#cursor");
+  $("#hover").onmousemove = ev => {
+    const r = svg.getBoundingClientRect(), px = (ev.clientX - r.left) / r.width * W;
+    const i = Math.max(0, Math.min(N - 1, Math.round((px - m.l) / (W - m.l - m.r) * (N - 1))));
+    cur.setAttribute("x1", x(i)); cur.setAttribute("x2", x(i)); cur.style.display = "";
+    tip.innerHTML = `<div class="h">${esc(DADOS.dias[i])}</div>` + series.map(s => `<div class="r"><span><span class="dot" style="--c:${s.cor}"></span>${s.nome}</span><span>${sp(s.v[i])}</span></div>`).join("");
+    tip.style.display = "block";
+    const left = ev.clientX - r.left + 14;
+    tip.style.left = (left + 200 > r.width ? left - 220 : left) + "px"; tip.style.top = (ev.clientY - r.top - 20) + "px";
+  };
+  $("#hover").onmouseleave = () => { tip.style.display = "none"; cur.style.display = "none"; };
+}
+
+function rank() {
+  const v = visiveis().filter(e => e.dia != null).sort((a, b) => b.dia - a.dia);
+  const [lo, hi] = escala(v.map(e => e.dia), [IB.dia]);
+  const x = val => (val - lo) / (hi - lo) * 100;
+  $("#rank").innerHTML = v.map(e => {
+    const a = Math.min(x(0), x(e.dia)), w = Math.abs(x(e.dia) - x(0));
+    return `<div class="r" title="${esc(e.nome)} · ${e.subsetor}"><span class="tk">${esc(e.ticker)}</span>
+      <span class="trk"><span class="z" style="left:${x(0)}%"></span><span class="ref" style="left:${x(IB.dia)}%"></span><i style="left:${a}%;width:${Math.max(.5, w)}%;--c:${COR[e.subsetor]}"></i></span>
+      <span class="n ${cls(e.dia)}">${sp(e.dia)}</span></div>`;
+  }).join("") + `<div class="note">Cor = subsetor; tracejado = Ibovespa (${sp(IB.dia)}).</div>`;
+}
+
+function disp() {
+  const v = visiveis().filter(e => e.dia != null && e.dy_agora != null);
+  const W = 560, H = 300, m = { l: 44, r: 14, t: 10, b: 34 };
+  const [xlo, xhi] = escala(v.map(e => e.dia), [IB.dia]);
+  const yhi = Math.max(...v.map(e => e.dy_agora)) * 1.08, ylo = 0;
+  const x = t => m.l + (t - xlo) / (xhi - xlo) * (W - m.l - m.r), y = t => m.t + (yhi - t) / (yhi - ylo) * (H - m.t - m.b);
+  const xt = []; for (let t = Math.ceil(xlo * 20) / 20; t <= xhi; t += .05) xt.push(t);
+  const yt = []; for (let t = 0; t <= yhi; t += .02) yt.push(t);
+  $("#disp").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="DY de agora contra variação do dia">
+    ${yt.map(t => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${pct(t, 0)}</text>`).join("")}
+    ${xt.map(t => `<text x="${x(t)}" y="${H - 18}" text-anchor="middle">${sp(t, 0)}</text>`).join("")}
+    <text x="${(m.l + W - m.r) / 2}" y="${H - 2}" text-anchor="middle">variação do dia</text>
+    <line x1="${x(IB.dia)}" x2="${x(IB.dia)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--text-2)" stroke-dasharray="4 3" opacity=".6"/>
+    <line x1="${x(0)}" x2="${x(0)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--axis)"/>
+    ${v.map(e => `<g><circle cx="${x(e.dia)}" cy="${y(e.dy_agora)}" r="6" fill="${COR[e.subsetor]}" stroke="var(--surface)" stroke-width="1.5"><title>${esc(e.ticker)} (${e.subsetor}) · dia ${sp(e.dia)} · DY ${pct(e.dy_snapshot)} → ${pct(e.dy_agora)}</title></circle>
+      <text x="${x(e.dia) + 8}" y="${y(e.dy_agora) + 4}" style="font-size:10px">${esc(e.ticker)}</text></g>`).join("")}
+  </svg>`;
+}
+
+const COLS = [
+  ["ticker", "Ticker", "l"], ["nome", "Empresa", "l"], ["subsetor", "Subsetor", "l"], ["preco", DADOS.finalizado ? "Fech." : "Agora"], ["fech_anterior", "Fech. ant."],
+  ["dia", "Dia"], ["acum_ult", "Acumulado"], ["dy_snapshot", "DY 02/10"], ["dy_agora", DADOS.finalizado ? "DY fech." : "DY agora"], ["pl_agora", "P/L"], ["pvp_agora", "P/VP"],
+  ["score_hoje", "Score"], ["decisao", "Decisão", "l"], ["p_governo", "Governo"], ["oposicao", "Flávio"],
+];
+function tabela() {
+  const v = visiveis().map(e => ({ ...e, acum_ult: e.acum[N - 1] }));
+  const k = estado.ord;
+  v.sort((a, b) => {
+    const x = a[k], y = b[k];
+    if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * (estado.asc ? 1 : -1);
+  });
+  $("#thead").innerHTML = COLS.map(([c, n, l]) => `<th class="${l || ""}" data-c="${c}">${n}${estado.ord === c ? (estado.asc ? " ▲" : " ▼") : ""}</th>`).join("");
+  $("#thead").querySelectorAll("th").forEach(th => th.onclick = () => {
+    estado.asc = estado.ord === th.dataset.c ? !estado.asc : th.dataset.c === "dia" || th.dataset.c === "acum_ult" || ["ticker", "nome", "subsetor", "decisao"].includes(th.dataset.c);
+    estado.ord = th.dataset.c; tabela();
+  });
+  $("#tbody").innerHTML = v.map(e => `<tr>
+    <td class="l tk">${esc(e.ticker)}${e.estatal ? ' <span class="badge" title="controle estatal">estatal</span>' : ""}</td>
+    <td class="l nm" title="${esc(e.nome)}">${esc(e.nome)}</td>
+    <td class="l"><span class="dot" style="--c:${COR[e.subsetor]}"></span>${e.subsetor}</td>
+    <td>${num(e.preco)}</td><td>${num(e.fech_anterior)}</td>
+    <td class="${cls(e.dia)}">${sp(e.dia, 2)}</td><td class="${cls(e.acum_ult)}">${sp(e.acum_ult)}</td>
+    <td>${pct(e.dy_snapshot)}</td><td style="font-weight:600">${pct(e.dy_agora)}</td>
+    <td>${num(e.pl_agora, 1)}</td><td>${num(e.pvp_agora, 2)}</td>
+    <td>${e.analisada ? `${num(e.score_hoje, 1)}` : "–"}</td>
+    <td class="l">${e.analisada ? `<span class="badge">${esc(e.decisao)}</span>` : '<span class="muted">não analisada</span>'}</td>
+    <td>${e.p_governo == null ? "–" : num(e.p_governo, 2)}</td><td>${e.oposicao == null ? "–" : (e.oposicao > 0 ? "+" : "") + num(e.oposicao, 2)}</td></tr>`).join("");
+  $("#ntab").textContent = `${v.length} empresas`;
+}
+
+function render() { chips(); kpis(); barras(); linhas(); rank(); disp(); tabela(); }
+render();
+</script>
+</body>
+</html>
