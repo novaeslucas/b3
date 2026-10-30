@@ -231,14 +231,17 @@ O painel tem:
 - **indicador de coleta no topo** — coletando agora, coletor ativo aguardando, ou coletor parado; data/hora da
   última coleta (e quanto ela levou), da próxima (com contagem regressiva), situação do mercado e falhas;
 - referências (Ibovespa, SMAL11, XFIX11, dólar) e a amplitude do universo (quantos sobem, caem ou ficam estáveis);
-- **mapa setorial** (só ações; os FIIs ficam na tabela e nas altas/baixas): três níveis, como no painel
-  pós-eleição — setor econômico da B3 → subsetor → empresas. Os setores ficam em volta do Ibovespa; clicar num setor
-  abre os subsetores dele, e clicar num subsetor abre as empresas (ex.: Financeiro → Intermediários Financeiros →
-  BBAS3). Setores, subsetores e empresas são caixas coloridas pela variação do dia (média simples no caso de setor e
-  subsetor): verde subindo, vermelho caindo, cinza em 0%, cor cheia a partir de ±3%. Arestas tracejadas ligam
-  empresas relacionadas: ON/PN/units da mesma companhia (pela raiz do ticker) e uma lista curta escrita à mão de
-  controladora/controlada (`RELACOES_CURADAS`). Setores podem ser arrastados; clicar numa empresa filtra a tabela por
-  ela. Com muitos setores abertos (“Abrir todos”), os blocos são empilhados em prateleiras para não se sobreporem;
+- **mapa setorial** (só ações; os FIIs ficam na tabela e nas altas/baixas): navegação em três níveis, como no
+  painel pós-eleição, sempre com um nó no centro e os filhos dele em volta. Ao abrir, o Ibovespa fica no centro e os
+  setores econômicos da B3 em volta; clicar num setor recarrega o mapa com ele no centro e os subsetores em volta;
+  clicar num subsetor recarrega com ele no centro e as ações em volta (ex.: B3 → Financeiro → Intermediários
+  Financeiros → BBAS3). Clicar no centro, no botão “Voltar” ou no caminho acima do mapa sobe de nível. Todos os nós
+  são caixas coloridas pela variação do dia (média simples das ações, no caso de setor e subsetor): verde subindo,
+  vermelho caindo, cinza em 0%, cor cheia a partir de ±3%. O setor do mapa também filtra as altas/baixas e a tabela.
+  Arestas tracejadas ligam ações relacionadas do mesmo subsetor: ON/PN/units da mesma companhia (pela raiz do
+  ticker) e uma lista curta escrita à mão de controladora/controlada (`RELACOES_CURADAS`); as relações de cada ação
+  aparecem também na dica ao passar o mouse. Clicar numa ação filtra a tabela por ela. Em tela estreita os filhos
+  ficam em grade acima e abaixo do centro;
 - **10 maiores altas e 10 maiores baixas** do dia;
 - **tabela** com ticker, empresa, setor, último preço, variação % e em R$, fechamento anterior, abertura,
   mínima/máxima, quantidade negociada, volume financeiro (aproximado pelas barras de 5 min), linha intradiária e
