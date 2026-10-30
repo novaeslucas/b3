@@ -112,3 +112,36 @@ def test_dados_do_painel_sao_json_valido_no_js(tmp_path, monkeypatch):
     assert json.loads(js[len("receberDados("):-3].replace("<\\/", "</")) == dados
     assert "</script> &" not in (tmp_path / "p.html").read_text(encoding="utf-8")
     assert p.dados_embutidos(str(tmp_path / "p.html")) == dados
+
+
+def test_liquidas_corta_pela_liquidez_de_2_meses(monkeypatch):
+    import painel_ao_vivo as p
+    pagina = open(os.path.join(os.path.dirname(FIXTURE), "resultado_amostra.html"), encoding="utf-8").read()
+    monkeypatch.setattr(p, "fetch", lambda *a, **k: pagina)
+    assert p.liquidas(1_000_000) == {"BMGB4": {"classe": "acao", "liq_2m": 3_000_000.0}}
+    assert p.liquidas(5_000_000) == {}
+
+
+def test_classificacao_usa_o_cache_e_refaz_o_vencido(tmp_path, monkeypatch):
+    import painel_ao_vivo as p
+    cache = tmp_path / "setores.json"
+    hoje = dt.date(2026, 10, 30)
+    cache.write_text(json.dumps({
+        "ITUB4": {"setor_economico": "Financeiro", "subsetor": "Intermediários", "segmento": "Bancos", "em": "2026-10-20"},
+        "VALE3": {"setor_economico": "velho", "subsetor": "x", "segmento": "y", "em": "2026-08-01"},
+    }), encoding="utf-8")
+    monkeypatch.setattr(p, "CACHE_SETORES", str(cache))
+    pedidos = []
+
+    def b3(t):
+        pedidos.append(t)
+        return None if t == "XXXX3" else {"setor_economico": "Materiais Básicos", "subsetor": "Mineração",
+                                         "segmento": "Minerais Metálicos", "atividade": None, "code_cvm": "1"}
+
+    monkeypatch.setattr(p, "classificacao_b3", b3)
+    res = p.classificar(["ITUB4", "VALE3", "XXXX3"], hoje=hoje)
+    assert sorted(pedidos) == ["VALE3", "XXXX3"]  # ITUB4 ainda vale; VALE3 passou de 30 dias
+    assert res["ITUB4"]["segmento"] == "Bancos" and res["VALE3"]["setor_economico"] == "Materiais Básicos"
+    assert res["XXXX3"] is None
+    gravado = json.loads(cache.read_text(encoding="utf-8"))
+    assert set(gravado) == {"ITUB4", "VALE3"} and gravado["VALE3"]["em"] == "2026-10-30"

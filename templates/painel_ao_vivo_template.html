@@ -285,7 +285,7 @@ function setoresDe(linhas) {
 function filtradas(semBusca) {
   const b = filtro.busca.trim().toUpperCase();
   return (DADOS.cotacoes || []).filter((c) =>
-    (filtro.classe === "todas" || c.classe === filtro.classe) &&
+    (filtro.classe === "todas" || c.classe === filtro.classe || (filtro.classe === "liq" && c.origem === "liquidez")) &&
     (!filtro.setor || c.setor_economico === filtro.setor) &&
     (semBusca || !b || c.ticker.includes(b) || String(c.empresa || "").toUpperCase().includes(b)));
 }
@@ -294,7 +294,7 @@ function renderFiltros() {
   if (filtro.setor && !setores.includes(filtro.setor)) filtro.setor = "";
   $("filtroSetor").innerHTML = `<option value="">Todos os setores</option>` +
     setores.map((s) => `<option ${s === filtro.setor ? "selected" : ""}>${esc(s)}</option>`).join("");
-  $("classes").innerHTML = [["todas", "Todos"], ["acao", "Ações"], ["fii", "FIIs"]].map(([k, n]) =>
+  $("classes").innerHTML = [["todas", "Todos"], ["acao", "Ações"], ["fii", "FIIs"], ["liq", "Só pela liquidez"]].map(([k, n]) =>
     `<button type="button" class="chip ${filtro.classe === k ? "on" : ""}" data-classe="${k}">${n}</button>`).join("");
 }
 function renderTop() {
@@ -306,7 +306,7 @@ function renderTop() {
   const baixas = base.filter((c) => c.var < 0).sort((a, b) => a.var - b.var).slice(0, 10);
   $("altas").innerHTML = altas.map(linha).join("") || `<div class="muted">Nenhuma alta no filtro atual.</div>`;
   $("baixas").innerHTML = baixas.map(linha).join("") || `<div class="muted">Nenhuma baixa no filtro atual.</div>`;
-  const rot = filtro.setor || (filtro.classe === "todas" ? "todo o universo" : filtro.classe === "fii" ? "FIIs" : "ações");
+  const rot = filtro.setor || { todas: "todo o universo", fii: "FIIs", acao: "ações", liq: "ações só pela liquidez" }[filtro.classe];
   $("topAltasSub").textContent = $("topBaixasSub").textContent = rot;
 }
 const COLUNAS = [
@@ -622,6 +622,7 @@ function tooltip(n, ev) {
       .map((r) => `${r.a === c.ticker ? r.b : r.a}: ${r.tipo}`);
     tip.innerHTML = `<div class="h">${esc(c.ticker)} · ${esc(c.empresa)}</div>
       <div class="muted" style="margin-bottom:4px">${esc([c.subsetor, c.segmento].filter(Boolean).join(" / "))}</div>
+      ${c.origem === "liquidez" ? `<div class="muted" style="margin-bottom:4px">Fora dos outros painéis: entrou pela liquidez</div>` : ""}
       <div class="r"><span>Último</span><span>R$ ${nf(c.preco)}</span></div>
       <div class="r"><span>Variação</span><span class="${sinal(c.var)}">${pct(c.var)} (${c.var_rs == null ? "–" : (c.var_rs > 0 ? "+" : "") + nf(c.var_rs)})</span></div>
       <div class="r"><span>Mínima / máxima</span><span>${nf(c.minima)} / ${nf(c.maxima)}</span></div>
@@ -696,7 +697,10 @@ $("voltar").addEventListener("click", () => { if (G.caminho.length) navegar(G.ca
 /* ---------- Atualização ---------- */
 function renderTudo() {
   if (!DADOS) return;
-  $("subtitulo").textContent = `${(DADOS.cotacoes || []).length} ativos dos painéis do repositório (ações da análise de dividendos, painel pós-eleição e BESST, e os FIIs) · cotações do Yahoo Finance com atraso de até 15 min`;
+  const cs = DADOS.cotacoes || [], acoes = cs.filter((c) => c.classe === "acao"), liq = acoes.filter((c) => c.origem === "liquidez").length;
+  const corte = (DADOS.status || {}).liq_min;
+  $("subtitulo").textContent = `${cs.length} ativos: ${acoes.length} ações (${acoes.length - liq} dos outros painéis do repositório + ${liq} pela liquidez` +
+    (corte ? ` ≥ R$ ${grande(corte)}/dia` : "") + `) e ${cs.length - acoes.length} FIIs · cotações do Yahoo Finance com atraso de até 15 min`;
   renderStatus(); renderKpis(); renderFiltros(); renderTop(); renderTabela(); renderLegenda();
   reconstruir(!G.nos.size);
 }

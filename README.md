@@ -221,10 +221,14 @@ Ibovespa, small caps (SMAL11), FIIs (XFIX11, aproximação do IFIX) e dólar. Sa
 
 [`painel_ao_vivo.py`](painel_ao_vivo.py) acompanha o pregão com cotações do Yahoo Finance (gráfico intradiário de
 5 min, ticker com `.SA`, **atraso de até 15 min**), sem o cache diário de `fetch` (download direto por
-`b3lib.http.baixar`). O universo são os mesmos tickers dos outros painéis: ativos do painel pós-eleição (ações e
-FIIs), ações de `resultados/resultado_dividendos.csv` e a lista BESST de `painel_besst.py`. O setor é a
-classificação oficial da B3 (setor econômico / subsetor / segmento), a mesma de `b3lib/setores.py`; FIIs ficam em
-“Fundos imobiliários”.
+`b3lib.http.baixar`). O universo junta os tickers dos outros painéis — ativos do painel pós-eleição (ações e
+FIIs), ações de `resultados/resultado_dividendos.csv` e a lista BESST de `painel_besst.py` — com as ações de
+liquidez média de 2 meses de pelo menos R$ 1 mi/dia no Fundamentus (`--liq-min`), para cobrir o mercado líquido e
+não só o que os estudos de dividendos selecionaram. Em 30/10/2026 eram 278 ativos: 209 ações (97 dos painéis + 112
+pela liquidez) e 69 FIIs; a coleta inteira leva cerca de 15 s. O setor é a classificação oficial da B3 (setor
+econômico / subsetor / segmento), a mesma de `b3lib/setores.py`, guardada em `cache/setores_b3_ao_vivo.json` e
+refeita depois de 30 dias; FIIs ficam em “Fundos imobiliários”. Na tabela, o filtro “Só pela liquidez” mostra as
+ações que estão fora dos outros painéis.
 
 O painel tem:
 
@@ -368,7 +372,7 @@ python painel_pos_eleicao.py    # painel acumulado de todas as leituras
 ```
 
 ```bash
-python painel_ao_vivo.py        # [--intervalo 120] [--uma-vez]; deixe rodando e abra resultados_ao_vivo/painel_ao_vivo.html
+python painel_ao_vivo.py        # [--intervalo 120] [--liq-min 1000000] [--uma-vez]; deixe rodando e abra resultados_ao_vivo/painel_ao_vivo.html
 ```
 
 `--sem-jev` roda só a parte determinística (sem chave de API). `--sem-cvm` não baixa o DFP

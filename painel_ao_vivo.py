@@ -1,10 +1,13 @@
 """Painel ao vivo: cotações do pregão (atraso de até 15 min) com altas, baixas e o mapa setorial da B3.
 
-Universo: os mesmos tickers dos outros painéis
-  - ativos do painel pós-eleição (resultados/dashboard_pos_eleicao.html), já com a classificação setorial da B3;
-  - ações da análise de dividendos (resultados/resultado_dividendos.csv);
-  - lista BESST de painel_besst.py (lida sem importar o script).
-Quem não tem setor da B3 no painel pós-eleição é classificado por b3lib.setores (cache diário em cache/).
+Universo:
+  - os tickers dos outros painéis: ativos do painel pós-eleição (resultados/dashboard_pos_eleicao.html, ações e FIIs,
+    já com a classificação setorial da B3), ações da análise de dividendos (resultados/resultado_dividendos.csv) e a
+    lista BESST de painel_besst.py (lida sem importar o script);
+  - mais as ações com liquidez média diária de 2 meses de pelo menos --liq-min no Fundamentus (resultado.php),
+    para o painel cobrir o mercado líquido e não só o que os estudos de dividendos selecionaram.
+Quem não tem setor da B3 no painel pós-eleição é classificado por b3lib.setores. A classificação muda pouco: fica
+guardada em cache/setores_b3_ao_vivo.json e é refeita depois de 30 dias.
 
 Coleta: gráfico intradiário do Yahoo Finance (chart?range=1d&interval=5m, ticker com .SA), sem cache em disco.
 O script roda em loop: a cada --intervalo segundos durante o pregão (e até 15 min depois do fechamento, por causa
@@ -15,7 +18,7 @@ Antes de cada coleta o .js é regravado com "coletando", para o indicador do top
 Abrir resultados_ao_vivo/painel_ao_vivo.html direto no navegador (file://) funciona: um <script> pode ser
 recarregado de arquivo local, ao contrário de fetch() de um JSON.
 
-Uso:  python painel_ao_vivo.py [--intervalo 120] [--uma-vez]
+Uso:  python painel_ao_vivo.py [--intervalo 120] [--liq-min 1000000] [--uma-vez]
 Não é recomendação de investimento.
 """
 import argparse
@@ -34,7 +37,8 @@ sys.path.insert(0, RAIZ)
 os.chdir(RAIZ)
 
 from b3lib.cotacoes import BRASILIA, agenda, cotacao, montar_universo, relacoes  # noqa: E402
-from b3lib.http import baixar  # noqa: E402
+from b3lib.fundamentus import parse_resultado_acoes  # noqa: E402
+from b3lib.http import CACHE_DIR, baixar, fetch  # noqa: E402
 from b3lib.log import configurar, falhas, limpar_falhas, registrar_falha, resumo_falhas  # noqa: E402
 from b3lib.setores import classificacao_b3  # noqa: E402
 from b3lib.yahoo import chart_resultado  # noqa: E402
@@ -47,6 +51,8 @@ SAIDA_JS = os.path.join(PASTA_SAIDA, "painel_ao_vivo_dados.js")
 PAINEL_POS_ELEICAO = os.path.join(RAIZ, "resultados", "dashboard_pos_eleicao.html")
 CSV_DIVIDENDOS = os.path.join(RAIZ, "resultados", "resultado_dividendos.csv")
 PAINEL_BESST = os.path.join(RAIZ, "painel_besst.py")
+CACHE_SETORES = os.path.join(RAIZ, CACHE_DIR, "setores_b3_ao_vivo.json")
+VALIDADE_SETORES = dt.timedelta(days=30)
 FII = "Fundos imobiliários"
 REFERENCIAS = [("ibov", "Ibovespa", "^BVSP"), ("smll", "Small caps (SMAL11)", "SMAL11.SA"),
                ("ifix", "FIIs (XFIX11)", "XFIX11.SA"), ("dolar", "Dólar (R$/US$)", "BRL=X")]
@@ -74,35 +80,67 @@ def lista_besst(arquivo=PAINEL_BESST):
     return []
 
 
-def cadastro():
+def liquidas(liq_min):
+    """{ticker: campos} das ações do Fundamentus com liquidez média de 2 meses >= liq_min (R$/dia)."""
+    try:
+        linhas = parse_resultado_acoes(fetch("/resultado.php"))
+    except Exception as e:
+        registrar_falha("resultado.php", "fundamentus", e)
+        return {}
+    return {r["ticker"]: {"classe": "acao", "liq_2m": r["liq_2m"]} for r in linhas if (r["liq_2m"] or 0) >= liq_min}
+
+
+def classificar(tickers, hoje=None):
+    """{ticker: classificação da B3 ou None}, com o cache persistente de CACHE_SETORES."""
+    hoje = hoje or dt.date.today()
+    try:
+        cache = json.load(open(CACHE_SETORES, encoding="utf-8"))
+    except (OSError, ValueError):
+        cache = {}
+    validos = {t: c for t, c in cache.items() if hoje - dt.date.fromisoformat(c["em"]) <= VALIDADE_SETORES}
+    faltam = [t for t in tickers if t not in validos]
+
+    def uma(t):
+        try:
+            return classificacao_b3(t)
+        except Exception as e:
+            registrar_falha(t, "setor B3", e)
+            return None
+
+    if faltam:
+        print(f"Classificando {len(faltam)} ações na B3 (fica em {os.path.relpath(CACHE_SETORES)})…", flush=True)
+        with ThreadPoolExecutor(max_workers=6) as pool:
+            for t, c in zip(faltam, pool.map(uma, faltam)):
+                if c:  # falha não entra no cache: tenta de novo na próxima execução
+                    validos[t] = {k: c[k] for k in ("setor_economico", "subsetor", "segmento")} | {"em": hoje.isoformat()}
+        os.makedirs(os.path.dirname(CACHE_SETORES), exist_ok=True)
+        escrever(CACHE_SETORES, json.dumps(validos, ensure_ascii=False, indent=0, sort_keys=True))
+    return {t: validos.get(t) for t in tickers}
+
+
+def cadastro(liq_min):
     """Universo do painel com setor econômico, subsetor e segmento da B3."""
     pos = {}
     for a in (dados_embutidos(PAINEL_POS_ELEICAO) or {}).get("ativos", []):
         pos[a["ticker"]] = {"nome": a.get("nome"), "classe": a["classe"], "setor_economico": a.get("setor_economico"),
-                            "subsetor": a.get("setor"), "segmento": a.get("segmento")}
+                            "subsetor": a.get("setor"), "segmento": a.get("segmento"), "origem": "painéis"}
     div = {}
     if os.path.exists(CSV_DIVIDENDOS):
         for r in csv.DictReader(open(CSV_DIVIDENDOS, encoding="utf-8-sig"), delimiter=";"):
-            div[r["ticker"]] = {"nome": r["empresa"], "classe": "acao", "setor_fundamentus": r["setor"]}
-    besst = {t: {"nome": n, "classe": "acao", "besst": s} for t, n, s, _ in lista_besst()}
-    universo = montar_universo(pos, div, besst)
+            div[r["ticker"]] = {"nome": r["empresa"], "classe": "acao", "setor_fundamentus": r["setor"], "origem": "painéis"}
+    besst = {t: {"nome": n, "classe": "acao", "besst": s, "origem": "painéis"} for t, n, s, _ in lista_besst()}
+    liq = {t: dict(c, origem="liquidez") for t, c in liquidas(liq_min).items()}
+    universo = montar_universo(pos, div, besst, liq)
 
     faltam = [u for u in universo if u["classe"] == "acao" and not u.get("setor_economico")]
-
-    def classificar(u):
-        try:
-            return classificacao_b3(u["ticker"])
-        except Exception as e:
-            registrar_falha(u["ticker"], "setor B3", e)
-            return None
-
-    with ThreadPoolExecutor(max_workers=4) as pool:
-        for u, c in zip(faltam, pool.map(classificar, faltam)):
-            if c:
-                u.update(setor_economico=c["setor_economico"], subsetor=c["subsetor"], segmento=c["segmento"])
-            else:  # sem B3: fica o setor do Fundamentus, marcado
-                u["setor_economico"] = "Sem classificação B3"
-                u["subsetor"] = u.get("setor_fundamentus") or u.get("besst")
+    setores = classificar([u["ticker"] for u in faltam])
+    for u in faltam:
+        c = setores[u["ticker"]]
+        if c:
+            u.update(setor_economico=c["setor_economico"], subsetor=c["subsetor"], segmento=c["segmento"])
+        else:  # sem B3: fica o setor do Fundamentus, se houver, marcado
+            u["setor_economico"] = "Sem classificação B3"
+            u["subsetor"] = u.get("setor_fundamentus") or u.get("besst")
     for u in universo:
         if u["classe"] == "fii":
             u["setor_economico"] = FII
@@ -136,7 +174,7 @@ def publicar(dados, template=None):
 def coletar(universo, anteriores):
     """Cotação de cada ticker; quem falhar mantém a cotação anterior marcada como desatualizada."""
     simbolos = [s for _, _, s in REFERENCIAS] + [f"{u['ticker']}.SA" for u in universo]
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=12) as pool:
         resp = dict(zip(simbolos, pool.map(cotar, simbolos)))
     pregao = next((c["pregao"] for c in resp.values() if c and c.get("pregao") and c["pregao"][0]), None)
     linhas = []
@@ -160,6 +198,8 @@ def coletar(universo, anteriores):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--intervalo", type=int, default=120, help="segundos entre coletas durante o pregão (mín. 30)")
+    ap.add_argument("--liq-min", type=float, default=1_000_000,
+                    help="inclui as ações com liquidez média de 2 meses (Fundamentus) acima disto, em R$/dia")
     ap.add_argument("--uma-vez", action="store_true", help="coleta uma vez, grava e sai")
     args = ap.parse_args()
     intervalo = dt.timedelta(seconds=max(30, args.intervalo))
@@ -167,10 +207,14 @@ def main():
     template = open(TEMPLATE_HTML, encoding="utf-8").read()
 
     print("Montando o universo e a classificação setorial…")
-    universo = cadastro()
+    universo = cadastro(args.liq_min)
     arestas = relacoes([u["ticker"] for u in universo], RELACOES_CURADAS)
-    print(f"{len(universo)} ativos; {len(arestas)} relações entre empresas.")
-    dados = {"status": {"coletando": False, "intervalo_s": intervalo.total_seconds(), "n_universo": len(universo)},
+    n_acoes = sum(u["classe"] == "acao" for u in universo)
+    n_liq = sum(u.get("origem") == "liquidez" for u in universo)
+    print(f"{len(universo)} ativos ({n_acoes} ações, das quais {n_liq} só pela liquidez; "
+          f"{len(universo) - n_acoes} FIIs); {len(arestas)} relações entre empresas.")
+    dados = {"status": {"coletando": False, "intervalo_s": intervalo.total_seconds(), "n_universo": len(universo),
+                        "liq_min": args.liq_min},
              "cotacoes": [], "referencias": [], "relacoes": arestas}
     # Retrato anterior: a página não fica vazia enquanto a primeira coleta roda.
     antigo = dados_embutidos(SAIDA_HTML)
