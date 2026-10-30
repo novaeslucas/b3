@@ -1,0 +1,40 @@
+{
+ "page": {
+  "pageNumber": -1,
+  "pageSize": -1,
+  "totalRecords": 466,
+  "totalPages": -466
+ },
+ "header": {
+  "update": "2026-10-30",
+  "startMonth": 9,
+  "endMonth": 12,
+  "year": 2026
+ },
+ "results": [
+  {
+   "company": "3M",
+   "spotlight": "DRN",
+   "code": "MMMC34",
+   "indexes": "BDRX"
+  },
+  {
+   "company": "ABC BRASIL",
+   "spotlight": "PN   N2",
+   "code": "ABCB4",
+   "indexes": "BNCO,IBRA,IBST,ICO2,IDIV,IDVR,IFNC,IGCT,IGCX,ITAG,SCSR,SMLL"
+  },
+  {
+   "company": "FII MAXI REN",
+   "spotlight": "CI",
+   "code": "MXRF11",
+   "indexes": "IFIL,IFIX"
+  },
+  {
+   "company": "ITAUUNIBANCO",
+   "spotlight": "PN   N1",
+   "code": "ITUB4",
+   "indexes": "BNCO,GPTW,IBBC,IBBE,IBBR,IBEP,IBEW,IBLV,IBOV,IBRA,IBST,IBXL,IBXX,ICO2,IDIV,IDVR,IFNC,IGCT,IGCX,ISEE,ITAG,MLCX"
+  }
+ ]
+}

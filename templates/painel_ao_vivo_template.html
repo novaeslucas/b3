@@ -10,7 +10,7 @@
   --bg: #f9f9f7; --surface: #fcfcfb; --surface-2: #f0efec; --border: rgba(11, 11, 11, .10);
   --text: #0b0b0b; --text-2: #52514e; --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7;
   --pos-txt: #137a3a; --neg-txt: #b8312f; --accent: #2a78d6; --ok: #1a9a4b; --warn: #c98500; --bad: #d03b3b;
-  --map-bg: #f3f2ee; --edge: rgba(11, 11, 11, .16);
+  --map-bg: #f3f2ee; --edge: rgba(11, 11, 11, .16); --neutro: #6f6e69;
 }
 @media (prefers-color-scheme: dark) {
   :root:where(:not([data-theme="light"])) {
@@ -18,7 +18,7 @@
     --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
     --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
     --pos-txt: #5cc98a; --neg-txt: #f08c8b; --accent: #3987e5; --ok: #34c06a; --warn: #e0a225; --bad: #e66767;
-    --map-bg: #111110; --edge: rgba(255, 255, 255, .16);
+    --map-bg: #111110; --edge: rgba(255, 255, 255, .16); --neutro: #4b4a46;
   }
 }
 :root[data-theme="dark"] {
@@ -26,7 +26,7 @@
   --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
   --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
   --pos-txt: #5cc98a; --neg-txt: #f08c8b; --accent: #3987e5; --ok: #34c06a; --warn: #e0a225; --bad: #e66767;
-  --map-bg: #111110; --edge: rgba(255, 255, 255, .16);
+  --map-bg: #111110; --edge: rgba(255, 255, 255, .16); --neutro: #4b4a46;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
@@ -82,6 +82,13 @@ button, select, input { font: inherit; color: var(--text); }
 .mapa .emp rect { stroke: rgba(0, 0, 0, .3); stroke-width: .8; }
 .mapa .emp.velha rect { stroke-dasharray: 3 2; opacity: .6; }
 .mapa .emp.foco rect { stroke: var(--text); stroke-width: 2; }
+.mapa .fitem { transition: transform .45s ease; }
+.mapa .fitem rect { stroke: rgba(0, 0, 0, .3); stroke-width: .8; }
+.mapa .edge { transition: opacity .45s ease; }
+.mapa .ficha rect { stroke: var(--text); stroke-width: 2; }
+.mapa .ficha text { fill: #fff; }
+.mapa .ftitulo { fill: var(--text-2); font-size: 13px; font-weight: 650; cursor: help; }
+.mapa .fhub { fill: var(--text-2); }
 .navmapa { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; font-size: 13px; }
 .navmapa #caminho { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .migalha { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font-size: 13px; }
@@ -216,7 +223,7 @@ function cor(v) {
 const media = (xs) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
 
 /* Estado da página */
-const filtro = { classe: "todas", setor: "", busca: "" };
+const filtro = { classe: "todas", setor: "", busca: "", indice: "" };
 let ordem = { col: "var", dir: -1 };
 let ultimaRenderizada = null, arquivoOk = null, ultimaRecepcao = null;
 
@@ -287,6 +294,7 @@ function filtradas(semBusca) {
   return (DADOS.cotacoes || []).filter((c) =>
     (filtro.classe === "todas" || c.classe === filtro.classe || (filtro.classe === "liq" && c.origem === "liquidez")) &&
     (!filtro.setor || c.setor_economico === filtro.setor) &&
+    (!filtro.indice || (c.indices || []).includes(filtro.indice)) &&
     (semBusca || !b || c.ticker.includes(b) || String(c.empresa || "").toUpperCase().includes(b)));
 }
 function renderFiltros() {
@@ -295,7 +303,8 @@ function renderFiltros() {
   $("filtroSetor").innerHTML = `<option value="">Todos os setores</option>` +
     setores.map((s) => `<option ${s === filtro.setor ? "selected" : ""}>${esc(s)}</option>`).join("");
   $("classes").innerHTML = [["todas", "Todos"], ["acao", "Ações"], ["fii", "FIIs"], ["liq", "Só pela liquidez"]].map(([k, n]) =>
-    `<button type="button" class="chip ${filtro.classe === k ? "on" : ""}" data-classe="${k}">${n}</button>`).join("");
+    `<button type="button" class="chip ${filtro.classe === k ? "on" : ""}" data-classe="${k}">${n}</button>`).join("") +
+    (filtro.indice ? `<button type="button" class="chip on" data-limpa-indice title="Limpar o filtro de índice">Índice ${esc(filtro.indice)} ✕</button>` : "");
 }
 function renderTop() {
   const base = filtradas(true).filter((c) => c.var != null && !c.desatualizada);
@@ -306,7 +315,7 @@ function renderTop() {
   const baixas = base.filter((c) => c.var < 0).sort((a, b) => a.var - b.var).slice(0, 10);
   $("altas").innerHTML = altas.map(linha).join("") || `<div class="muted">Nenhuma alta no filtro atual.</div>`;
   $("baixas").innerHTML = baixas.map(linha).join("") || `<div class="muted">Nenhuma baixa no filtro atual.</div>`;
-  const rot = filtro.setor || { todas: "todo o universo", fii: "FIIs", acao: "ações", liq: "ações só pela liquidez" }[filtro.classe];
+  const rot = (filtro.indice ? `índice ${filtro.indice}` : "") || filtro.setor || { todas: "todo o universo", fii: "FIIs", acao: "ações", liq: "ações só pela liquidez" }[filtro.classe];
   $("topAltasSub").textContent = $("topBaixasSub").textContent = rot;
 }
 const COLUNAS = [
@@ -570,9 +579,189 @@ function animar() {
   G.raf = requestAnimationFrame(quadro);
 }
 function aquecer(a) { G.alpha = Math.max(G.alpha, a); animar(); }
+/* ---------- Ficha da ação (4º nível do mapa) ----------
+   Como o Relationship Map do terminal Bloomberg: a ação num cartão no centro e, em volta, grupos de informação,
+   cada um com um nó-título e os itens ao redor dele. Até 10 itens por grupo; "Mais…" mostra o resto.
+   Grupos desta etapa: concorrentes (mesmo segmento B3), índices da B3 e classes/listagem. */
+const FICHA = { LW: 80, LH: 38, LIMITE: 10, CW: 268, CH: 124 };
+G.expandidos = new Set();
+const ROTULO_MERCADO = { "NOVO MERCADO": "Novo Mercado", "BOVESPA NIVEL 1": "Nível 1", "BOVESPA NIVEL 2": "Nível 2",
+  "BOLSA": "Tradicional", "BOVESPA MAIS": "Bovespa Mais", "BOVESPA MAIS NIVEL 2": "Bovespa Mais N2", "MB": "Balcão" };
+const raizDe = (t) => t.slice(0, 4);
+function acaoDaFicha() {
+  const t = G.caminho[2];
+  return t ? acoesDoMapa().find((c) => c.ticker === t) || null : null;
+}
+function itensFicha(c) {
+  /* [{id, titulo, itens, total, nota}] da ação c. */
+  const todas = acoesDoMapa(), porTicker = new Map((DADOS.cotacoes || []).map((x) => [x.ticker, x]));
+  const porVolume = (a, b) => (b.financeiro ?? -1) - (a.financeiro ?? -1);
+  // concorrentes: mesmo segmento B3 (se houver pelo menos 3), senão mesmo subsetor; uma classe por companhia
+  let base = "segmento", peers = todas.filter((x) => x.segmento && x.segmento === c.segmento && raizDe(x.ticker) !== raizDe(c.ticker));
+  if (peers.length < 3) { base = "subsetor"; peers = todas.filter((x) => subDe(x) === subDe(c) && raizDe(x.ticker) !== raizDe(c.ticker)); }
+  const vistos = new Set();
+  peers = peers.sort(porVolume).filter((x) => !vistos.has(raizDe(x.ticker)) && vistos.add(raizDe(x.ticker)));
+  const ibov = (DADOS.referencias || []).find((r) => r.id === "ibov");
+  const indices = (c.indices || []).map((cod) => {
+    const membros = (DADOS.cotacoes || []).filter((x) => (x.indices || []).includes(cod));
+    const m = media(membros.map((x) => x.var).filter((v) => v != null));
+    const v = cod === "IBOV" && ibov ? ibov.var : m;
+    return { id: "i:" + cod, tipo: "indice", cod, nome: (DADOS.nomes_indices || {})[cod], membros, v, l1: cod, l2: pct(v),
+      real: cod === "IBOV" && !!ibov };
+  });
+  const classes = (c.classes || []).filter((t) => t !== c.ticker).map((t) => porTicker.get(t)
+    ? { id: "e:" + t, tipo: "emp", c: porTicker.get(t), v: porTicker.get(t).var, l1: t, l2: pct(porTicker.get(t).var) }
+    : { id: "x:" + t, tipo: "info", l1: t, l2: "fora do painel", v: null, dica: `${t}: outra classe da companhia, sem cotação no painel (abaixo do corte de liquidez ou sem negócios).` });
+  if (c.mercado) classes.push({ id: "listagem", tipo: "info", l1: ROTULO_MERCADO[c.mercado] || c.mercado, l2: "listagem B3", v: null,
+    dica: `Segmento de listagem na B3: ${c.mercado}.` });
+  if (c.site) classes.push({ id: "site", tipo: "link", l1: "Site", l2: c.site.replace(/^https?:\/\//, "").split("/")[0].slice(0, 14), v: null,
+    url: /^https?:/.test(c.site) ? c.site : "https://" + c.site });
+  return [
+    { id: "peers", titulo: "Concorrentes", nota: `mesmo ${base} da B3, por volume`, total: peers.length,
+      itens: peers.map((x) => ({ id: "e:" + x.ticker, tipo: "emp", c: x, v: x.var, l1: x.ticker, l2: pct(x.var) })) },
+    { id: "indices", titulo: "Índices", nota: "cor: média do dia das ações do índice no painel (IBOV: o próprio índice)", total: indices.length, itens: indices },
+    { id: "classes", titulo: "Classes e listagem", nota: "outras classes da companhia e cadastro na B3", total: classes.length, itens: classes },
+  ].filter((g) => g.itens.length);
+}
+function visiveis(g) {
+  const aberto = G.expandidos.has(g.id), lista = g.itens.slice(0, aberto ? g.itens.length : FICHA.LIMITE);
+  if (g.itens.length > FICHA.LIMITE)
+    lista.push({ id: "m:" + g.id, tipo: "mais", grupo: g.id, l1: aberto ? "Menos" : "Mais…", l2: aberto ? "" : `+${g.itens.length - FICHA.LIMITE}`, v: null });
+  return lista;
+}
+function layoutFicha(grupos, largo) {
+  /* Posições relativas ao centro do cartão (0, 0): grupos em anel (largo) ou empilhados (estreito). */
+  const { LW, LH, CW, CH } = FICHA, pos = [];
+  if (largo) {
+    const angulos = { 1: [-90], 2: [-90, 90], 3: [-90, 150, 30] }[grupos.length];
+    const raios = grupos.map((g) => Math.max(70, visiveis(g).length * (LW + 14) / (2 * Math.PI)));
+    grupos.forEach((g, i) => {
+      const a = angulos[i] * Math.PI / 180, r = raios[i], outros = Math.max(0, ...raios.filter((_, j) => j !== i));
+      // longe o bastante do cartão e dos outros grupos (os de baixo ficam a 120° um do outro)
+      const D = Math.max(Math.hypot(CW / 2, CH / 2) + r + LH, (r + outros + LW + 40) / Math.sqrt(3), 150);
+      const hx = D * Math.cos(a), hy = D * Math.sin(a), itens = visiveis(g);
+      const volta = Math.atan2(-hy, -hx);  // direção do centro: os itens começam do lado oposto
+      pos.push({ g, hx, hy, r, titulo: [hx, hy - r - LH / 2 - 12],
+        itens: itens.map((it, k) => {
+          const t = volta + Math.PI / itens.length + 2 * Math.PI * k / itens.length;
+          return { it, x: hx + r * Math.cos(t), y: hy + r * Math.sin(t) };
+        }) });
+    });
+  } else {
+    const W = G.W, cols = Math.max(1, Math.floor((W - 16) / (LW + 8)));
+    let y = CH / 2 + 30;
+    for (const g of grupos) {
+      const itens = visiveis(g), x0 = -((Math.min(cols, itens.length) - 1) * (LW + 8)) / 2;
+      const hy = y + 26;
+      pos.push({ g, hx: 0, hy, r: 0, titulo: [0, y + 10],
+        itens: itens.map((it, k) => ({ it, x: x0 + (k % cols) * (LW + 8), y: hy + 36 + Math.floor(k / cols) * (LH + 8) })) });
+      y = hy + 36 + Math.ceil(itens.length / cols) * (LH + 8) + 6;
+    }
+  }
+  return pos;
+}
+function desenharFicha(novaVisao) {
+  const c = acaoDaFicha();
+  if (!c) return false;
+  cancelAnimationFrame(G.raf);
+  G.alpha = 0;
+  G.W = Math.max(320, $("mapa").clientWidth);
+  const largo = G.W >= 600, grupos = itensFicha(c), pos = layoutFicha(grupos, largo);
+  const { LW, LH, CW, CH } = FICHA;
+  // caixa que envolve tudo, para o viewBox
+  let x0 = -CW / 2, x1 = CW / 2, y0 = -CH / 2, y1 = CH / 2;
+  for (const p of pos) {
+    for (const q of p.itens) { x0 = Math.min(x0, q.x - LW / 2); x1 = Math.max(x1, q.x + LW / 2); y0 = Math.min(y0, q.y - LH / 2); y1 = Math.max(y1, q.y + LH / 2); }
+    y0 = Math.min(y0, p.titulo[1] - 16); x0 = Math.min(x0, p.titulo[0] - 120); x1 = Math.max(x1, p.titulo[0] + 120);
+  }
+  if (!largo) { x0 = -G.W / 2; x1 = G.W / 2; }
+  x0 -= 12; x1 += 12; y0 -= 12; y1 += 12;
+  const bw = x1 - x0, bh = y1 - y0;
+  G.H = Math.round(bh * Math.min(1, G.W / bw));
+  svg.setAttribute("viewBox", `${x0} ${y0} ${bw} ${bh}`);
+  svg.setAttribute("height", G.H);
+  svg.innerHTML = "";
+  G.nos = new Map();
+  G.relacoes = [];
+  const gE = el("g", {}, svg), gN = el("g", {}, svg);
+  const itens = [];
+  let fimAnterior = CH / 2;
+  for (const p of pos) {
+    if (largo) el("line", { class: "edge", x1: 0, y1: 0, x2: p.hx, y2: p.hy }, gE);
+    else {  // tronco vertical, de um grupo ao próximo, sem cruzar os títulos
+      el("line", { class: "edge", x1: 0, y1: fimAnterior, x2: 0, y2: p.titulo[1] - 16 }, gE);
+      fimAnterior = Math.max(...p.itens.map((q) => q.y + LH / 2)) + 4;
+    }
+    const titulo = el("text", { class: "ftitulo", x: p.titulo[0], y: p.titulo[1], "text-anchor": "middle" }, gN);
+    titulo.textContent = `${p.g.titulo} (${Math.min(p.g.itens.length, G.expandidos.has(p.g.id) ? p.g.itens.length : FICHA.LIMITE)}/${p.g.total})`;
+    el("title", {}, titulo).textContent = p.g.nota;
+    if (largo) el("circle", { class: "fhub", cx: p.hx, cy: p.hy, r: 5 }, gN);
+    for (const q of p.itens) {
+      const linha = largo ? el("line", { class: "edge", x1: p.hx, y1: p.hy, x2: q.x, y2: q.y }, gE) : null;
+      const n = Object.assign(q.it, { x: q.x, y: q.y, w: LW, h: LH });
+      const g = el("g", { class: "no fitem " + n.tipo + (n.tipo === "emp" && n.c.desatualizada ? " velha" : "") }, gN);
+      g.dataset.id = n.id;
+      const cinza = n.tipo === "info" || n.tipo === "mais" || n.tipo === "link";
+      const r = el("rect", { x: -LW / 2, y: -LH / 2, width: LW, height: LH, rx: 5, fill: cor(n.v) }, g);
+      if (cinza) r.style.fill = "var(--neutro)";  // var() não vale no atributo fill
+      el("text", { "text-anchor": "middle", y: n.l2 ? -3 : 4, "font-size": 12, "font-weight": 700 }, g).textContent = n.l1;
+      if (n.l2) el("text", { "text-anchor": "middle", y: 11, "font-size": 10.5 }, g).textContent = n.l2;
+      G.nos.set(n.id, n);
+      itens.push({ g, linha, n });
+    }
+  }
+  // cartão central
+  const cartao = { id: "ficha", tipo: "ficha", c, x: 0, y: 0, w: CW, h: CH };
+  G.nos.set("ficha", cartao);
+  const g = el("g", { class: "no ficha" }, gN);
+  g.dataset.id = "ficha";
+  el("rect", { x: -CW / 2, y: -CH / 2, width: CW, height: CH, rx: 10, fill: cor(c.var) }, g);
+  const L = -CW / 2 + 14;
+  el("text", { x: L, y: -CH / 2 + 24, "font-size": 18, "font-weight": 700 }, g).textContent = "↑ " + c.ticker;
+  const nome = String(c.empresa || c.razao_social || "");
+  el("text", { x: L, y: -CH / 2 + 42, "font-size": 11.5 }, g).textContent = nome.length > 36 ? nome.slice(0, 35) + "…" : nome;
+  el("text", { x: L, y: 8, "font-size": 16, "font-weight": 700 }, g).textContent = "R$ " + nf(c.preco);
+  el("text", { x: L, y: 26, "font-size": 12 }, g).textContent = `${pct(c.var)} (${c.var_rs == null ? "–" : (c.var_rs > 0 ? "+" : "") + nf(c.var_rs)})`;
+  const p = c.spark || [];
+  if (p.length > 1) {  // linha do dia, com o fechamento anterior tracejado
+    const sx0 = 8, sx1 = CW / 2 - 14, sy0 = -10, sy1 = 28;
+    const lo = Math.min(...p, c.anterior ?? Infinity), hi = Math.max(...p, c.anterior ?? -Infinity);
+    const y = (v) => hi === lo ? (sy0 + sy1) / 2 : sy1 - (sy1 - sy0) * (v - lo) / (hi - lo);
+    if (c.anterior != null) el("line", { x1: sx0, x2: sx1, y1: y(c.anterior), y2: y(c.anterior), stroke: "rgba(255,255,255,.55)", "stroke-dasharray": "3 3" }, g);
+    el("polyline", { fill: "none", stroke: "#fff", "stroke-width": 1.6,
+      points: p.map((v, i) => `${(sx0 + (sx1 - sx0) * i / (p.length - 1)).toFixed(1)},${y(v).toFixed(1)}`).join(" ") }, g);
+  }
+  if (c.min52 != null && c.max52 != null && c.max52 > c.min52) {  // faixa de 52 semanas
+    const by = CH / 2 - 18, bx0 = L + 28, bx1 = CW / 2 - 14, t = Math.max(0, Math.min(1, (c.preco - c.min52) / (c.max52 - c.min52)));
+    el("text", { x: L, y: by + 4, "font-size": 10 }, g).textContent = "52s";
+    el("line", { x1: bx0, x2: bx1, y1: by, y2: by, stroke: "rgba(255,255,255,.6)", "stroke-width": 2 }, g);
+    el("circle", { cx: bx0 + t * (bx1 - bx0), cy: by, r: 4, fill: "#fff" }, g);
+    el("text", { x: bx0, y: by + 14, "font-size": 9.5 }, g).textContent = nf(c.min52);
+    el("text", { x: bx1, y: by + 14, "font-size": 9.5, "text-anchor": "end" }, g).textContent = nf(c.max52);
+  }
+  // entrada: itens saem do centro (transição CSS no transform)
+  for (const { g: gi, linha, n } of itens) {
+    gi.style.transform = novaVisao ? "translate(0px,0px) scale(.4)" : `translate(${n.x}px,${n.y}px)`;
+    if (linha && novaVisao) linha.style.opacity = 0;
+  }
+  if (novaVisao) {
+    svg.getBoundingClientRect();  // força o layout com a posição inicial; a transição CSS leva até a final
+    for (const { g: gi, linha, n } of itens) { gi.style.transform = `translate(${n.x}px,${n.y}px)`; if (linha) linha.style.opacity = 1; }
+  }
+  return true;
+}
+function filtrarIndice(cod) {
+  filtro.indice = cod; filtro.setor = ""; filtro.classe = "todas";
+  renderFiltros(); renderTop(); renderTabela();
+  $("contagem").scrollIntoView({ behavior: "smooth", block: "start" });
+}
 function reconstruir(novaVisao) {
   /* novaVisao: recarrega o grafo com o centro atual e anima os filhos saindo dele. Senão (chegada de dados, mudança
      de largura) só redesenha nas posições atuais. */
+  if (G.caminho.length === 3) {
+    if (desenharFicha(novaVisao)) { renderCaminho(); return; }
+    G.caminho = G.caminho.slice(0, 2);  // a ação saiu do painel: volta ao subsetor
+  }
   cancelAnimationFrame(G.raf);
   const animando = G.alpha > 0.01;  // dados chegando no meio da animação: ela continua de onde estava
   estruturaGrafo(novaVisao);
@@ -587,6 +776,7 @@ function navegar(caminho) {
   G.foco = null;
   // a tabela e as altas/baixas acompanham o setor do mapa
   filtro.setor = caminho[0] || "";
+  filtro.indice = "";
   if (filtro.busca && !caminho.length) { filtro.busca = ""; $("busca").value = ""; }
   renderFiltros(); renderTop(); renderTabela();
   $("tip").style.display = "none";
@@ -600,7 +790,8 @@ function renderCaminho() {
   $("dicaMapa").textContent = [
     "Clique num setor para recarregar o mapa com ele no centro e os subsetores em volta.",
     "Clique num subsetor para ver as ações dele; no centro, para voltar à B3.",
-    "Clique numa empresa para filtrar a tabela; no centro, para voltar ao setor.",
+    "Clique numa ação para abrir a ficha dela; no centro, para voltar ao setor.",
+    "Ficha da ação: clique num concorrente ou noutra classe para abrir a ficha dele, num índice para filtrar a tabela pelas ações do índice; no cartão do centro, para voltar ao subsetor.",
   ][G.caminho.length];
 }
 function renderLegenda() {
@@ -629,7 +820,33 @@ function tooltip(n, ev) {
       <div class="r"><span>Volume</span><span>R$ ${grande(c.financeiro)}</span></div>
       <div class="r"><span>Hora</span><span>${hora(c.hora)}${c.desatualizada ? " (coleta anterior)" : ""}</span></div>
       ${rel.length ? `<div class="note">Relacionadas: ${esc(rel.join("; "))}</div>` : ""}
-      <div class="note">Clique para ${G.foco === c.ticker ? "limpar o filtro" : "filtrar a tabela"}.</div>`;
+      <div class="note">Clique para abrir a ficha.</div>`;
+  } else if (n.tipo === "ficha") {
+    const c = n.c;
+    tip.innerHTML = `<div class="h">${esc(c.ticker)} · ${esc(c.razao_social || c.empresa)}</div>
+      <div class="muted" style="margin-bottom:4px">${esc([c.setor_economico, c.subsetor, c.segmento].filter(Boolean).join(" / "))}</div>
+      <div class="r"><span>Último</span><span>R$ ${nf(c.preco)} · ${hora(c.hora)}</span></div>
+      <div class="r"><span>Variação</span><span class="${sinal(c.var)}">${pct(c.var)}</span></div>
+      <div class="r"><span>Abertura / fech. ant.</span><span>${nf(c.abertura)} / ${nf(c.anterior)}</span></div>
+      <div class="r"><span>Mínima / máxima do dia</span><span>${nf(c.minima)} / ${nf(c.maxima)}</span></div>
+      <div class="r"><span>Mín. / máx. 52 semanas</span><span>${nf(c.min52)} / ${nf(c.max52)}</span></div>
+      <div class="r"><span>Volume</span><span>R$ ${grande(c.financeiro)} (${grande(c.volume)} papéis)</span></div>
+      ${c.peso_ibov ? `<div class="r"><span>Peso no Ibovespa</span><span>${nf(100 * c.peso_ibov, 3)}%</span></div>` : ""}
+      <div class="note">Clique para voltar ao subsetor.</div>`;
+  } else if (n.tipo === "indice") {
+    const ord = n.membros.filter((x) => x.var != null).sort(porVar);
+    const peso = n.cod === "IBOV" && acaoDaFicha() && acaoDaFicha().peso_ibov;
+    tip.innerHTML = `<div class="h">${esc(n.cod)}${n.nome ? " · " + esc(n.nome) : ""}</div>
+      <div class="r"><span>${n.real ? "Variação do índice" : "Média das ações no painel"}</span><span class="${sinal(n.v)}">${pct(n.v)}</span></div>
+      <div class="r"><span>Ações do índice no painel</span><span>${n.membros.length}</span></div>
+      ${peso ? `<div class="r"><span>Peso de ${esc(acaoDaFicha().ticker)}</span><span>${nf(100 * peso, 3)}%</span></div>` : ""}
+      ${ord.length ? `<div class="r"><span>Maior alta</span><span>${esc(ord[0].ticker)} ${pct(ord[0].var)}</span></div>
+      <div class="r"><span>Maior baixa</span><span>${esc(ord[ord.length - 1].ticker)} ${pct(ord[ord.length - 1].var)}</span></div>` : ""}
+      <div class="note">Clique para filtrar a tabela pelas ações do índice.</div>`;
+  } else if (n.tipo === "info" || n.tipo === "link" || n.tipo === "mais") {
+    tip.innerHTML = n.tipo === "link" ? `<div class="h">Site da companhia</div><div>${esc(n.url)}</div><div class="note">Clique para abrir.</div>`
+      : n.tipo === "mais" ? `<div class="h">${n.l1 === "Menos" ? "Mostrar só os 10 primeiros" : "Mostrar todos os itens do grupo"}</div>`
+      : `<div>${esc(n.dica)}</div>`;
   } else {
     const ord = n.membros.filter((c) => c.var != null);
     const acao = n.tipo === "centro"
@@ -665,7 +882,7 @@ svg.addEventListener("pointerdown", (ev) => {
 svg.addEventListener("pointermove", (ev) => {
   if (!G.arrasto) { tooltip(noDoEvento(ev), ev); return; }
   const a = G.arrasto, p = ponto(ev);
-  if (Math.hypot(ev.clientX - a.x0, ev.clientY - a.y0) > 4 && a.n.tipo !== "centro") a.moveu = true;
+  if (Math.hypot(ev.clientX - a.x0, ev.clientY - a.y0) > 4 && a.n.tipo !== "centro" && G.caminho.length < 3) a.moveu = true;
   if (!a.moveu) return;
   a.n.fixo = true; a.n.x = p.x + a.dx; a.n.y = p.y + a.dy; a.n.vx = a.n.vy = 0;
   $("tip").style.display = "none";
@@ -678,14 +895,14 @@ svg.addEventListener("pointerup", () => {
   if (a.n.tipo !== "centro") a.n.fixo = false;
   if (a.moveu) return;
   $("tip").style.display = "none";
-  if (a.n.tipo === "centro") { if (G.caminho.length) navegar(G.caminho.slice(0, -1)); }
-  else if (a.n.tipo === "setor") navegar([a.n.nome]);
-  else if (a.n.tipo === "sub") navegar([a.n.setor, a.n.nome]);
-  else {
-    G.foco = G.foco === a.n.c.ticker ? null : a.n.c.ticker;
-    filtro.busca = G.foco || ""; $("busca").value = filtro.busca;
-    renderTabela(); desenharGrafo();
-  }
+  const n = a.n;
+  if (n.tipo === "centro" || n.tipo === "ficha") { if (G.caminho.length) navegar(G.caminho.slice(0, -1)); }
+  else if (n.tipo === "setor") navegar([n.nome]);
+  else if (n.tipo === "sub") navegar([n.setor, n.nome]);
+  else if (n.tipo === "emp") navegar([setorDe(n.c), subDe(n.c), n.c.ticker]);
+  else if (n.tipo === "indice") filtrarIndice(n.cod);
+  else if (n.tipo === "mais") { G.expandidos.has(n.grupo) ? G.expandidos.delete(n.grupo) : G.expandidos.add(n.grupo); reconstruir(false); }
+  else if (n.tipo === "link") window.open(n.url, "_blank", "noopener");
 });
 svg.addEventListener("pointerleave", () => { if (!G.arrasto) $("tip").style.display = "none"; });
 $("caminho").addEventListener("click", (e) => {
@@ -730,6 +947,7 @@ $("filtroSetor").addEventListener("change", (e) => {
 });
 $("busca").addEventListener("input", (e) => { filtro.busca = e.target.value; renderTabela(); });
 $("classes").addEventListener("click", (e) => {
+  if (e.target.closest("[data-limpa-indice]")) { filtro.indice = ""; renderFiltros(); renderTop(); renderTabela(); return; }
   const b = e.target.closest("[data-classe]");
   if (!b) return;
   filtro.classe = b.dataset.classe; renderFiltros(); renderTop(); renderTabela();

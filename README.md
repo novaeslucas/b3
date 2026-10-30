@@ -244,8 +244,20 @@ O painel tem:
   vermelho caindo, cinza em 0%, cor cheia a partir de ±3%. O setor do mapa também filtra as altas/baixas e a tabela.
   Arestas tracejadas ligam ações relacionadas do mesmo subsetor: ON/PN/units da mesma companhia (pela raiz do
   ticker) e uma lista curta escrita à mão de controladora/controlada (`RELACOES_CURADAS`); as relações de cada ação
-  aparecem também na dica ao passar o mouse. Clicar numa ação filtra a tabela por ela. Em tela estreita os filhos
-  ficam em grade acima e abaixo do centro;
+  aparecem também na dica ao passar o mouse. Em tela estreita os filhos ficam em grade acima e abaixo do centro;
+- **ficha da ação** (4º nível do mapa, ao clicar numa ação), no formato do *Relationship Map* do terminal Bloomberg:
+  a ação num cartão no centro (preço, variação, linha do dia contra o fechamento anterior e faixa de 52 semanas) e,
+  em volta, grupos com até 10 itens cada e “Mais…” para o resto:
+  - **Concorrentes:** ações do mesmo segmento da B3 (ou do subsetor, se o segmento tiver menos de 3), uma classe por
+    companhia, as mais negociadas primeiro, coloridas pela variação; clicar abre a ficha do concorrente;
+  - **Índices:** os índices da B3 de que o papel participa (B3 `GetStockIndex`), dos amplos para os setoriais, com
+    o peso no Ibovespa (B3 `GetPortfolioDay`) na dica. A cor é a variação do Ibovespa no caso do IBOV e, nos demais,
+    a média do dia das ações do índice que estão no painel; clicar filtra a tabela e as altas/baixas pelo índice;
+  - **Classes e listagem:** as outras classes da companhia (B3 `GetDetail`; as que estão fora do painel ficam
+    cinza), o segmento de listagem (Novo Mercado, Nível 1/2, Tradicional) e o site.
+
+  A ficha cresce aos poucos: acionistas e grupo econômico, proventos e fatos relevantes, conselho e diretoria,
+  balanço e os estudos do repositório são os próximos grupos;
 - **10 maiores altas e 10 maiores baixas** do dia;
 - **tabela** com ticker, empresa, setor, último preço, variação % e em R$, fechamento anterior, abertura,
   mínima/máxima, quantidade negociada, volume financeiro (aproximado pelas barras de 5 min), linha intradiária e

@@ -6,8 +6,10 @@ Universo:
     lista BESST de painel_besst.py (lida sem importar o script);
   - mais as ações com liquidez média diária de 2 meses de pelo menos --liq-min no Fundamentus (resultado.php),
     para o painel cobrir o mercado líquido e não só o que os estudos de dividendos selecionaram.
-Quem não tem setor da B3 no painel pós-eleição é classificado por b3lib.setores. A classificação muda pouco: fica
-guardada em cache/setores_b3_ao_vivo.json e é refeita depois de 30 dias.
+Cada ação é consultada na B3 (GetDetail, via b3lib.setores): setor econômico / subsetor / segmento para quem não
+tem no painel pós-eleição, e o cadastro da ficha (razão social, segmento de listagem, site, outras classes). Isso
+muda pouco: fica em cache/setores_b3_ao_vivo.json e é refeito depois de 30 dias. Os índices de que cada papel
+participa (GetStockIndex) e os pesos do Ibovespa (GetPortfolioDay) vêm da B3 com o cache diário de cache/.
 
 Coleta: gráfico intradiário do Yahoo Finance (chart?range=1d&interval=5m, ticker com .SA), sem cache em disco.
 O script roda em loop: a cada --intervalo segundos durante o pregão (e até 15 min depois do fechamento, por causa
@@ -23,6 +25,7 @@ Não é recomendação de investimento.
 """
 import argparse
 import ast
+import base64
 import csv
 import datetime as dt
 import json
@@ -38,7 +41,8 @@ os.chdir(RAIZ)
 
 from b3lib.cotacoes import BRASILIA, agenda, cotacao, montar_universo, relacoes  # noqa: E402
 from b3lib.fundamentus import parse_resultado_acoes  # noqa: E402
-from b3lib.http import CACHE_DIR, baixar, fetch  # noqa: E402
+from b3lib.http import B3, CACHE_DIR, baixar, fetch  # noqa: E402
+from b3lib.indices import NOMES as NOMES_INDICES, carteira, indices_por_papel  # noqa: E402
 from b3lib.log import configurar, falhas, limpar_falhas, registrar_falha, resumo_falhas  # noqa: E402
 from b3lib.setores import classificacao_b3  # noqa: E402
 from b3lib.yahoo import chart_resultado  # noqa: E402
@@ -53,6 +57,8 @@ CSV_DIVIDENDOS = os.path.join(RAIZ, "resultados", "resultado_dividendos.csv")
 PAINEL_BESST = os.path.join(RAIZ, "painel_besst.py")
 CACHE_SETORES = os.path.join(RAIZ, CACHE_DIR, "setores_b3_ao_vivo.json")
 VALIDADE_SETORES = dt.timedelta(days=30)
+CAMPOS_B3 = ("setor_economico", "subsetor", "segmento", "razao_social", "mercado", "site", "classes")
+INDICES = B3.replace("listedCompaniesProxy/CompanyCall", "indexProxy/indexCall")
 FII = "Fundos imobiliários"
 REFERENCIAS = [("ibov", "Ibovespa", "^BVSP"), ("smll", "Small caps (SMAL11)", "SMAL11.SA"),
                ("ifix", "FIIs (XFIX11)", "XFIX11.SA"), ("dolar", "Dólar (R$/US$)", "BRL=X")]
@@ -97,7 +103,9 @@ def classificar(tickers, hoje=None):
         cache = json.load(open(CACHE_SETORES, encoding="utf-8"))
     except (OSError, ValueError):
         cache = {}
-    validos = {t: c for t, c in cache.items() if hoje - dt.date.fromisoformat(c["em"]) <= VALIDADE_SETORES}
+    # entrada sem algum campo de CAMPOS_B3 é de uma versão anterior do cache: refaz
+    validos = {t: c for t, c in cache.items()
+               if hoje - dt.date.fromisoformat(c["em"]) <= VALIDADE_SETORES and all(k in c for k in CAMPOS_B3)}
     faltam = [t for t in tickers if t not in validos]
 
     def uma(t):
@@ -112,7 +120,7 @@ def classificar(tickers, hoje=None):
         with ThreadPoolExecutor(max_workers=6) as pool:
             for t, c in zip(faltam, pool.map(uma, faltam)):
                 if c:  # falha não entra no cache: tenta de novo na próxima execução
-                    validos[t] = {k: c[k] for k in ("setor_economico", "subsetor", "segmento")} | {"em": hoje.isoformat()}
+                    validos[t] = {k: c.get(k) for k in CAMPOS_B3} | {"em": hoje.isoformat()}
         os.makedirs(os.path.dirname(CACHE_SETORES), exist_ok=True)
         escrever(CACHE_SETORES, json.dumps(validos, ensure_ascii=False, indent=0, sort_keys=True))
     return {t: validos.get(t) for t in tickers}
@@ -132,19 +140,46 @@ def cadastro(liq_min):
     liq = {t: dict(c, origem="liquidez") for t, c in liquidas(liq_min).items()}
     universo = montar_universo(pos, div, besst, liq)
 
-    faltam = [u for u in universo if u["classe"] == "acao" and not u.get("setor_economico")]
-    setores = classificar([u["ticker"] for u in faltam])
-    for u in faltam:
-        c = setores[u["ticker"]]
+    acoes = [u for u in universo if u["classe"] == "acao"]
+    b3 = classificar([u["ticker"] for u in acoes])
+    for u in acoes:
+        c = b3[u["ticker"]] or {}
+        u.update({k: c.get(k) for k in ("razao_social", "mercado", "site", "classes")})
+        if u.get("setor_economico"):  # o setor do painel pós-eleição prevalece
+            continue
         if c:
             u.update(setor_economico=c["setor_economico"], subsetor=c["subsetor"], segmento=c["segmento"])
         else:  # sem B3: fica o setor do Fundamentus, se houver, marcado
             u["setor_economico"] = "Sem classificação B3"
             u["subsetor"] = u.get("setor_fundamentus") or u.get("besst")
+    por_papel, peso_ibov = indices_b3()
     for u in universo:
         if u["classe"] == "fii":
             u["setor_economico"] = FII
+        u["indices"] = por_papel.get(u["ticker"], [])
+        u["peso_ibov"] = peso_ibov.get(u["ticker"])
     return universo
+
+
+def _b3_indices(metodo, params, nome):
+    p = base64.b64encode(json.dumps(params, separators=(",", ":")).encode()).decode()
+    return fetch(None, f"{INDICES}/{metodo}/{p}", "utf-8", nome)
+
+
+def indices_b3():
+    """({ticker: [índices]}, {ticker: peso no Ibovespa}); vazios se a B3 falhar."""
+    try:
+        por_papel = indices_por_papel(_b3_indices("GetStockIndex", {"language": "pt-br"}, "b3_GetStockIndex"))
+    except Exception as e:
+        registrar_falha("GetStockIndex", "índices B3", e)
+        por_papel = {}
+    try:
+        peso = carteira(_b3_indices("GetPortfolioDay", {"language": "pt-br", "pageNumber": 1, "pageSize": 200,
+                                                        "index": "IBOV", "segment": "1"}, "b3_GetPortfolioDay_IBOV"))
+    except Exception as e:
+        registrar_falha("IBOV", "carteira B3", e)
+        peso = {}
+    return por_papel, peso
 
 
 def cotar(simbolo):
@@ -215,7 +250,7 @@ def main():
           f"{len(universo) - n_acoes} FIIs); {len(arestas)} relações entre empresas.")
     dados = {"status": {"coletando": False, "intervalo_s": intervalo.total_seconds(), "n_universo": len(universo),
                         "liq_min": args.liq_min},
-             "cotacoes": [], "referencias": [], "relacoes": arestas}
+             "cotacoes": [], "referencias": [], "relacoes": arestas, "nomes_indices": NOMES_INDICES}
     # Retrato anterior: a página não fica vazia enquanto a primeira coleta roda.
     antigo = dados_embutidos(SAIDA_HTML)
     if antigo:

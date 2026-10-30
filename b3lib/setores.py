@@ -5,6 +5,7 @@ pregão e não foram alteradas. Este módulo é o ponto único do código atual.
 """
 import base64
 import json
+import re
 import unicodedata
 
 from b3lib.http import B3, fetch
@@ -30,7 +31,11 @@ def classificacao_b3(ticker, dia=None):
     partes = [p.strip() for p in det["industryClassification"].split("/")]
     partes += [None] * (3 - len(partes))
     return {"setor_economico": partes[0], "subsetor": partes[1], "segmento": partes[2],
-            "atividade": (det.get("activity") or "").strip() or None, "code_cvm": str(cvm)}
+            "atividade": (det.get("activity") or "").strip() or None, "code_cvm": str(cvm),
+            # cadastro, para a ficha da ação no painel ao vivo
+            "razao_social": det.get("companyName"), "mercado": (det.get("market") or "").strip() or None,
+            "site": (det.get("website") or "").strip() or None,
+            "classes": [o["code"] for o in det.get("otherCodes") or [] if re.fullmatch(r"[A-Z0-9]{4}\d{1,2}", o["code"])]}
 
 
 def _norm(s):

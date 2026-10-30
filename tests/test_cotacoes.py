@@ -126,9 +126,13 @@ def test_classificacao_usa_o_cache_e_refaz_o_vencido(tmp_path, monkeypatch):
     import painel_ao_vivo as p
     cache = tmp_path / "setores.json"
     hoje = dt.date(2026, 10, 30)
+    cadastro = {"razao_social": "R", "mercado": "NOVO MERCADO", "site": None, "classes": []}
     cache.write_text(json.dumps({
-        "ITUB4": {"setor_economico": "Financeiro", "subsetor": "Intermediários", "segmento": "Bancos", "em": "2026-10-20"},
-        "VALE3": {"setor_economico": "velho", "subsetor": "x", "segmento": "y", "em": "2026-08-01"},
+        "ITUB4": {"setor_economico": "Financeiro", "subsetor": "Intermediários", "segmento": "Bancos", "em": "2026-10-20",
+                  **cadastro},
+        "VALE3": {"setor_economico": "velho", "subsetor": "x", "segmento": "y", "em": "2026-08-01", **cadastro},
+        # versão anterior do cache, só com o setor: é refeita
+        "PETR4": {"setor_economico": "Petróleo", "subsetor": "x", "segmento": "y", "em": "2026-10-29"},
     }), encoding="utf-8")
     monkeypatch.setattr(p, "CACHE_SETORES", str(cache))
     pedidos = []
@@ -139,9 +143,9 @@ def test_classificacao_usa_o_cache_e_refaz_o_vencido(tmp_path, monkeypatch):
                                          "segmento": "Minerais Metálicos", "atividade": None, "code_cvm": "1"}
 
     monkeypatch.setattr(p, "classificacao_b3", b3)
-    res = p.classificar(["ITUB4", "VALE3", "XXXX3"], hoje=hoje)
-    assert sorted(pedidos) == ["VALE3", "XXXX3"]  # ITUB4 ainda vale; VALE3 passou de 30 dias
+    res = p.classificar(["ITUB4", "VALE3", "PETR4", "XXXX3"], hoje=hoje)
+    assert sorted(pedidos) == ["PETR4", "VALE3", "XXXX3"]  # ITUB4 ainda vale; VALE3 venceu; PETR4 sem cadastro
     assert res["ITUB4"]["segmento"] == "Bancos" and res["VALE3"]["setor_economico"] == "Materiais Básicos"
     assert res["XXXX3"] is None
     gravado = json.loads(cache.read_text(encoding="utf-8"))
-    assert set(gravado) == {"ITUB4", "VALE3"} and gravado["VALE3"]["em"] == "2026-10-30"
+    assert set(gravado) == {"ITUB4", "VALE3", "PETR4"} and gravado["VALE3"]["em"] == "2026-10-30"
