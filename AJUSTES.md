@@ -430,4 +430,22 @@ Nesta execução (`--sem-jev`, Jev não chamado; a distribuição de P(extra) n�
 
 COGN3, TEND3 e SEER3 não perdem mais nota por payout zerado. TEND3 e SEER3 ficam no score publicado: a alavancagem já saturava a nota e tirar o payout (que também estava no topo) não move a média. COGN3 vai de 68,9 a 61,8 porque a nota de payout cheia sai da média e a de dívida/EBIT, abaixo do topo, fica sozinha. Não é penalidade de prejuízo.
 
+## Rodada 6
+
+Os extraordinários da rodada 5 estão certos: em novembro e dezembro de 2025 muita empresa antecipou dividendo antes da tributação que começa em 2026 (Lei 15.270/2025). Cada evento com data-com entre 01/11/2025 e 31/12/2025 vai ao Jev com `antecipacao_tributacao_2026`, e o gatilho no CSV ganha o mesmo nome. A pergunta do extraordinário avisa que esses pagamentos tendem a ser únicos e que o provento por ação de 2026, no acumulado do ano, costuma vir menor.
+
+`dy_recorrente` é o DY bruto de 12 meses sem os eventos dessa janela cujo valor por ação passa da mediana dos anos fechados. Vai no estado do Jev e na coluna ao lado do DY cheio. Não entra no score. ITUB4: 7,5% → 3,1%. UGPA3: 5,7% → 2,8%. CURY3: 15,4% → 8,7%. PLPL3: 9,3% → 0 (o de 12 meses era o pagamento de 29/12). TGMA3 fica 9,2%: o R$ 1,52 de 02/12 não passa da mediana de R$ 1,71, então o flag vai ao Jev e o valor continua no DY.
+
+Mediana zero com provento agora é `retomada`, não extraordinário. São CEAB3, SEER3, COGN3 e ALPA4.
+
+SEER3 no Fundamentus traz duas linhas de R$ 0,2388 em 06/04/2026 (pagamento em 30/04 e 29/05) e duas de R$ 0,2028 em 31/08/2026 (pagamento em 25/09 e 30/10). Data-com, valor e tipo coincidem; a data de pagamento não. São parcelas e as duas entram. Só sai a linha em que os quatro campos repetem. Em TIMS3 havia essa repetição: dividendo de R$ 0,1804 em 09/04/2024, pagamento em branco, duas vezes. Tirar a cópia baixou 2024, a mediana foi a R$ 0,78 e a razão de 12 meses passou de 1,8: TIMS3 fica extraordinário por pico, com o flag de antecipação.
+
+A oscilação de 12 meses da cotação volta ao estado do Jev (`share_price_change_12m`, do `detalhes.php`). Não entra no score. A regra de decisão e as faixas do score não mudaram. Nesta execução, `--sem-jev`: nenhuma decisão mudou; a coluna `causa` está no CSV, vazia porque não houve troca. P(extra) não foi medido.
+
+Com o `.env`, na raiz, para não reaproveitar resposta antiga:
+
+```bash
+python comparacoes/comparar_ranking.py --limpar-cache-jev
+```
+
 

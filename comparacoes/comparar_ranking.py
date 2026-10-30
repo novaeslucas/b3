@@ -159,6 +159,15 @@ def proventos(ticker):
         return {}, {}, []
 
 
+def oscilacao(ticker):
+    """Oscilação de 12 meses do detalhes.php, para a pergunta de provento extraordinário."""
+    try:
+        return acoes.detalhes(ticker).get("oscil_12m")
+    except Exception as exc:
+        print(f"  oscilação {ticker}: {type(exc).__name__}: {exc}")
+        return None
+
+
 def codigo(ticker):
     try:
         return acoes.codigo_cvm(ticker)
@@ -293,6 +302,7 @@ def main():
     with ThreadPoolExecutor(max_workers=4) as pool:
         series = list(pool.map(lambda r: proventos(r["ticker"]), antigos))
         codigos = list(pool.map(codigo, [r["ticker"] for r in antigos]))
+        oscils = list(pool.map(oscilacao, [r["ticker"] for r in antigos]))
     cds = {c for c in codigos if c}
     anos_cvm, consolidado, individual = pacotes_por_cd(
         cds, PREGAO, os.path.join(acoes.CACHE_DIR, "cvm"), anos=[2021, 2022, 2023, 2024, 2025])
@@ -301,7 +311,7 @@ def main():
     linhas = []
     estados_novos = []
     estados_antigos = []
-    for antigo, (bruto, liquido, eventos), cd in zip(antigos, series, codigos):
+    for antigo, (bruto, liquido, eventos), cd, oscil in zip(antigos, series, codigos, oscils):
         financeiro = setor_financeiro(antigo.get("setor"))
         cvm = None
         if cd and (cd in consolidado or cd in individual):
@@ -316,7 +326,7 @@ def main():
             "ev_ebitda": None, "div_liq_patrim": None,
             "proventos_ano": bruto, "proventos_ano_liquido": liquido,
             "eventos_proventos": eventos,
-            "div_liquida": None, "ebit_12m": None, "lucro_12m": None, "oscil_12m": None,
+            "div_liquida": None, "ebit_12m": None, "lucro_12m": None, "oscil_12m": oscil,
         }
         if cvm:
             r["cvm"] = cvm
@@ -357,6 +367,7 @@ def main():
             "score_antigo": publicado, "score_novo": novo,
             "delta": delta,
             "isolado_antigo": isolado_antigo, "isolado_novo": isolado_novo,
+            "dy": num(antigo["dy"]), "dy_recorrente": r.get("dy_recorrente"),
             "payout_antigo": num(antigo["payout"]), "payout_novo": m["payout"],
             "payout_fonte": m["payout_fonte"],
             "decisao_antiga": antigo["decisao"],
@@ -460,6 +471,11 @@ def main():
     texto += [
         f"Natureza: {dict(nat_cont)}.",
         f"Extraordinário por gatilho: {dict(gat_cont)}.",
+        "Retomada: " + ", ".join(x["ticker"] for x in linhas if x["natureza"] == "retomada") + ".",
+        "Antecipação nov/dez 2025: " + ", ".join(
+            x["ticker"] for x in linhas if "antecipacao_tributacao_2026" in (x["gatilho_natureza"] or "")) + ".",
+        "A oscilação de 12 meses vai no estado do Jev (detalhes.php desta execução) e não entra no score.",
+        "dy_recorrente é o DY bruto sem os proventos de nov/dez de 2025 acima da mediana; também não entra no score.",
         "",
         "## Natureza nos papéis pedidos",
         "",

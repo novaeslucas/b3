@@ -7,7 +7,7 @@ import pytest
 from b3lib.fundamentus import parse_resultado_acoes
 from b3lib.proventos import (
     agregar_por_ano, aliquota_jcp, aplicar_dy_liquido, classificar_natureza,
-    parse_proventos_html, tabela_anual,
+    deduplicar_eventos, dy_recorrente, parse_proventos_html, tabela_anual,
 )
 
 FIX = Path(__file__).resolve().parent / "fixtures"
@@ -122,6 +122,57 @@ def test_faixa_mista_so_com_rotulo_e_reserva_e_historico_curto():
 
     curto = classificar_natureza([_ev(2024, 1.0), _ev(2025, 1.0), _ev(2026, 3.0, mes=3)], hoje)
     assert curto["natureza_proventos"] == "historico_insuficiente"
+
+
+def test_mediana_zero_e_retomada_e_nao_extraordinario():
+    """COGN3/SEER3: anos fechados com mediana 0. A razão infinita não é pico."""
+    hoje = dt.date(2026, 10, 26)
+    eventos = [_ev(2021, 0.0), _ev(2025, 1.0), _ev(2026, 0.4, mes=6)]
+    nat = classificar_natureza(eventos, hoje)
+    assert nat["mediana_proventos_acao"] == 0
+    assert nat["natureza_proventos"] == "retomada"
+    assert nat["natureza_proventos"] != "extraordinario"
+    assert "pico_proventos" not in nat["gatilho_natureza"]
+    assert "retomada" in nat["gatilho_natureza"]
+
+
+def test_antecipacao_de_nov_dez_2025_sai_do_dy_recorrente_se_passa_da_mediana():
+    hoje = dt.date(2026, 10, 26)
+    eventos = [_ev(ano, 1.0) for ano in (2021, 2022, 2023, 2024)]
+    eventos.append(_ev(2025, 1.87, mes=12, dia=9))
+    eventos.append(_ev(2026, 0.2, mes=6))
+    nat = classificar_natureza(eventos, hoje)
+    assert any(e["antecipacao_tributacao_2026"] for e in nat["eventos_caixa_12m"])
+    assert "antecipacao_tributacao_2026" in nat["gatilho_natureza"]
+    assert nat["proventos_12m_antecipados_acima_mediana"] == pytest.approx(1.87)
+    # DY bruto 0,10; dos 2,07 por ação na janela, 1,87 é a antecipação acima da mediana 1.
+    assert dy_recorrente(0.10, nat["proventos_12m_bruto"], nat["proventos_12m_antecipados_acima_mediana"]) == pytest.approx(
+        0.10 * 0.2 / (1.87 + 0.2))
+    pequeno = classificar_natureza(
+        [_ev(ano, 1.0) for ano in (2021, 2022, 2023, 2024)] + [_ev(2025, 0.4, mes=12, dia=9)], hoje)
+    assert pequeno["proventos_12m_antecipados_acima_mediana"] == 0
+    assert dy_recorrente(0.10, pequeno["proventos_12m_bruto"], 0) == pytest.approx(0.10)
+
+
+def test_seer3_parcelas_com_pagamento_diferente_contam_as_duas():
+    """Fundamentus de SEER3: mesma data-com e valor, datas de pagamento diferentes.
+
+    São parcelas. Só some a linha quando a data de pagamento também repete.
+    """
+    html = """
+    <table><tbody>
+    <tr><td>31/08/2026</td><td>0,2028</td><td>DIVIDENDO</td><td>30/10/2026</td><td>1</td></tr>
+    <tr><td>31/08/2026</td><td>0,2028</td><td>DIVIDENDO</td><td>25/09/2026</td><td>1</td></tr>
+    <tr><td>06/04/2026</td><td>0,2388</td><td>DIVIDENDO</td><td>29/05/2026</td><td>1</td></tr>
+    <tr><td>06/04/2026</td><td>0,2388</td><td>DIVIDENDO</td><td>30/04/2026</td><td>1</td></tr>
+    <tr><td>06/04/2026</td><td>0,2388</td><td>DIVIDENDO</td><td>30/04/2026</td><td>1</td></tr>
+    </tbody></table>
+    """
+    eventos = parse_proventos_html(html)
+    assert len(eventos) == 4
+    assert sum(e["valor_bruto"] for e in eventos if e["data_com"] == dt.date(2026, 4, 6)) == pytest.approx(0.2388 * 2)
+    repetida = deduplicar_eventos(eventos + [eventos[0]])
+    assert len(repetida) == 4
 
 
 def test_desdobramento_ajusta_o_provento_antigo():

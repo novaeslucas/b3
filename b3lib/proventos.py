@@ -24,6 +24,9 @@ DATA_NOVA_ALIQUOTA_JCP = dt.date(2026, 1, 1)
 
 _DATA = re.compile(r"\d{2}/\d{2}/\d{4}")
 _EXTRA = ("extraordin", "especial", "nao recorrente")
+# Lei 15.270/2025: tributação de dividendos a partir de 2026. Nov/dez de 2025 concentrou antecipação.
+INICIO_ANTECIPACAO_2025 = dt.date(2025, 11, 1)
+FIM_ANTECIPACAO_2025 = dt.date(2025, 12, 31)
 # Pico de provento por ação contra a mediana dos anos fechados, na mesma série.
 FATOR_PICO_PROVENTOS = 1.8
 FATOR_MISTO_PROVENTOS = 1.3
@@ -91,7 +94,40 @@ def parse_proventos_html(page):
             # O valor da linha, já dividido por «por quantas ações», é esse fator.
             "fator": bruto if classe == "ajuste" and bruto > 0 else None,
         })
-    return eventos
+    return deduplicar_eventos(eventos)
+
+
+def deduplicar_eventos(eventos):
+    """Tira só a linha repetida: data-com, valor, tipo e data de pagamento iguais.
+
+    Mesma data-com, valor e tipo com pagamentos diferentes são parcelas e as duas ficam.
+    """
+    vistos = set()
+    saida = []
+    for e in eventos:
+        chave = (e.get("data_com"), e.get("valor_bruto"), e.get("tipo"), e.get("data_pagamento"))
+        if chave in vistos:
+            continue
+        vistos.add(chave)
+        saida.append(e)
+    return saida
+
+
+def eh_antecipacao_tributacao_2026(data_com):
+    """Data-com entre 1º/11/2025 e 31/12/2025, antes da tributação de dividendos de 2026."""
+    return data_com is not None and INICIO_ANTECIPACAO_2025 <= data_com <= FIM_ANTECIPACAO_2025
+
+
+def dy_recorrente(dy_bruto, proventos_12m, excluidos):
+    """DY bruto de 12 meses sem os proventos de nov/dez de 2025 que passam da mediana.
+
+    Não entra no score. ``excluidos`` é a soma, por ação, desses eventos.
+    """
+    if dy_bruto is None:
+        return None
+    if not proventos_12m or proventos_12m <= 0 or not excluidos:
+        return dy_bruto
+    return dy_bruto * max(0.0, proventos_12m - excluidos) / proventos_12m
 
 
 def tabela_anual(page):
@@ -199,8 +235,24 @@ def classificar_natureza(eventos, hoje, _anos_completos=None, pago_de_reserva=Fa
     razao = None
     if mediana is not None and mediana > 0:
         razao = ttm / mediana
-    elif mediana == 0 and ttm > 0:
-        razao = float("inf")
+    # Mediana zero com provento agora é retomada. Razão infinita não vira extraordinário.
+    retomada = mediana == 0 and ttm > 0
+
+    excluidos = 0.0
+    eventos_12m = []
+    antecipou = any(eh_antecipacao_tributacao_2026(e["data_com"]) for e in caixa)
+    for e in janela:
+        valor = bruto(e)
+        if mediana and mediana > 0 and eh_antecipacao_tributacao_2026(e["data_com"]) and valor > mediana:
+            excluidos += valor
+        pagamento = e.get("data_pagamento")
+        eventos_12m.append({
+            "date": e["data_com"].isoformat(),
+            "payment_date": pagamento.isoformat() if pagamento else None,
+            "type": e.get("tipo"),
+            "gross_per_share": round(valor, 4),
+            "antecipacao_tributacao_2026": eh_antecipacao_tributacao_2026(e["data_com"]),
+        })
 
     gatilhos = []
     if pago_de_reserva:
@@ -216,15 +268,23 @@ def classificar_natureza(eventos, hoje, _anos_completos=None, pago_de_reserva=Fa
         natureza = "misto"
     elif "rotulado" in gatilhos:
         natureza = "extraordinario"
+    elif retomada:
+        natureza = "retomada"
     elif mediana is None:
         natureza = "historico_insuficiente"
     else:
         natureza = "recorrente"
+    if natureza == "retomada":
+        gatilhos.append("retomada")
+    if antecipou:
+        gatilhos.append("antecipacao_tributacao_2026")
     return {
         "natureza_proventos": natureza,
         "gatilho_natureza": "+".join(gatilhos),
         "parcela_extraordinaria": 0.0 if not ttm or razao is None or razao <= 1 else min(1.0, (razao - 1) / razao),
         "proventos_12m_bruto": ttm,
+        "proventos_12m_antecipados_acima_mediana": excluidos,
+        "eventos_caixa_12m": eventos_12m,
         "mediana_proventos_acao": mediana,
         "razao_proventos": None if razao is None or razao == float("inf") else razao,
         "proventos_anuais_bruto": por_ano,

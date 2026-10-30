@@ -50,7 +50,8 @@ from b3lib.http import B3, CACHE_DIR, fetch as _fetch, load_env
 from b3lib.log import configurar, registrar_falha, resumo_falhas
 from b3lib.numeros import lin, media, num
 from b3lib.proventos import (
-    agregar_por_ano, aplicar_dy_liquido, classificar_natureza, parse_proventos_html, tabela_anual,
+    agregar_por_ano, aplicar_dy_liquido, classificar_natureza, dy_recorrente, parse_proventos_html,
+    tabela_anual,
 )
 from b3lib.yahoo import chart_resultado, fechamentos_brasilia
 
@@ -355,6 +356,11 @@ def estado_jev(r):
                    "dividends plus JCP per share, gross, by ex-date, adjusted for splits and bonus issues. "
                    "cvm_payout_by_year is distributions over net income by fiscal year when the filing was read. "
                    "labeled_extraordinary_events lists company-labeled one-off payments inside the trailing 12 months. "
+                   "dividend_events_12m lists each cash payment in that window; antecipacao_tributacao_2026 is true "
+                   "when the ex-date falls between 2025-11-01 and 2025-12-31. "
+                   "dividend_yield_12m_gross_recurring is the gross trailing yield after removing those Nov/Dec 2025 "
+                   "payments that exceed the prior-years per-share median. It is not an input to the score. "
+                   "share_price_change_12m is the 12-month share-price change. "
                    "paid_from_prior_year_profit_reserves is true when the equity statement debits prior-year profit "
                    "reserves for a distribution larger than that year's earnings. "
                    "company.dividends_above_fcf means cash dividends exceeded free cash flow "
@@ -365,6 +371,7 @@ def estado_jev(r):
             "ticker": r["ticker"], "name": r.get("empresa"), "sector": r.get("setor"), "subsector": r.get("subsetor"),
             "dividend_yield_12m": pct(r["dy"]),
             "dividend_yield_12m_gross": pct(r.get("dy_bruto")),
+            "dividend_yield_12m_gross_recurring": pct(r.get("dy_recorrente")),
             "payout_ratio": pct(m["payout"]),
             "payout_source": m.get("payout_fonte") or "dy_x_pl",
             "payout_yield_times_pe": pct(m.get("payout_dy_pl")),
@@ -379,6 +386,7 @@ def estado_jev(r):
             },
             "paid_from_prior_year_profit_reserves": bool(r.get("pago_de_reserva")),
             "labeled_extraordinary_events": r.get("eventos_rotulados_12m") or [],
+            "dividend_events_12m": r.get("eventos_caixa_12m") or [],
             "dividends_above_fcf": m.get("dividendo_acima_fcf"),
             "dividends_per_share_by_year_BRL": {str(a): round(v, 4) for a, v in zip(m["anos_completos"], m["serie_div"])},
             "dividends_per_share_current_year_so_far_BRL": round(serie_ano.get(HOJE.year, 0.0), 4),
@@ -416,15 +424,22 @@ PERGUNTAS = {
         "type": "noul",
         "instructions": "Is the trailing 12-month dividend yield of the company in `company` inflated by a "
                         "one-off distribution or by a sharp share-price drop, rather than reflecting its "
-                        "recurring dividend capacity? Judge only from the per-share cash amounts "
-                        "(trailing 12 months versus prior closed years), labeled_extraordinary_events, "
-                        "paid_from_prior_year_profit_reserves, and cvm_payout_by_year. A fall in profit that "
-                        "leaves per-share dividends near their own history is not an extraordinary distribution. "
-                        "A large share of JCP is not, by itself, an extraordinary distribution.",
+                        "recurring dividend capacity? Judge from the per-share cash amounts "
+                        "(trailing 12 months versus prior closed years), dividend_events_12m, "
+                        "labeled_extraordinary_events, paid_from_prior_year_profit_reserves, cvm_payout_by_year, "
+                        "dividend_yield_12m_gross_recurring, and share_price_change_12m. "
+                        "In November and December 2025 many companies anticipated dividends before the dividend "
+                        "tax that started in 2026 (Lei 15.270/2025), so payments with antecipacao_tributacao_2026 "
+                        "tend to be one-off; 2026 year-to-date dividends are often lower. "
+                        "A fall in profit that leaves per-share dividends near their own history is not an "
+                        "extraordinary distribution. A resumption after years without dividends is not, by itself, "
+                        "an extraordinary distribution. A large share of JCP is not, by itself, an extraordinary "
+                        "distribution. A sharp drop in share_price_change_12m can inflate the yield.",
         "criteria": {
             "true": "Per-share cash distributions in the last 12 months are far above the company's own prior "
-                    "years, a payment is labeled extraordinary or special by the company, the equity statement "
-                    "shows a debit to prior-year profit reserves, or the price fell sharply.",
+                    "years, a payment is labeled extraordinary or special by the company, a Nov/Dec 2025 payment "
+                    "was anticipated ahead of the 2026 dividend tax, the equity statement shows a debit to "
+                    "prior-year profit reserves, or share_price_change_12m shows the price fell sharply.",
             "false": "Per-share distributions are in line with prior closed years, no payment is labeled as a "
                      "one-off, none was drawn from prior-year profit reserves, and the yield matches recurring "
                      "capacity.",
@@ -512,7 +527,7 @@ def relatorio(candidatas):
     curto = {"DIVIDENDO_SUSTENTAVEL": "SUSTENTÁVEL", "DIVIDENDO_ATENCAO": "ATENÇÃO", "DIVIDENDO_FRAGIL": "FRÁGIL"}
     f = lambda v, d=1: "   -" if v is None else f"{100 * v:5.{d}f}%"
     nat = {"recorrente": "recorr.", "misto": "misto", "extraordinario": "extraord.",
-           "historico_insuficiente": "insuf."}
+           "historico_insuficiente": "insuf.", "retomada": "retomada"}
     print(f"\n{'Ticker':<7}{'Setor':<22}{'DYliq':>7}{'DYbr':>7}{'Payout':>8}{'ROE':>7}{'Pagos':>6}{'Cortes':>7}"
           f"{'CAGR div':>9}{'Score':>7}  {'Jev':<12}{'conf':>5}{'P(extra)':>9}  {'Proventos':<10}Decisão")
     print("DY líquido = o que o acionista recebe (IR do JCP descontado). DY bruto = filtro --dy-min e payout DY×P/L.")
@@ -536,7 +551,8 @@ def relatorio(candidatas):
         w = csv.writer(fh, delimiter=";")
         w.writerow(["ticker", "empresa", "setor", "dy", "payout", "roe", "roic", "pl", "pvp", "div_liq_ebit",
                     "anos_pagos", "cortes", "cagr_div", "score", *PESOS, "jev_classe", "jev_confianca",
-                    "jev_p_extraordinario", "decisao", "conferencia_b3", "dy_bruto", "natureza_proventos",
+                    "jev_p_extraordinario", "decisao", "conferencia_b3", "dy_bruto", "dy_recorrente",
+                    "natureza_proventos",
                     "gatilho_natureza", "parcela_extraordinaria", "payout_fonte", "payout_dy_pl",
                     "dividendo_acima_fcf", "cvm_anos", "coleta"])
         for r in candidatas:
@@ -547,7 +563,8 @@ def relatorio(candidatas):
                         r["pl"], r["pvp"], m.get("div_liq_ebit"), m.get("anos_pagos"), m.get("cortes"), m.get("cagr_div"),
                         r.get("score"), *(r["pilares"][k] for k in PESOS), j.get("classe"), j.get("confianca"),
                         j.get("p_extraordinario"), r["decisao"], r.get("conferencia_b3"), r.get("dy_bruto"),
-                        r.get("natureza_proventos"), r.get("gatilho_natureza"), r.get("parcela_extraordinaria"),
+                        r.get("dy_recorrente"), r.get("natureza_proventos"), r.get("gatilho_natureza"),
+                        r.get("parcela_extraordinaria"),
                         m.get("payout_fonte"), m.get("payout_dy_pl"), acima, m.get("cvm_anos"), r.get("coleta") or "ok"])
 
     divergentes = [f"{r['ticker']} ({r['conferencia_b3']})" for r in candidatas
@@ -611,6 +628,9 @@ def atualizar_natureza(r, hoje):
             if a.get("pago_de_reserva") and a["ano"] >= inicio_ano:
                 reserva = True
     r.update(classificar_natureza(eventos, hoje, pago_de_reserva=reserva))
+    bruto = r["dy_bruto"] if r.get("dy_bruto") is not None else r.get("dy")
+    r["dy_recorrente"] = dy_recorrente(
+        bruto, r.get("proventos_12m_bruto"), r.get("proventos_12m_antecipados_acima_mediana"))
 
 
 def anexar_cvm(candidatas):
