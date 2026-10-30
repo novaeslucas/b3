@@ -1,0 +1,46 @@
+{
+ "page": {
+  "pageNumber": 1,
+  "pageSize": 200,
+  "totalRecords": 76,
+  "totalPages": 1
+ },
+ "header": {
+  "date": "30/10/26",
+  "text": "Quantidade Teórica Total",
+  "part": "100,000",
+  "partAcum": null,
+  "textReductor": "Redutor",
+  "reductor": "13.999.429,66674930",
+  "theoricalQty": "93.803.750.400"
+ },
+ "results": [
+  {
+   "segment": null,
+   "cod": "ALOS3",
+   "asset": "ALLOS",
+   "type": "ON  ED  NM",
+   "part": "0,476",
+   "partAcum": null,
+   "theoricalQty": "478.975.645"
+  },
+  {
+   "segment": null,
+   "cod": "ITUB4",
+   "asset": "ITAUUNIBANCO",
+   "type": "PN      N1",
+   "part": "8,911",
+   "partAcum": null,
+   "theoricalQty": "5.337.898.685"
+  },
+  {
+   "segment": null,
+   "cod": "PETR4",
+   "asset": "PETROBRAS",
+   "type": "PN      N2",
+   "part": "9,721",
+   "partAcum": null,
+   "theoricalQty": "4.410.957.710"
+  }
+ ]
+}

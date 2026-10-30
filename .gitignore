@@ -14,3 +14,6 @@ __pycache__/
 .venv/
 .vscode/
 .idea/
+
+# Painel ao vivo: regravado a cada coleta (python painel_ao_vivo.py)
+resultados_ao_vivo/
