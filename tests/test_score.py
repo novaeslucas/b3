@@ -92,6 +92,68 @@ def test_metricas_usa_serie_liquida_e_payout_cvm_quando_ha_tres_anos():
     assert m["dividendo_acima_fcf"] is True
 
 
+def test_lucro_nao_encontrado_volta_ao_dy_bruto_sem_penalidade():
+    import dividendos
+    dividendos.HOJE = dt.date(2026, 10, 30)
+    r = {
+        "dy": 0.085, "dy_bruto": 0.10, "pl": 8,
+        "proventos_ano": {ano: 1.0 for ano in range(2020, 2026)},
+        "div_liquida": None, "ebit_12m": None,
+        "cvm": {
+            "lucro_nao_encontrado": True, "util_no_score": False, "sem_cobertura": False,
+            "anos_prejuizo_com_provento": 5, "payout_agregado": None, "lucro_recente": 0,
+        },
+    }
+    m = dividendos.metricas(r)
+    assert m["payout_fonte"] == "lucro_nao_encontrado"
+    assert m["payout"] == pytest.approx(0.8)
+    assert m["anos_prejuizo_com_provento"] == 0
+    assert m["sem_cobertura"] is False
+
+
+def test_lucro_que_diverge_do_fundamentus_nao_entra_no_score():
+    import dividendos
+    dividendos.HOJE = dt.date(2026, 10, 30)
+    r = {
+        "dy": 0.10, "dy_bruto": 0.10, "pl": 9.35, "valor_mercado": 436_002_000_000,
+        "proventos_ano": {ano: 1.0 for ano in range(2020, 2026)},
+        "div_liquida": None, "ebit_12m": None,
+        "cvm": {
+            "util_no_score": True, "payout_agregado": 0.99, "lucro_recente": 0,
+            "anos_prejuizo_com_provento": 5, "sem_cobertura": False,
+        },
+    }
+    m = dividendos.metricas(r)
+    assert m["payout_fonte"] == "lucro_diverge"
+    assert m["payout"] == pytest.approx(0.10 * 9.35)
+    assert m["anos_prejuizo_com_provento"] == 0
+
+
+def test_sem_base_de_lucro_zera_a_nota_e_nao_soma_penalidade():
+    import dividendos
+    dividendos.HOJE = dt.date(2026, 10, 30)
+    r = {
+        "dy": 0.08, "pl": 8, "roe": 0.2, "roic": 0.15, "mrg_liq": 0.2,
+        "liq_corr": 1.5, "cresc_rec_5a": 0.15, "pvp": 1, "ev_ebitda": 4,
+        "proventos_ano": {ano: 1.0 for ano in range(2020, 2026)},
+        "div_liquida": None, "ebit_12m": None,
+        "cvm": {
+            "sem_base_de_lucro": True, "sem_cobertura": True, "util_no_score": False,
+            "payout_exibido": 3.0, "payout_agregado": 7.47, "anos_prejuizo_com_provento": 1,
+            "lucro_recente": 214_436_000,
+        },
+    }
+    m = dividendos.metricas(r)
+    assert m["payout_fonte"] == "sem_base_de_lucro"
+    assert m["payout"] == pytest.approx(3.0)
+    assert m["sem_cobertura"] is True
+    assert m["anos_prejuizo_com_provento"] == 0
+    r["m"] = m
+    _, pilares = dividendos.score(r)
+    # nota de payout 0; alavancagem ausente; liquidez corrente no topo → pilar 50
+    assert pilares["sustentabilidade"] == 50
+
+
 def test_payout_de_fallback_usa_dy_bruto():
     import dividendos
     dividendos.HOJE = dt.date(2026, 10, 30)

@@ -1,6 +1,6 @@
-"""Payout a partir do DFP consolidado da CVM (dados.cvm.gov.br).
+"""Payout a partir do DFP da CVM (dados.cvm.gov.br).
 
-- lucro da controladora (3.11.01; se faltar, 3.11);
+- lucro pelo texto da conta (não pelo código: em banco a 3.11 individual pode ser reversão de JCP);
 - proventos do exercício pela DVA (folhas de dividendos e JCP em 7.08.04 ou, em banco, 7.09.04);
   a conta-pai inclui lucro retido e não entra. Sem essas folhas, DMPL com subcontas; senão, caixa da DFC;
 - payout da janela = soma dos proventos ÷ soma dos lucros, prejuízo incluído;
@@ -173,16 +173,111 @@ def selecionar_versao(linhas):
     return {ano: rows for ano, (_, _, rows) in escolhido.items()}
 
 
+def _nome_conta(row):
+    return sem_acento(row.get("DS_CONTA") or "").lower().strip()
+
+
+def _eh_lucro_do_periodo(nome):
+    """Lucro do exercício, não reversão de JCP, não lucro por ação e não linha intermediária."""
+    if any(k in nome for k in (
+        "por acao", "basico por acao", "diluid", "descontinuad", "antes dos tribut",
+        "antes da tribut", "antes das particip", "reversao dos juros", "reversao de juros",
+    )):
+        return False
+    if nome.startswith("atribuido a socios da empresa controladora") or nome.startswith("atribuido aos socios da empresa controladora"):
+        return True
+    return nome.startswith((
+        "lucro/prejuizo do periodo",
+        "lucro ou prejuizo do periodo",
+        "lucro/prejuizo consolidado do periodo",
+        "lucro ou prejuizo consolidado do periodo",
+        "lucro/prejuizo liquido do periodo",
+        "lucro ou prejuizo liquido do periodo",
+        "lucro/prejuizo liquido consolidado do periodo",
+        "lucro ou prejuizo liquido consolidado do periodo",
+    ))
+
+
 def lucro_controladora(linhas_dre):
-    """3.11.01 quando está preenchida. Alguns bancos gravam 3.11.01 = 0 e o lucro de verdade em 3.11."""
-    por_codigo = {d.get("CD_CONTA"): _reais(d) for d in linhas_dre}
-    atrib = por_codigo.get("3.11.01")
-    total = por_codigo.get("3.11")
-    if atrib not in (None, 0.0):
-        return atrib
-    if total not in (None, 0.0):
-        return total
-    return atrib if atrib is not None else total
+    """Lucro pelo texto da conta, não pelo código.
+
+    Em vários bancos a 3.11 individual é «Reversão dos Juros sobre Capital Próprio» (zero)
+    e o lucro está na 3.13. No consolidado o lucro costuma ser 3.09/3.09.01, não 3.11.
+    Atribuído à controladora ganha quando está preenchido; senão, o lucro do período.
+    """
+    if not linhas_dre:
+        return None
+    atribuidos = []
+    periodos = []
+    for d in linhas_dre:
+        nome = _nome_conta(d)
+        if not _eh_lucro_do_periodo(nome):
+            continue
+        valor = _reais(d)
+        if "atribuido" in nome and "controladora" in nome:
+            atribuidos.append(valor)
+        else:
+            periodos.append(valor)
+    for valor in atribuidos:
+        if valor not in (0.0,):
+            return valor
+    for valor in periodos:
+        if valor not in (0.0,):
+            return valor
+    if atribuidos:
+        return atribuidos[0]
+    if periodos:
+        return periodos[0]
+    return None
+
+
+# Lucro implícito do Fundamentus = valor de mercado ÷ P/L. Acima disso, o lucro da CVM não entra no score.
+TOLERANCIA_LUCRO_FUNDAMENTUS = 0.30
+# Payout agregado acima disso: o lucro somado é pequeno demais para ser base.
+TETO_PAYOUT_EXIBIDO = 3.0
+
+
+def lucro_diverge_do_fundamentus(lucro_cvm, valor_mercado, pl, tolerancia=TOLERANCIA_LUCRO_FUNDAMENTUS):
+    """True se o lucro da CVM e o implícito (valor de mercado ÷ P/L) discordam mais que a tolerância.
+
+    Lucro lido como zero, com P/L e valor de mercado preenchidos, também diverge: foi o caso
+    de ITUB4 e BMGB4 quando a conta 3.11 era a reversão de JCP.
+    """
+    if lucro_cvm is None or not valor_mercado or valor_mercado <= 0 or not pl or pl <= 0:
+        return False
+    implicito = valor_mercado / pl
+    if implicito <= 0:
+        return False
+    if lucro_cvm == 0:
+        return True
+    base = max(abs(implicito), abs(lucro_cvm))
+    return abs(lucro_cvm - implicito) / base > tolerancia
+
+
+def pago_de_reserva_no_exercicio(linhas_dmpl, lucro, proventos):
+    """O provento passou do lucro do ano e a DMPL debitou reserva de lucros.
+
+    Roteamento do lucro do próprio exercício por «Reservas de Lucro» não conta: a distribuição
+    ainda cabe no lucro. O que conta é o excesso, coberto por reserva de exercícios anteriores.
+    """
+    if not linhas_dmpl or not proventos or proventos <= 0:
+        return False
+    if lucro is not None and lucro > 0 and proventos <= lucro:
+        return False
+    excesso = proventos if lucro is None or lucro <= 0 else proventos - lucro
+    por_conta = defaultdict(list)
+    for d in linhas_dmpl:
+        if _conta_provento_dmpl(d):
+            por_conta[d.get("CD_CONTA") or ""].append(d)
+    reserva = 0.0
+    for codigo in _folhas(por_conta):
+        for r in por_conta[codigo]:
+            if (r.get("COLUNA_DF") or "").strip() != "Reservas de Lucro":
+                continue
+            valor = _reais(r)
+            if valor < 0:
+                reserva += -valor
+    return reserva > 0 and reserva + 1.0 >= excesso
 
 
 def _linha_capex(row):
@@ -285,9 +380,10 @@ def montar_anos(dre_por_ano, dmpl_por_ano, dfc_por_ano, anos, dva_por_ano=None):
         else:
             proventos, fonte = None, None
         payout = proventos / lucro if proventos is not None and lucro and lucro > 0 else None
+        reserva = pago_de_reserva_no_exercicio(dmpl, lucro, proventos) if dmpl and proventos else False
         saida.append({
             "ano": ano, "lucro": lucro, "proventos": proventos, "fonte_proventos": fonte,
-            "payout": payout, **caixa,
+            "payout": payout, "pago_de_reserva": reserva, **caixa,
         })
     return saida
 
@@ -303,22 +399,35 @@ def resumir(anos_montados, financeiro=False):
     com_dados = [a for a in anos_montados if a["lucro"] is not None and a["proventos"] is not None]
     soma_lucro = sum(a["lucro"] for a in com_dados)
     soma_prov = sum(a["proventos"] for a in com_dados)
-    prejuizo_com = sum(1 for a in com_dados if a["lucro"] <= 0 and a["proventos"] > 0)
-    sem_cobertura = bool(com_dados) and soma_lucro <= 0 and soma_prov > 0
-    agregado = soma_prov / soma_lucro if com_dados and soma_lucro > 0 else None
+    n = len(anos_montados)
+    sem_lucro_util = sum(1 for a in anos_montados if a["lucro"] in (None, 0, 0.0))
+    # Zero ou ausência na maioria dos anos é falha de leitura, não uma sequência de prejuízo.
+    lucro_nao_encontrado = n >= 3 and sem_lucro_util * 2 > n
+    prejuizo_com = 0 if lucro_nao_encontrado else sum(
+        1 for a in com_dados if a["lucro"] < 0 and a["proventos"] > 0)
+    sem_base = (not lucro_nao_encontrado) and bool(com_dados) and (
+        soma_lucro <= 0 or (soma_prov > 0 and soma_lucro < soma_prov / TETO_PAYOUT_EXIBIDO))
+    agregado = soma_prov / soma_lucro if com_dados and soma_lucro > 0 and not lucro_nao_encontrado else None
+    exibido = None if agregado is None else min(agregado, TETO_PAYOUT_EXIBIDO)
     if financeiro:
         flag = None
     else:
         comparaveis = [a["dividendos_pagos"] > a["fcf"] for a in anos_montados
                        if a["fcf"] is not None and a["dividendos_pagos"] is not None]
         flag = (sum(comparaveis) > len(comparaveis) / 2) if len(comparaveis) >= 2 else None
+    ultimo = next((a for a in reversed(anos_montados) if a["lucro"] not in (None, 0, 0.0)), None)
     return {
         "payout_agregado": agregado,
-        "payout_medio": agregado,
-        "anos": len(com_dados),
-        "util_no_score": agregado is not None and len(com_dados) >= MIN_ANOS_SCORE,
-        "sem_cobertura": sem_cobertura and len(com_dados) >= MIN_ANOS_SCORE,
+        "payout_exibido": exibido,
+        "payout_medio": exibido,
+        "anos": 0 if lucro_nao_encontrado else len(com_dados),
+        "util_no_score": (not lucro_nao_encontrado) and (not sem_base) and agregado is not None and len(com_dados) >= MIN_ANOS_SCORE,
+        "sem_cobertura": sem_base and not lucro_nao_encontrado,
+        "sem_base_de_lucro": sem_base,
+        "lucro_nao_encontrado": lucro_nao_encontrado,
         "anos_prejuizo_com_provento": prejuizo_com,
+        "lucro_recente": None if ultimo is None else ultimo["lucro"],
+        "pago_de_reserva": False if lucro_nao_encontrado else any(a.get("pago_de_reserva") for a in anos_montados),
         "dividendo_acima_fcf": flag,
         "por_ano": anos_montados,
     }

@@ -82,6 +82,78 @@ def test_natureza_recorrente_misto_e_extraordinario_na_janela_do_dy():
     assert pico["proventos_janela_liquido"] == pytest.approx(5)
 
 
+def test_crescimento_do_dividendo_com_payout_estavel_e_recorrente():
+    """O valor por ação dobra; o payout de 12 meses fica na mediana. Não é extraordinário."""
+    def ev(ano, bruto, mes=6, dia=1):
+        return {
+            "data_com": dt.date(ano, mes, dia), "classe": "dividendo", "tipo": "DIVIDENDO",
+            "valor_bruto": bruto, "valor_liquido": bruto, "extraordinario": False,
+        }
+    anos = [2020, 2021, 2022, 2023, 2024, 2025]
+    eventos = [ev(a, 1) for a in anos] + [ev(2026, 5, mes=3)]
+    payouts = {a: 0.40 for a in anos}
+    nat = classificar_natureza(
+        eventos, dt.date(2026, 10, 30), anos + [2026],
+        payouts_por_ano=payouts, payout_12m=0.42,
+    )
+    assert nat["natureza_proventos"] == "recorrente"
+    assert nat["parcela_extraordinaria"] == 0
+
+
+def test_pico_de_payout_rotulo_e_reserva():
+    def ev(ano, bruto, tipo="DIVIDENDO", mes=6):
+        return {
+            "data_com": dt.date(ano, mes, 1), "classe": "dividendo", "tipo": tipo,
+            "valor_bruto": bruto, "valor_liquido": bruto,
+            "extraordinario": "EXTRA" in tipo,
+        }
+    anos = [2020, 2021, 2022, 2023, 2024, 2025]
+    hoje = dt.date(2026, 10, 26)
+    eventos = [ev(2026, 1, mes=5)]
+    payouts = {2021: 0.22, 2022: 0.22, 2023: 0.21, 2024: 0.30}
+    pico = classificar_natureza(eventos, hoje, anos, payouts_por_ano=payouts, payout_12m=0.96)
+    assert pico["natureza_proventos"] == "extraordinario"
+    assert pico["parcela_extraordinaria"] > 0.5
+
+    reserva = classificar_natureza(eventos, hoje, anos, payouts_por_ano=payouts, payout_12m=0.25, pago_de_reserva=True)
+    assert reserva["natureza_proventos"] == "extraordinario"
+    assert reserva["pago_de_reserva"] is True
+
+
+def test_cury_plpl_e_pomo_pelo_payout_de_12_meses():
+    """DY×P/L de 26/10 contra o payout anual do DFP 2021–2024 (antes da janela).
+
+    PLPL3 cresceu o dividendo com o lucro e fica misto, não extraordinário.
+    CURY3 e POMO4 estouram a mediana de payout.
+    """
+    hoje = dt.date(2026, 10, 26)
+    anos = [2020, 2021, 2022, 2023, 2024, 2025]
+    evento = [{
+        "data_com": dt.date(2026, 5, 1), "classe": "dividendo", "tipo": "DIVIDENDO",
+        "valor_bruto": 1.0, "valor_liquido": 1.0, "extraordinario": False,
+    }]
+
+    def nat(payouts, dy, pl):
+        return classificar_natureza(evento, hoje, anos, payouts_por_ano=payouts, payout_12m=dy * pl)
+
+    cury = nat(
+        {2021: 0.6605371756079171, 2022: 0.4763993512890856, 2023: 0.7649725488568078, 2024: 0.3913837650017004},
+        0.1537389221465786, 7.590732286306528,
+    )
+    plpl = nat(
+        {2021: 0.0636705506122026, 2022: 0.2400002992242611, 2023: 0.11822203355749682, 2024: 0.34460654288240494},
+        0.0934124962881209, 3.5262412748720062,
+    )
+    pomo = nat(
+        {2021: 0.22438308562201498, 2022: 0.22093944967202092, 2023: 0.21462484638409918, 2024: 0.30343186232884645},
+        0.22590439255005507, 4.261488628587383,
+    )
+    assert cury["natureza_proventos"] == "extraordinario"
+    assert plpl["natureza_proventos"] == "misto"
+    assert pomo["natureza_proventos"] == "extraordinario"
+    assert plpl["parcela_extraordinaria"] < 0.5 < pomo["parcela_extraordinaria"]
+
+
 def test_aliquota_historica_e_a_partir_de_2026():
     from b3lib.proventos import ALIQUOTA_JCP_ATE_2025, ALIQUOTA_JCP_DESDE_2026, DATA_NOVA_ALIQUOTA_JCP
     assert aliquota_jcp(dt.date(2025, 12, 31)) == ALIQUOTA_JCP_ATE_2025 == 0.15

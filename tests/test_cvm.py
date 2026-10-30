@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 
 from b3lib.cvm import (
-    fator_escala, fluxo, ler_csv, norm_cd, proventos_declarados, resumo_empresa, resumo_textos,
+    fator_escala, fluxo, ler_csv, lucro_controladora, lucro_diverge_do_fundamentus, norm_cd,
+    pago_de_reserva_no_exercicio, proventos_declarados, resumo_empresa, resumo_textos,
     resumir, selecionar_versao, setor_financeiro,
 )
 
@@ -175,6 +176,72 @@ def test_lavvi_e_yduq_2025_nao_ficam_com_payout_zero():
     assert y["fonte_proventos"] == "dmpl"
     assert y["proventos"] == pytest.approx((68_923 + 106_896) * 1000)
     assert y["payout"] == pytest.approx((68_923 + 106_896) / 181_491)
+
+
+def test_itau_2025_lucro_esta_na_3_13_e_nao_na_reversao():
+    """DFP individual: 3.11 é reversão de JCP (zero); o lucro do período é a 3.13, R$ 45,659 bi."""
+    txt = (FIX / "itau_2025_ind_dre.csv").read_text(encoding="utf-8")
+    linhas = selecionar_versao(ler_csv(txt))[2025]
+    assert lucro_controladora(linhas) == pytest.approx(45_659_000 * 1000)
+
+
+def test_ir_diferido_nao_e_lucro_do_periodo():
+    """No individual do BTG a 3.09 é IR diferido; o lucro é a 3.13."""
+    linhas = [
+        {"CD_CONTA": "3.09", "DS_CONTA": "IR Diferido", "VL_CONTA": "1289820", "ESCALA_MOEDA": "MIL"},
+        {"CD_CONTA": "3.11", "DS_CONTA": "Reversão dos Juros sobre Capital Próprio", "VL_CONTA": "0", "ESCALA_MOEDA": "MIL"},
+        {"CD_CONTA": "3.13", "DS_CONTA": "Lucro/Prejuízo do Período", "VL_CONTA": "15947050", "ESCALA_MOEDA": "MIL"},
+    ]
+    assert lucro_controladora(linhas) == pytest.approx(15_947_050 * 1000)
+
+
+def test_lucro_zero_na_maioria_dos_anos_e_falha_de_leitura():
+    anos = [
+        {"ano": y, "lucro": 0.0, "proventos": 10.0, "payout": None, "fcf": None, "dividendos_pagos": None}
+        for y in range(2021, 2026)
+    ]
+    r = resumir(anos)
+    assert r["lucro_nao_encontrado"] is True
+    assert r["anos_prejuizo_com_provento"] == 0
+    assert r["util_no_score"] is False
+    assert r["payout_agregado"] is None
+    assert r["pago_de_reserva"] is False
+
+
+def test_lucro_somado_pequeno_demais_nao_entra_no_score():
+    anos = [
+        {"ano": y, "lucro": 1.0, "proventos": 100.0, "payout": None, "fcf": 1.0, "dividendos_pagos": 1.0}
+        for y in (2023, 2024, 2025)
+    ]
+    r = resumir(anos)
+    assert r["sem_base_de_lucro"] is True
+    assert r["payout_agregado"] == pytest.approx(100)
+    assert r["payout_exibido"] == pytest.approx(3)
+    assert r["util_no_score"] is False
+    assert r["anos_prejuizo_com_provento"] == 0
+
+
+def test_sanidade_pegaria_itub4_e_bmgb4_lidos_como_zero():
+    """Fundamentus em 30/10/2026. Lucro 0 (a reversão) contra valor de mercado ÷ P/L estoura 30%."""
+    # ITUB4: VM 436,002 bi, P/L 9,35 → implícito ~46,6 bi. DFP individual 2025: 45,659 bi.
+    assert lucro_diverge_do_fundamentus(0, 436_002_000_000, 9.35) is True
+    assert lucro_diverge_do_fundamentus(45_659_000_000, 436_002_000_000, 9.35) is False
+    # BMGB4: VM 3,345 bi, P/L 5,35 → implícito ~625 mi. DFP individual 2025: 560,685 mi.
+    assert lucro_diverge_do_fundamentus(0, 3_345_150_000, 5.35) is True
+    assert lucro_diverge_do_fundamentus(560_685_000, 3_345_150_000, 5.35) is False
+    assert lucro_diverge_do_fundamentus(100, 150, 1) is True
+    assert lucro_diverge_do_fundamentus(100, 120, 1) is False
+
+
+def test_provento_acima_do_lucro_debitado_em_reserva():
+    dmpl = [
+        {"CD_CONTA": "5.04.10", "DS_CONTA": "Dividendos adicionais", "COLUNA_DF": "Reservas de Lucro",
+         "VL_CONTA": "-40", "ESCALA_MOEDA": "UNIDADE"},
+        {"CD_CONTA": "5.04.10", "DS_CONTA": "Dividendos adicionais", "COLUNA_DF": "Patrimônio Líquido",
+         "VL_CONTA": "-40", "ESCALA_MOEDA": "UNIDADE"},
+    ]
+    assert pago_de_reserva_no_exercicio(dmpl, 100, 140) is True
+    assert pago_de_reserva_no_exercicio(dmpl, 200, 140) is False
 
 
 def test_bb_2025_payout_sai_da_controladora():

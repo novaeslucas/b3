@@ -6,9 +6,10 @@ Fluxo:
   3. Fundamentus (detalhes.php e proventos.php) por candidata: setor, dívida, lucro, EBIT,
      oscilação de 12 meses e proventos por ano.
   4. Dividend Quality Score (0-100) calculado aqui no código, com pesos explícitos.
-     O DY e a série por ação entram líquidos de IR sobre JCP. O payout do score prefere a média
-     de 5 anos da CVM (proventos declarados ÷ lucro da controladora); sem DFP suficiente, cai
-     para DY líquido × P/L. Há flag de provento recorrente/extraordinário e de dividendo acima do FCF.
+     O DY e a série por ação entram líquidos de IR sobre JCP. O payout do score prefere a soma
+     de 5 anos da CVM (proventos declarados ÷ lucro da controladora); sem DFP suficiente, ou se o
+     lucro não foi lido, cai para DY bruto × P/L. Há flag de provento recorrente/extraordinário
+     e de dividendo acima do FCF.
   5. Jev classifica cada empresa (SUSTENTAVEL / ATENCAO / FRAGIL) e diz se o DY atual parece
     inflado por um pagamento extraordinário ou por queda da cotação. O estado inclui a natureza
     do provento e a fonte do payout (o hash do cache muda quando esse estado muda).
@@ -41,7 +42,8 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 from b3lib.cvm import (
-    MIN_ANOS_SCORE, anos_exercicio, norm_cd, pacotes_por_cd, resumo_empresa, setor_financeiro,
+    MIN_ANOS_SCORE, anos_exercicio, lucro_diverge_do_fundamentus, norm_cd, pacotes_por_cd,
+    resumo_empresa, setor_financeiro,
 )
 from b3lib.fundamentus import parse_campos_detalhe, parse_resultado_acoes
 from b3lib.http import B3, CACHE_DIR, fetch as _fetch, load_env
@@ -169,6 +171,7 @@ def detalhes(ticker):
         "div_liquida": num(campos.get("Dív. Líquida")),
         "lucro_12m": num(campos.get("Lucro Líquido")),
         "ebit_12m": num(campos.get("EBIT")),
+        "valor_mercado": num(campos.get("Valor de mercado")),
     }
 
 
@@ -262,19 +265,35 @@ def metricas(r):
     dy_bruto = r["dy_bruto"] if r.get("dy_bruto") is not None else r["dy"]
     payout_aprox = dy_bruto * r["pl"] if dy_bruto is not None and r["pl"] else None
     cvm = r.get("cvm") or {}
-    if cvm.get("sem_cobertura"):
-        payout, fonte = None, "cvm_sem_lucro"
+    diverge = bool(cvm.get("lucro_diverge_do_fundamentus")) or lucro_diverge_do_fundamentus(
+        cvm.get("lucro_recente"), r.get("valor_mercado"), r.get("pl"))
+    if cvm.get("lucro_nao_encontrado"):
+        payout, fonte = payout_aprox, "lucro_nao_encontrado"
+    elif diverge:
+        payout, fonte = payout_aprox, "lucro_diverge"
+    elif cvm.get("sem_base_de_lucro") or cvm.get("sem_cobertura"):
+        payout, fonte = cvm.get("payout_exibido"), "sem_base_de_lucro"
     elif cvm.get("util_no_score"):
         payout, fonte = cvm["payout_agregado"], "cvm"
     else:
         payout, fonte = payout_aprox, "dy_x_pl"
+    # A penalidade de prejuízo só vale quando o payout usado é a soma da CVM.
+    # Lucro não lido, divergente ou pequeno demais não é tratado como ano de perda.
+    if fonte == "cvm":
+        prejuizo = cvm.get("anos_prejuizo_com_provento") or 0
+    else:
+        prejuizo = 0
+    sem_cobertura = fonte == "sem_base_de_lucro"
     ebit = r.get("ebit_12m")
     alav = r["div_liquida"] / ebit if r.get("div_liquida") is not None and ebit and ebit > 0 else None
     return {
         "anos_completos": completos, "serie_div": serie, "anos_pagos": pagos, "cortes": cortes,
         "cagr_div": cagr, "payout": payout, "payout_dy_pl": payout_aprox, "payout_fonte": fonte,
-        "sem_cobertura": bool(cvm.get("sem_cobertura")),
-        "anos_prejuizo_com_provento": cvm.get("anos_prejuizo_com_provento") or 0,
+        "sem_cobertura": sem_cobertura,
+        "anos_prejuizo_com_provento": prejuizo,
+        "lucro_nao_encontrado": bool(cvm.get("lucro_nao_encontrado")),
+        "lucro_diverge": fonte == "lucro_diverge",
+        "sem_base_de_lucro": fonte == "sem_base_de_lucro",
         "dividendo_acima_fcf": cvm.get("dividendo_acima_fcf"), "cvm_anos": cvm.get("anos"),
         "div_liq_ebit": alav,
         "div_ultimo_vs_media": fim / (sum(serie[:-1]) / (len(serie) - 1)) if sum(serie[:-1]) > 0 else None,
@@ -324,10 +343,17 @@ def estado_jev(r):
                    "public data. dividend_yield_12m and the per-share history below are net of withholding tax on JCP "
                    "(interest on capital): 15% before 2026-01-01 and 17.5% on payment or credit from that date. "
                    "Payout is gross: sum of declared distributions over sum of controlling shareholders' net income "
-                   "across five CVM DFP years when company.payout_source is 'cvm' (loss years stay in both sums); "
-                   "otherwise gross dividend yield times P/E. company.dividend_nature (recorrente, misto, "
-                   "extraordinario) was computed on the same trailing 12 months as the yield, against the median of "
-                   "prior full years. company.dividends_above_fcf means cash dividends exceeded free cash flow "
+                   "across five CVM DFP years when company.payout_source is 'cvm' (loss years stay in both sums). "
+                   "payout_source 'lucro_nao_encontrado' or 'lucro_diverge' means the filing profit was missing, "
+                   "zero in most years, or more than 30% away from market cap divided by P/E, so the code used "
+                   "gross dividend yield times P/E and did not apply the loss-year penalty. "
+                   "'sem_base_de_lucro' means summed profit is too small to cover the distributions (the displayed "
+                   "payout is capped and the payout score is zero). Otherwise the source is gross yield times P/E. "
+                   "company.dividend_nature (recorrente, misto, extraordinario) uses the same trailing 12 months as "
+                   "the yield. It is recorrente when that payout stays near the median payout of prior full years, "
+                   "even if the dividend amount grew with profit. It is extraordinario when the trailing payout is "
+                   "well above that median, when the event is labeled extraordinary, or when it was paid from "
+                   "prior-year retained-earnings reserves. company.dividends_above_fcf means cash dividends exceeded free cash flow "
                    "(CFO minus capex and IFRS 16 lease principal) in most of the last five years; the gap can be "
                    "covered by cash already on the balance sheet. Banks and insurers do not report EBIT, so "
                    "EBIT-based leverage is missing for them, and the FCF flag is not applied to financials.",
@@ -378,27 +404,38 @@ PERGUNTAS = {
                         "one-off or extraordinary distribution, or by a sharp share-price drop, rather than "
                         "reflecting its recurring dividend capacity? Use company.dividend_nature and "
                         "company.extraordinary_share_of_ttm_yield, which the code already computed on the same "
-                        "trailing 12 months as the yield. "
-                        "A large share of JCP is not, by itself, an extraordinary distribution.",
+                        "trailing 12 months as the yield. Dividend growth that kept the payout near its median "
+                        "is not extraordinary. A large share of JCP is not, by itself, an extraordinary distribution.",
         "criteria": {
-            "true": "The current yield looks inflated: dividend_nature is extraordinario or misto with a large "
-                    "extraordinary share, last year's dividends are far above the historical pattern, payout is "
-                    "well above earnings, or the price fell sharply.",
-            "false": "The current yield is consistent with the company's recurring earnings and dividend history "
+            "true": "The current yield looks inflated: dividend_nature is extraordinario, or misto with a large "
+                    "extraordinary share (trailing payout well above its historical median, a labeled one-off, "
+                    "or a payment from prior-year profit reserves), or the price fell sharply.",
+            "false": "The current yield is consistent with recurring earnings and the payout history "
                      "(dividend_nature recorrente, or the extraordinary share is immaterial).",
         },
     },
 }
 
 
-def ask_jev(state, url, model, key, perguntas=PERGUNTAS):
-    body = json.dumps({"state": state, "model": model, "questions": perguntas}).encode()
-    req = urllib.request.Request(url, data=body, headers={"Authorization": f"Bearer {key}",
-                                                          "Content-Type": "application/json"})
+def ask_jev(state, url, model, key, perguntas=PERGUNTAS, temperature=None):
+    """Uma chamada. ``temperature`` vai no JSON; se a API responder 400, tenta de novo sem ela."""
+    temp = temperature
+
+    def requisicao(temp_envio):
+        payload = {"state": state, "model": model, "questions": perguntas}
+        if temp_envio is not None:
+            payload["temperature"] = temp_envio
+        body = json.dumps(payload).encode()
+        return urllib.request.Request(url, data=body, headers={"Authorization": f"Bearer {key}",
+                                                               "Content-Type": "application/json"})
+
     for tentativa in range(5):
         try:
-            return json.load(urllib.request.urlopen(req, timeout=120))
+            return json.load(urllib.request.urlopen(requisicao(temp), timeout=120))
         except urllib.error.HTTPError as e:
+            if e.code == 400 and temp is not None:
+                temp = None
+                continue
             if e.code in (429, 529, 502, 503) and tentativa < 4:
                 time.sleep(2 ** tentativa)
                 continue
@@ -464,7 +501,12 @@ def relatorio(candidatas):
     print("DY líquido = o que o acionista recebe (IR do JCP descontado). DY bruto = filtro --dy-min e payout DY×P/L.")
     for r in candidatas:
         m, j = r["m"], r.get("jev") or {}
-        fonte = " CVM" if m.get("payout_fonte") == "cvm" else ""
+        fonte = {
+            "cvm": " CVM",
+            "lucro_nao_encontrado": " sem lucro",
+            "lucro_diverge": " diverge",
+            "sem_base_de_lucro": " sem base",
+        }.get(m.get("payout_fonte"), "")
         score_txt = "   -" if r.get("score") is None else f"{r['score']:>7.1f}"
         print(f"{r['ticker']:<7}{(r.get('setor') or '')[:21]:<22}{f(r['dy'])}{f(r.get('dy_bruto')):>7}"
               f"{f(m.get('payout'), 0):>8}{f(r['roe'], 0):>7}"
@@ -539,8 +581,33 @@ def codigo_cvm(ticker):
     return None
 
 
+def atualizar_natureza(r, hoje):
+    """Reclassifica depois da CVM: payout de 12 meses contra a mediana dos exercícios anteriores."""
+    eventos = r.get("eventos_proventos") or []
+    completos = [hoje.year - i for i in range(ANOS_HIST, 0, -1)]
+    cvm = r.get("cvm") or {}
+    payouts = {}
+    reserva = False
+    diverge = cvm.get("lucro_diverge_do_fundamentus") or lucro_diverge_do_fundamentus(
+        cvm.get("lucro_recente"), r.get("valor_mercado"), r.get("pl"))
+    if not cvm.get("lucro_nao_encontrado") and not diverge:
+        inicio_ano = (hoje - dt.timedelta(days=365)).year
+        for a in cvm.get("por_ano") or []:
+            if a.get("payout"):
+                payouts[a["ano"]] = a["payout"]
+            if a.get("pago_de_reserva") and a["ano"] >= inicio_ano:
+                reserva = True
+    dy_bruto = r["dy_bruto"] if r.get("dy_bruto") is not None else r.get("dy")
+    pl = r.get("pl")
+    payout_12m = dy_bruto * pl if dy_bruto is not None and pl else None
+    r.update(classificar_natureza(
+        eventos, hoje, completos,
+        payouts_por_ano=payouts, payout_12m=payout_12m, pago_de_reserva=reserva,
+    ))
+
+
 def anexar_cvm(candidatas):
-    """Preenche r['cvm'] com a média de payout do DFP. Falha de rede não derruba a análise."""
+    """Preenche r['cvm'] com o payout do DFP. Falha de rede não derruba a análise."""
     def um(r):
         try:
             return codigo_cvm(r["ticker"])
@@ -568,11 +635,24 @@ def anexar_cvm(candidatas):
             continue
         resumo = resumo_empresa(consolidado.get(cd), individual.get(cd), anos,
                                 financeiro=setor_financeiro(r.get("setor"), r.get("subsetor")))
-        if not resumo or not resumo.get("anos"):
+        if not resumo:
+            sem.append(r["ticker"])
+            continue
+        if not resumo.get("anos") and not resumo.get("lucro_nao_encontrado") and not resumo.get("sem_base_de_lucro"):
             sem.append(r["ticker"])
             continue
         r["cd_cvm"] = cd
         r["cvm"] = resumo
+        if resumo.get("lucro_nao_encontrado"):
+            print(f"  aviso: {r['ticker']} lucro não encontrado na CVM (zero ou ausente na maioria dos anos); "
+                  "payout volta a DY bruto × P/L, sem penalidade de prejuízo")
+        elif lucro_diverge_do_fundamentus(resumo.get("lucro_recente"), r.get("valor_mercado"), r.get("pl")):
+            resumo["lucro_diverge_do_fundamentus"] = True
+            print(f"  aviso: {r['ticker']} lucro da CVM diverge mais de 30% do implícito "
+                  "(valor de mercado ÷ P/L); payout volta a DY bruto × P/L, sem penalidade de prejuízo")
+        elif resumo.get("sem_base_de_lucro"):
+            print(f"  aviso: {r['ticker']} sem base de lucro (lucro somado pequeno demais perto dos proventos); "
+                  "payout exibido no teto e nota de payout zerada")
     janela = anos_exercicio(HOJE)
     print(f"CVM: payout de {len(candidatas) - len(sem)} empresas (DFP {janela[0]}–{janela[-1]}, "
           f"média usada no score com pelo menos {MIN_ANOS_SCORE} anos)"
@@ -612,6 +692,7 @@ def main():
                 r["oscil_12m"] = (1 + r["oscil_12m"]) * r["fator_preco"] - 1
             page = fetch(f"/proventos.php?papel={r['ticker']}&tipo=2")
             eventos = parse_proventos_html(page)
+            r["eventos_proventos"] = eventos
             r["proventos_ano"] = tabela_anual(page) or agregar_por_ano(eventos, liquido=False)
             r["proventos_ano_liquido"] = agregar_por_ano(eventos, liquido=True, incluir_outros=False)
             completos = [HOJE.year - i for i in range(ANOS_HIST, 0, -1)]
@@ -635,6 +716,9 @@ def main():
         sys.exit("Nenhuma empresa com coleta completa.")
     if not args.sem_cvm and completas:
         anexar_cvm(completas)
+    for r in completas:
+        if r.get("eventos_proventos") is not None:
+            atualizar_natureza(r, HOJE)
     for r in incompletas:
         r["m"] = {"payout": None, "payout_fonte": None, "payout_dy_pl": None, "div_liq_ebit": None,
                   "anos_pagos": None, "cortes": None, "cagr_div": None, "dividendo_acima_fcf": None, "cvm_anos": None}

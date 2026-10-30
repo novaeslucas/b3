@@ -268,14 +268,13 @@ continuam sem o flag.
 A faixa (nota cheia até 90% de payout, zero acima de 120%) foi desenhada para payout bruto.
 Como o fallback voltou a ser bruto e a CVM também é bruta, a faixa permanece.
 
-Comparação no mesmo universo de 26/10 (`comparacoes/ranking_2026_10_26.csv` e o `.md`):
-80 empresas, Jev antigo, score novo. Mediana do delta de score: **+0,1**. Decisão diferente: **nenhuma**.
-Cinco cruzaram 60 e continuaram na mesma decisão porque o Jev já segurava (ABCB4, BRAP4, ALLD3,
-YDUQ3, VALE3). As maiores idas e vindas são de payout contábil, não de escala de DY: PETR4 sobe
-13 pontos (payout de 35% no DY×P/L para 75% na soma de cinco anos, os dois ainda abaixo de 90%);
-ABCB4 cai 12,5 (payout de 67% para 154%, com dois anos de prejuízo e provento). Liquidez corrente
-e crescimento de receita dessa conta saíram do Fundamentus de 30/10, porque o CSV antigo não os
-guarda; rentabilidade e valuation ficaram nos pilares gravados.
+A comparação numérica não fica repetida aqui. Ela é a saída de `comparacoes/comparar_ranking.py`,
+gravada em `comparacoes/ranking_2026_10_26.md`. Uma frase antiga desta seção dizia «decisão
+diferente: nenhuma»; isso era o score novo com o Jev **antigo**, e não sobrevive a uma releitura
+do Jev. A contagem que vale é a do markdown gerado. Na regeneração desta passagem, sem chamar o
+Jev: mediana do delta **0,0**, **0** mudanças de decisão com o Jev antigo, **10** papéis cruzaram
+60 e continuaram na mesma decisão. Liquidez corrente e crescimento de receita de 30/10 ficaram
+de fora dos dois lados do delta.
 
 ### 8. Alíquota do JCP conferida na lei
 
@@ -342,5 +341,59 @@ python comparacoes/comparar_ranking.py
 ```
 
 O script reaproveita o cache do dia, chama o Jev no estado novo do pregão de 26/10 e reescreve `comparacoes/ranking_2026_10_26.md` com a diferença real de decisão.
+
+## Quarta passagem
+
+### Lucro do banco pelo nome da conta
+
+Em vários bancos a DRE **individual** não guarda o lucro na 3.11. A 3.11 é «Reversão dos Juros sobre Capital Próprio» e vem zerada; o lucro do período é a 3.13. No consolidado o lucro costuma ser 3.09 / 3.09.01, e a 3.09 individual pode ser «IR Diferido». Ler pelo código tratava o ano inteiro como lucro zero, marcava `cvm_sem_lucro` e aplicava a penalidade de prejuízo com provento. ITUB4 e BMGB4 caíam nesse caso.
+
+O lucro agora é a linha cujo texto é o lucro do período, de preferência «Atribuído a/aos Sócios da Empresa Controladora» quando ela não está zerada. Ficam de fora reversão de JCP, lucro por ação, operação descontinuada e resultado antes dos tributos. Instituição financeira continua na demonstração individual, que é quem declara o JCP. O teste usa o recorte real do DFP 2025 do Itaú (3.11 = 0, 3.13 = R$ 45,659 bi) e o do Banco do Brasil (3.11 = «Lucro ou Prejuízo Líquido do Período», R$ 18,152 bi).
+
+| Papel | Lucro 2025 usado | Proventos 2025 | Payout 2025 | Payout de 5 anos no score | Referência |
+|---|---:|---:|---:|---:|---|
+| ITUB4 | R$ 45,659 bi (individual, 3.13) | R$ 33,704 bi (DVA) | 73,8% | 59,2% | RI: lucro recorrente R$ 46,8 bi, proventos R$ 33,7 bi, payout 72% do recorrente. 33,704 / 45,659 = 73,8% sobre o lucro contábil individual. |
+| BMGB4 | R$ 560,7 mi (individual, 3.13) | R$ 323,6 mi de JCP (DVA individual) | 57,7% | 81,0% | Release e tabela de JCP do RI: lucro R$ 561 mi e JCP R$ 323,6 mi. A DVA consolidada de 2025 traz JCP 0; por isso o individual. |
+| BPAC11 | R$ 15,947 bi (individual, 3.13) | R$ 4,750 bi de JCP | 29,8% | 27,7% | O consolidado 3.09 é R$ 16,664 bi (o lucro de ~R$ 16,7 bi da manchete). A 3.09 individual é IR diferido e não entra. BPAC11 não estava nas 80 do pregão. |
+
+No ranking de 26/10, ITUB4 e BMGB4 seguem com a nota de payout cheia (os dois payouts, o antigo e o de cinco anos, ficam abaixo de 90%). O que a leitura antiga quebrava era a penalidade: cinco anos lidos como prejuízo com provento. Isso não volta.
+
+### Lucro não encontrado, e o confronto com o valor de mercado
+
+Zero ou ausência na maioria dos anos da janela é falha de leitura (`lucro não encontrado`), não prejuízo. O script avisa, o payout volta a DY bruto × P/L e a penalidade de ano de prejuízo não entra.
+
+Além disso, o lucro recente da CVM é comparado ao implícito do Fundamentus, valor de mercado ÷ P/L (`detalhes.php`). Diferença acima de 30% marca o papel e usa o mesmo fallback, também sem a penalidade. Lucro lido como zero, com valor de mercado e P/L preenchidos, já estoura o limite: é o teste que pega ITUB4 e BMGB4 na leitura antiga (em 30/10/2026, ITUB4 valor de mercado R$ 436,002 bi e P/L 9,35; BMGB4 R$ 3,345 bi e P/L 5,35). Com o lucro certo, a folga fica em cerca de 2% (Itaú, 45,659 bi contra ~46,6 bi) e 10% (BMG, 560,7 mi contra ~625 mi). Não dispara.
+
+### Sem base de lucro
+
+SEER3 somava payout de 747%: o lucro da janela fica em cerca de R$ 15,6 mi por causa dos prejuízos de 2022–2024, contra proventos bem maiores. Não é lucro zerado por parse (2025 tem R$ 214 mi). O agregado acima de 300%, ou lucro somado menor ou igual a zero, vira `sem base de lucro`: o número exibido para no teto de 300% (SEER3 mostra 3,0; se não há razão, o campo fica vazio), a nota de payout é zero e a penalidade de prejuízo não se soma em cima. No ranking, SEER3 vai de 69,6 para 57,1 e continua em descartar. No mesmo caso: TEND3, COGN3 e ALPA4.
+
+### Natureza: payout contra payout
+
+A regra antiga comparava o dividendo em reais com a mediana dos próprios reais. Empresa que cresceu o lucro e o dividendo junto era marcada extraordinária.
+
+Agora a janela de 12 meses do DY (payout = DY bruto × P/L) é comparada à mediana do payout anual dos exercícios encerrados antes dessa janela. Perto da mediana, é recorrente, mesmo com o valor por ação maior. Extraordinário só quando o payout de 12 meses passa de 1,8× a mediana (a parcela é o excesso sobre a mediana; acima de metade da janela o rótulo é extraordinário, senão misto), quando o evento vem rotulado (extraordinário, especial, não recorrente) ou quando a DMPL mostra distribuição acima do lucro do ano debitada em reserva de lucros de exercícios anteriores. Reserva que só encaminha o lucro do próprio ano não conta.
+
+Números do pregão de 26/10, mediana do DFP 2021–2024:
+
+| Papel | Payout de 12 meses | Mediana | O que a regra faz |
+|---|---:|---:|---|
+| CURY3 | 116,7% | 56,8% (2,05×) | Extraordinário. O contábil de 2025 é 81% (R$ 793 mi / R$ 976 mi), dentro de uma faixa que já teve 76% em 2023; os 117% são a janela móvel, que empilha pagamentos de dois exercícios. Nenhum evento veio rotulado e o provento de 2025 cabe no lucro do ano, então não é reserva. |
+| PLPL3 | 32,9% | 17,9% (1,84×) | Misto (parcela 46%). O dividendo por ação subiu forte, o payout de cinco anos ficou em 22,6% e o de 2025 em 25%. Não é extraordinário. |
+| POMO4 | 96,3% | 22,3% (4,3×) | Extraordinário. O contábil de 2025 é 81% (R$ 992 mi / R$ 1,223 bi), contra ~22% em 2021–2023. O dividendo cresceu mais do que o lucro. Também não é reserva: 2025 cabe no lucro do ano. |
+
+### Jev, ainda sem chamada daqui
+
+Não há chave neste ambiente. Nenhuma classe foi inventada e a taxa de virada de base não foi medida. O script, com chave, faz o seguinte: três chamadas no estado antigo, com a mesma entrada e temperature 0, para a taxa de virada (fração de papéis em que as três não foram unânimes); maioria de três no estado novo; «além da base» são as trocas de decisão nos papéis que eram unânimes no estado antigo. Se a API responder 400 ao campo `temperature`, a chamada repete sem ele. Cada repetição tem chave de cache própria, senão as três colapsam numa resposta só.
+
+Na raiz do repositório:
+
+```bash
+python comparacoes/comparar_ranking.py
+python comparacoes/comparar_ranking.py --repeticoes 1
+python comparacoes/comparar_ranking.py --sem-jev
+```
+
+O primeiro é o padrão (três e três). O segundo é uma chamada só, sem taxa de virada. O terceiro regrava o markdown só com o score. Esta passagem usou o terceiro. O resultado está em `comparacoes/ranking_2026_10_26.md`.
 
 

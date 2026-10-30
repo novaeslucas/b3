@@ -24,6 +24,8 @@ DATA_NOVA_ALIQUOTA_JCP = dt.date(2026, 1, 1)
 
 _DATA = re.compile(r"\d{2}/\d{2}/\d{4}")
 _EXTRA = ("extraordin", "especial", "nao recorrente")
+# Payout de 12 meses acima disto × a mediana histórica começa a contar como pico.
+FATOR_PICO_PAYOUT = 1.8
 
 
 def aliquota_jcp(data_ref):
@@ -125,39 +127,38 @@ def fator_liquido_12m(eventos, hoje):
     return liquido / bruto
 
 
-def classificar_natureza(eventos, hoje, anos_completos):
+def classificar_natureza(eventos, hoje, anos_completos, payouts_por_ano=None, payout_12m=None,
+                         pago_de_reserva=False):
     """Recorrente, misto ou extraordinário na mesma janela de 12 meses do DY.
 
-    A base é a mediana dos anos civis inteiros anteriores ao início da janela
-    (pelo menos três com pagamento). Um dividendo extraordinário de 2026 entra
-    mesmo que 2025 tenha sido um ano normal. JCP não é extraordinário só por ser JCP.
-    A parcela é o maior entre o valor rotulado e o excesso sobre a mediana, para
-    não contar o mesmo pico duas vezes.
+    Compara o payout de 12 meses (DY bruto × P/L) com a mediana do payout anual dos
+    exercícios encerrados antes da janela. Dividendo que cresceu junto com o lucro
+    — payout perto da mediana — continua recorrente. Extraordinário quando esse
+    payout passa de ``FATOR_PICO_PAYOUT`` vezes a mediana, quando o evento vem
+    rotulado (extraordinário, especial, não recorrente) ou quando a DMPL mostra
+    pagamento além do lucro do ano saindo de reserva de lucros. Sem a série de
+    payout, crescimento do valor por ação não marca pico. JCP não é extraordinário
+    só por ser JCP.
     """
     inicio = hoje - dt.timedelta(days=365)
+    payouts_por_ano = payouts_por_ano or {}
 
     def da_janela(e):
         return e["classe"] != "outro" and inicio < e["data_com"] <= hoje
 
-    def total_ano(ano, so_extra=False):
-        s = 0.0
-        for e in eventos:
-            if e["classe"] == "outro" or e["data_com"].year != ano:
-                continue
-            if so_extra and not e["extraordinario"]:
-                continue
-            s += e["valor_liquido"]
-        return s
-
     janela = [e for e in eventos if da_janela(e)]
     tot = sum(e["valor_liquido"] for e in janela)
     rotulado = sum(e["valor_liquido"] for e in janela if e["extraordinario"])
-    anteriores = [total_ano(a) for a in anos_completos
-                  if dt.date(a, 12, 31) < inicio and total_ano(a) > 0]
+    anteriores = [payouts_por_ano[a] for a in anos_completos
+                  if dt.date(a, 12, 31) < inicio and payouts_por_ano.get(a) not in (None, 0)]
     mediana = statistics.median(anteriores) if len(anteriores) >= 3 else None
-    excesso = tot - mediana if mediana is not None and tot > 1.8 * mediana else 0.0
-    parcela = max(rotulado, excesso)
-    share = parcela / tot if tot > 0 else 0.0
+    excesso = 0.0
+    if mediana and payout_12m and payout_12m > FATOR_PICO_PAYOUT * mediana and payout_12m > 0:
+        excesso = (payout_12m - mediana) / payout_12m
+    share = rotulado / tot if tot > 0 else 0.0
+    share = max(share, excesso)
+    if pago_de_reserva and tot > 0:
+        share = max(share, 1.0)
     if tot <= 0 or share <= 0:
         natureza = "recorrente"
     elif share > 0.5:
@@ -168,7 +169,9 @@ def classificar_natureza(eventos, hoje, anos_completos):
         "natureza_proventos": natureza,
         "parcela_extraordinaria": share,
         "proventos_janela_liquido": tot,
-        "mediana_anterior_liquida": mediana,
+        "mediana_payout_anterior": mediana,
+        "payout_12m": payout_12m,
+        "pago_de_reserva": bool(pago_de_reserva and tot > 0),
     }
 
 

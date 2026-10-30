@@ -132,7 +132,7 @@ Os endpoints da B3 não são documentados; o levantamento de por que foram escol
 4. **Métricas** sobre os 6 últimos anos completos: anos com pagamento, cortes (queda > 20% a/a), CAGR dos
    dividendos e último ano vs. média anterior, na série **líquida de IR sobre JCP**. O payout do score é a média
    de até 5 exercícios do DFP da CVM (soma dos proventos ÷ soma do lucro da controladora, prejuízo incluído), quando há pelo menos 3 anos;
-   sem isso, cai para DY líquido × P/L. Há também a natureza do provento (recorrente, misto, extraordinário) e,
+   sem isso, ou quando o lucro não foi lido ou diverge do valor de mercado ÷ P/L, cai para DY bruto × P/L. Há também a natureza do provento (recorrente, misto, extraordinário) e,
    fora de banco e seguradora, a marca de dividendo pago acima do fluxo de caixa livre. O detalhe e o que ainda
    não entrou estão em [AJUSTES.md](AJUSTES.md).
 5. **Score 0–100**, média ponderada de cinco pilares. Cada sub-indicador é mapeado linearmente de um valor “ruim”
@@ -140,7 +140,7 @@ Os endpoints da B3 não são documentados; o levantamento de por que foram escol
 
    | Pilar | Peso | Sub-indicadores (ruim → bom) |
    |---|---:|---|
-   | Sustentabilidade | 25% | payout (> 120% → ≤ 90%; CVM se houver 3 anos, senão DY líquido × P/L), dív. líq./EBIT (4× → 1×), liquidez corrente (0,8 → 1,5) |
+   | Sustentabilidade | 25% | payout (> 120% → ≤ 90%; CVM se houver 3 anos, senão DY bruto × P/L), dív. líq./EBIT (4× → 1×), liquidez corrente (0,8 → 1,5) |
    | Histórico | 20% | anos pagos (3 → 6 de 6), cortes (3 → 0) |
    | Rentabilidade | 20% | ROE (5% → 20%), ROIC (5% → 15%), margem líquida (0% → 20%) |
    | Crescimento | 20% | receita 5a (0% → 15%), CAGR dos dividendos (−5% → 10%) |
