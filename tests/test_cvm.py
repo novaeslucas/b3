@@ -221,16 +221,17 @@ def test_lucro_somado_pequeno_demais_nao_entra_no_score():
     assert r["anos_prejuizo_com_provento"] == 0
 
 
-def test_sanidade_pegaria_itub4_e_bmgb4_lidos_como_zero():
-    """Fundamentus em 30/10/2026. Lucro 0 (a reversão) contra valor de mercado ÷ P/L estoura 30%."""
-    # ITUB4: VM 436,002 bi, P/L 9,35 → implícito ~46,6 bi. DFP individual 2025: 45,659 bi.
-    assert lucro_diverge_do_fundamentus(0, 436_002_000_000, 9.35) is True
-    assert lucro_diverge_do_fundamentus(45_659_000_000, 436_002_000_000, 9.35) is False
-    # BMGB4: VM 3,345 bi, P/L 5,35 → implícito ~625 mi. DFP individual 2025: 560,685 mi.
-    assert lucro_diverge_do_fundamentus(0, 3_345_150_000, 5.35) is True
-    assert lucro_diverge_do_fundamentus(560_685_000, 3_345_150_000, 5.35) is False
-    assert lucro_diverge_do_fundamentus(100, 150, 1) is True
-    assert lucro_diverge_do_fundamentus(100, 120, 1) is False
+def test_divergencia_so_pega_lucro_zerado_ou_com_sinal_trocado():
+    """ITUB4 lido como zero (a 3.11 era a reversão de JCP) diverge; tamanho diferente não."""
+    assert lucro_diverge_do_fundamentus(0, 46_600_000_000) is True
+    assert lucro_diverge_do_fundamentus(45_659_000_000, 46_600_000_000) is False
+    assert lucro_diverge_do_fundamentus(-100, 50) is True
+    assert lucro_diverge_do_fundamentus(100, -50) is True
+    # KLBN11 em 26/10: CVM 2025 R$ 1,68 bi contra 12 meses de R$ 0,56 bi. Períodos diferentes, mesmo sinal.
+    assert lucro_diverge_do_fundamentus(1_678_211_000, 561_000_000) is False
+    # Sem o lucro do Fundamentus não há com o que comparar.
+    assert lucro_diverge_do_fundamentus(0, None) is False
+    assert lucro_diverge_do_fundamentus(None, 100) is False
 
 
 def test_provento_acima_do_lucro_debitado_em_reserva():

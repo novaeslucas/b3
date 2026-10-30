@@ -46,8 +46,10 @@ Em `b3lib/cvm.py`, com os ZIP anuais de `https://dados.cvm.gov.br/dados/CIA_ABER
   O score só usa esse número com pelo menos 3 anos (`payout_fonte = cvm`).
 - **Ano de prejuízo com provento** tira 0,5 da nota de payout (0 a 1), até zerar.
 - **Quando não confiar no lucro da CVM**, o payout volta a DY × P/L, sem penalidade:
-  lucro zero ou ausente na maioria dos anos (`lucro_nao_encontrado`), ou lucro recente a mais de 30% do
-  implícito no Fundamentus, valor de mercado ÷ P/L (`lucro_diverge`).
+  lucro zero ou ausente na maioria dos anos (`lucro_nao_encontrado`), ou lucro recente da CVM zerado ou
+  com sinal trocado em relação ao «Lucro Líquido» de 12 meses do Fundamentus (`lucro_diverge`). Diferença
+  de tamanho não conta: os períodos são diferentes, e uma tolerância de 30% contra valor de mercado ÷ P/L
+  mandava 39 dos 80 papéis de 26/10 para um DY × P/L que estoura (issue #2).
 - **Sem base de lucro:** soma do lucro ≤ 0 ou payout agregado acima de 300%. O payout exibido fica `n/d`
   e, havendo provento, a nota de payout é 0, como acima de 120%: cobertura pior nunca rende score
   maior. Sem provento nenhum, o payout sai da média e os pesos restantes se renormalizam.

@@ -37,7 +37,9 @@ sys.path.insert(0, RAIZ)
 os.chdir(RAIZ)
 
 import dividendos as acoes  # noqa: E402
-from b3lib.cvm import norm_cd, pacotes_por_cd, resumo_empresa, setor_financeiro  # noqa: E402
+from b3lib.cvm import (  # noqa: E402
+    lucro_diverge_do_fundamentus, norm_cd, pacotes_por_cd, resumo_empresa, setor_financeiro,
+)
 from b3lib.numeros import lin, media  # noqa: E402
 from b3lib.proventos import agregar_por_ano, parse_proventos_html, tabela_anual  # noqa: E402
 
@@ -161,13 +163,18 @@ def proventos(ticker):
         return {}
 
 
-def oscilacao(ticker):
-    """Oscilação de 12 meses do detalhes.php. Vai igual nos dois estados (o CSV de 26/10 não a guarda)."""
+def detalhe(ticker):
+    """(oscilação de 12 meses, lucro de 12 meses) do detalhes.php.
+
+    A oscilação vai igual nos dois estados (o CSV de 26/10 não a guarda). O lucro só serve
+    para a checagem de leitura da CVM, a mesma de ``dividendos.py``; não entra no estado do Jev.
+    """
     try:
-        return acoes.detalhes(ticker).get("oscil_12m")
+        d = acoes.detalhes(ticker)
+        return d.get("oscil_12m"), d.get("lucro_12m")
     except Exception as exc:
-        print(f"  oscilação {ticker}: {type(exc).__name__}: {exc}")
-        return None
+        print(f"  detalhes {ticker}: {type(exc).__name__}: {exc}")
+        return None, None
 
 
 def codigo(ticker):
@@ -298,7 +305,7 @@ def main():
     with ThreadPoolExecutor(max_workers=4) as pool:
         series = list(pool.map(lambda r: proventos(r["ticker"]), antigos))
         codigos = list(pool.map(codigo, [r["ticker"] for r in antigos]))
-        oscils = list(pool.map(oscilacao, [r["ticker"] for r in antigos]))
+        detalhes = list(pool.map(detalhe, [r["ticker"] for r in antigos]))
     cds = {c for c in codigos if c}
     anos_cvm, consolidado, individual = pacotes_por_cd(
         cds, PREGAO, os.path.join(acoes.CACHE_DIR, "cvm"), anos=[2021, 2022, 2023, 2024, 2025])
@@ -307,7 +314,7 @@ def main():
     linhas = []
     estados_novos = []
     estados_antigos = []
-    for antigo, bruto, cd, oscil in zip(antigos, series, codigos, oscils):
+    for antigo, bruto, cd, (oscil, lucro_12m) in zip(antigos, series, codigos, detalhes):
         financeiro = setor_financeiro(antigo.get("setor"))
         cvm = None
         if cd and (cd in consolidado or cd in individual):
@@ -324,6 +331,7 @@ def main():
             "div_liquida": None, "ebit_12m": None, "lucro_12m": None, "oscil_12m": oscil,
         }
         if cvm:
+            cvm["lucro_diverge_do_fundamentus"] = lucro_diverge_do_fundamentus(cvm.get("lucro_recente"), lucro_12m)
             r["cvm"] = cvm
         m = acoes.metricas(r)
         m["div_liq_ebit"] = num(antigo["div_liq_ebit"])

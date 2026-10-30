@@ -255,7 +255,7 @@ def metricas(r):
     payout_aprox = r["dy"] * r["pl"] if r["dy"] is not None and r["pl"] else None
     cvm = r.get("cvm") or {}
     diverge = bool(cvm.get("lucro_diverge_do_fundamentus")) or lucro_diverge_do_fundamentus(
-        cvm.get("lucro_recente"), r.get("valor_mercado"), r.get("pl"))
+        cvm.get("lucro_recente"), r.get("lucro_12m"))
     if cvm.get("lucro_nao_encontrado"):
         payout, fonte = payout_aprox, "lucro_nao_encontrado"
     elif diverge:
@@ -586,10 +586,10 @@ def anexar_cvm(candidatas):
         if resumo.get("lucro_nao_encontrado"):
             print(f"  aviso: {r['ticker']} lucro não encontrado na CVM (zero ou ausente na maioria dos anos); "
                   "payout volta a DY × P/L, sem penalidade de prejuízo")
-        elif lucro_diverge_do_fundamentus(resumo.get("lucro_recente"), r.get("valor_mercado"), r.get("pl")):
+        elif lucro_diverge_do_fundamentus(resumo.get("lucro_recente"), r.get("lucro_12m")):
             resumo["lucro_diverge_do_fundamentus"] = True
-            print(f"  aviso: {r['ticker']} lucro da CVM diverge mais de 30% do implícito "
-                  "(valor de mercado ÷ P/L); payout volta a DY × P/L, sem penalidade de prejuízo")
+            print(f"  aviso: {r['ticker']} lucro da CVM zerado ou com sinal trocado em relação ao lucro de 12 meses "
+                  "do Fundamentus; payout volta a DY × P/L, sem penalidade de prejuízo")
         elif resumo.get("sem_base_de_lucro"):
             print(f"  aviso: {r['ticker']} sem base de lucro; payout fica n/d e a nota de payout é 0")
     janela = anos_exercicio(HOJE)

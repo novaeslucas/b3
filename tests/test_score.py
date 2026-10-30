@@ -114,7 +114,7 @@ def test_lucro_que_diverge_do_fundamentus_nao_entra_no_score():
     import dividendos
     dividendos.HOJE = dt.date(2026, 10, 30)
     r = {
-        "dy": 0.10, "pl": 9.35, "valor_mercado": 436_002_000_000,
+        "dy": 0.10, "pl": 9.35, "lucro_12m": 46_600_000_000,
         "proventos_ano": {ano: 1.0 for ano in range(2020, 2026)},
         "div_liquida": None, "ebit_12m": None,
         "cvm": {

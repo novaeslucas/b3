@@ -231,27 +231,24 @@ def lucro_controladora(linhas_dre):
     return None
 
 
-# Lucro implícito do Fundamentus = valor de mercado ÷ P/L. Acima disso, o lucro da CVM não entra no score.
-TOLERANCIA_LUCRO_FUNDAMENTUS = 0.30
 # Payout agregado acima disso: o lucro somado é pequeno demais para ser base.
 TETO_PAYOUT_EXIBIDO = 3.0
 
 
-def lucro_diverge_do_fundamentus(lucro_cvm, valor_mercado, pl, tolerancia=TOLERANCIA_LUCRO_FUNDAMENTUS):
-    """True se o lucro da CVM e o implícito (valor de mercado ÷ P/L) discordam mais que a tolerância.
+def lucro_diverge_do_fundamentus(lucro_cvm, lucro_12m):
+    """True quando o lucro da CVM parece leitura quebrada: zerado, ou com sinal trocado em
+    relação ao «Lucro Líquido» de 12 meses do Fundamentus.
 
-    Lucro lido como zero, com P/L e valor de mercado preenchidos, também diverge: foi o caso
-    de ITUB4 e BMGB4 quando a conta 3.11 era a reversão de JCP.
+    Só pega erro de leitura (foi o caso de ITUB4 e BMGB4 quando a conta 3.11 era a reversão
+    de JCP). Diferença de tamanho não conta: o exercício da CVM e os 12 meses do Fundamentus
+    são períodos diferentes, e numa tolerância de 30% metade do universo de 26/10 caía no
+    fallback DY × P/L, que estoura justamente onde a CVM está certa (issue #2).
     """
-    if lucro_cvm is None or not valor_mercado or valor_mercado <= 0 or not pl or pl <= 0:
-        return False
-    implicito = valor_mercado / pl
-    if implicito <= 0:
+    if lucro_cvm is None or not lucro_12m:
         return False
     if lucro_cvm == 0:
         return True
-    base = max(abs(implicito), abs(lucro_cvm))
-    return abs(lucro_cvm - implicito) / base > tolerancia
+    return (lucro_cvm < 0) != (lucro_12m < 0)
 
 
 def pago_de_reserva_no_exercicio(linhas_dmpl, lucro, proventos):
