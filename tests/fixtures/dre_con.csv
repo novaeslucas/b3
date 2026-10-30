@@ -1,0 +1,18 @@
+CNPJ_CIA;DT_REFER;VERSAO;DENOM_CIA;CD_CVM;GRUPO_DFP;MOEDA;ESCALA_MOEDA;ORDEM_EXERC;DT_INI_EXERC;DT_FIM_EXERC;CD_CONTA;DS_CONTA;VL_CONTA;ST_CONTA_FIXA
+00.000.000/0001-91;2023-12-31;1;EMPRESA TESTE;000001;DF Consolidado - Demonstração do Resultado;REAL;UNIDADE;ÚLTIMO;2023-01-01;2023-12-31;3.11;Lucro/Prejuízo Consolidado do Período;1000;S
+00.000.000/0001-91;2023-12-31;1;EMPRESA TESTE;000001;DF Consolidado - Demonstração do Resultado;REAL;UNIDADE;ÚLTIMO;2023-01-01;2023-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;800;S
+00.000.000/0001-91;2023-12-31;1;EMPRESA TESTE;000001;DF Consolidado - Demonstração do Resultado;REAL;UNIDADE;PENÚLTIMO;2022-01-01;2022-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;1;S
+00.000.000/0001-91;2024-12-31;1;EMPRESA TESTE;000001;DF Consolidado - Demonstração do Resultado;REAL;UNIDADE;ÚLTIMO;2024-01-01;2024-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;1000;S
+00.000.000/0001-91;2025-12-31;1;EMPRESA TESTE;000001;DF Consolidado - Demonstração do Resultado;REAL;UNIDADE;ÚLTIMO;2025-01-01;2025-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;50;S
+00.000.000/0001-91;2025-12-31;2;EMPRESA TESTE;000001;DF Consolidado - Demonstração do Resultado;REAL;UNIDADE;ÚLTIMO;2025-01-01;2025-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;1000;S
+33.000.167/0001-01;2025-12-31;1;PETROLEO BRASILEIRO S.A. PETROBRAS;009512;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2025-01-01;2025-12-31;3.11;Lucro/Prejuízo Consolidado do Período;110605000;S
+33.000.167/0001-01;2025-12-31;1;PETROLEO BRASILEIRO S.A. PETROBRAS;009512;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2025-01-01;2025-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;110129000;S
+33.000.167/0001-01;2025-12-31;1;PETROLEO BRASILEIRO S.A. PETROBRAS;009512;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2025-01-01;2025-12-31;3.11.02;Atribuído a Sócios Não Controladores;476000;S
+60.746.948/0001-12;2025-12-31;1;BCO BRADESCO S.A.;000906;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2025-01-01;2025-12-31;3.11;Lucro ou Prejuízo Líquido Consolidado do Período;23924636;S
+60.746.948/0001-12;2025-12-31;1;BCO BRADESCO S.A.;000906;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2025-01-01;2025-12-31;3.11.01;Atribuído aos Sócios da Empresa Controladora;23672706;S
+00.000.000/0001-91;2025-12-31;1;BCO BRASIL S.A.;001023;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2025-01-01;2025-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;13698124;S
+07.859.971/0001-30;2025-12-31;1;TRANSMISSORA ALIANÇA DE ENERGIA ELÉTRICA S.A.;020257;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2025-01-01;2025-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;1579863;S
+28.195.667/0001-06;2022-12-31;2;BCO ABC BRASIL S.A.;020958;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2022-01-01;2022-12-31;3.11;Lucro ou Prejuízo Líquido Consolidado do Período;789718;S
+28.195.667/0001-06;2022-12-31;2;BCO ABC BRASIL S.A.;020958;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2022-01-01;2022-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;0;S
+31.232.884/0001-00;2025-12-31;1;LAVVI EMPREENDIMENTOS IMOBILIÁRIOS S.A.;025062;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2025-01-01;2025-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;414072;S
+08.807.432/0001-10;2025-12-31;1;YDUQS PARTICIPACOES S.A.;021016;DF Consolidado - Demonstração do Resultado;REAL;MIL;ÚLTIMO;2025-01-01;2025-12-31;3.11.01;Atribuído a Sócios da Empresa Controladora;181491;S

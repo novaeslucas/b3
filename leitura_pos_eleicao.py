@@ -27,6 +27,8 @@ from concurrent.futures import ThreadPoolExecutor
 import dividendos as acoes
 import fiis
 from dividendos import CACHE_DIR, PROVIDERS, ask_jev, fetch, load_env
+from b3lib.log import configurar, registrar_falha, resumo_falhas
+from b3lib.yahoo import chart_resultado, fechamentos_brasilia
 
 YAHOO = "https://query1.finance.yahoo.com/v8/finance/chart/{}?range=1mo&interval=1d"
 JEV_CACHE = os.path.join(CACHE_DIR, "jev_eleicao.json")
@@ -79,13 +81,10 @@ def fechamentos(ticker, base, pregao):
     simbolo = ticker if ticker.startswith("^") else f"{ticker}.SA"
     try:
         texto = fetch(None, YAHOO.format(simbolo), "utf-8", f"yahoo_{simbolo}_{pregao:%Y%m%d}")
-        r = json.loads(texto)["chart"]["result"][0]
-        fech = {}
-        for ts, c in zip(r["timestamp"], r["indicators"]["quote"][0]["close"]):
-            if c is not None:
-                fech[dt.datetime.fromtimestamp(ts, dt.timezone(dt.timedelta(hours=-3))).date()] = c
+        fech = fechamentos_brasilia(chart_resultado(texto))
         return fech.get(base), fech.get(pregao)
-    except Exception:
+    except Exception as e:
+        registrar_falha(ticker, "yahoo", e)
         return None, None
 
 
@@ -196,6 +195,7 @@ def main():
     args = ap.parse_args()
     base, pregao = dt.date.fromisoformat(args.data_base), dt.date.fromisoformat(args.data_pregao)
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    configurar()
     load_env()
 
     ca, cf = carregar_acoes(), carregar_fiis()
@@ -292,6 +292,7 @@ def main():
                         r["jev"]["classe"], r["decisao"], None, None, None])
     gerar_dashboard(ca, cf, base, pregao, ibov, ifix, sem_preco)
     print(f"\nDetalhes em {SAIDA_CSV} e {SAIDA_HTML}. Não é recomendação de investimento.")
+    resumo_falhas()
 
 
 def gerar_dashboard(ca, cf, base, pregao, ibov, ifix, sem_preco):
