@@ -38,17 +38,22 @@ def fetch(path, url=None, encoding="latin-1", nome=None, dia=None):
     fn = os.path.join(CACHE_DIR, re.sub(r"[^\w]+", "_", nome or path or "url") + f"_{dia:%Y%m%d}.html")
     if os.path.exists(fn):
         return open(fn, encoding="utf-8").read()
-    destino = url or "https://www.fundamentus.com.br" + path
-    req = urllib.request.Request(destino, headers={"User-Agent": "Mozilla/5.0"})
-    for tentativa in range(3):
-        try:
-            text = urllib.request.urlopen(req, timeout=30).read().decode(encoding)
-            break
-        except (urllib.error.URLError, TimeoutError) as exc:
-            if tentativa == 2:
-                logger.warning("download falhou %s: %s", destino, exc)
-                raise
-            time.sleep(2 ** tentativa)
+    text = baixar(url or "https://www.fundamentus.com.br" + path, encoding)
     with open(fn, "w", encoding="utf-8") as f:
         f.write(text)
     return text
+
+
+def baixar(url, encoding="utf-8", timeout=30):
+    """GET sem cache, com até 3 tentativas. Para cotação ao vivo, em que o cache diário de ``fetch`` não serve."""
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    for tentativa in range(3):
+        try:
+            return urllib.request.urlopen(req, timeout=timeout).read().decode(encoding)
+        except (urllib.error.URLError, TimeoutError) as exc:
+            # 404 e afins não melhoram com nova tentativa (ex.: ticker que saiu do Yahoo); 429 e 5xx sim
+            definitivo = isinstance(exc, urllib.error.HTTPError) and 400 <= exc.code < 500 and exc.code != 429
+            if tentativa == 2 or definitivo:
+                logger.warning("download falhou %s: %s", url, exc)
+                raise
+            time.sleep(2 ** tentativa)

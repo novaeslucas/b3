@@ -61,6 +61,7 @@ nenhuma das duas entra no painel consolidado de `resultados/`, que só usa preg�
   - [3. Leitura pós-eleição (pregões diários)](#3-leitura-pós-eleição-pregões-diários)
   - [4. Fatores do 2º turno](#4-fatores-do-2º-turno)
   - [5. Painel geral](#5-painel-geral)
+  - [6. Painel ao vivo](#6-painel-ao-vivo)
 - [Onde o Jev foi aplicado](#onde-o-jev-foi-aplicado)
 - [Resultados](#resultados)
 - [Como executar](#como-executar)
@@ -78,6 +79,7 @@ nenhuma das duas entra no painel consolidado de `resultados/`, que só usa preg�
 ├── leitura_pos_eleicao.py     # 1ª leitura do pregão pós-1º turno (05/10)   → resultados/
 ├── painel_pos_eleicao.py      # painel acumulado de todas as leituras diárias → resultados/
 ├── painel_besst.py            # bancos, energia, saneamento, seguros e telecom → resultados/ ou resultados_pregao_em_andamento/
+├── painel_ao_vivo.py          # cotações do pregão em loop, altas/baixas e mapa setorial → resultados_ao_vivo/
 ├── setores_b3.py              # classificação setorial atual (a lógica mora em b3lib/setores.py)
 ├── b3lib/                     # HTTP, números, proventos, CVM, Yahoo e setores compartilhados
 ├── tests/                     # pytest, só com fixtures locais (sem rede)
@@ -94,6 +96,7 @@ nenhuma das duas entra no painel consolidado de `resultados/`, que só usa preg�
 ├── leituras/AAAA_MM_DD/       # uma pasta por pregão (06/10 a 29/10): scripts do dia + CSV + dashboard
 ├── leituras/AAAA_MM_DD_pregao_em_andamento/   # leitura com preços parciais, fora do painel consolidado
 ├── resultados_pregao_em_andamento/            # painéis gerados durante um pregão não finalizado
+├── resultados_ao_vivo/        # painel ao vivo e o .js que ele recarrega (gerados localmente, fora do git)
 ├── cache/jev*.json            # respostas do Jev usadas nas análises (chave = hash do estado + perguntas)
 └── docs/pesquisa_endpoint_b3.md  # levantamento das fontes gratuitas de proventos da B3
 ```
@@ -111,7 +114,7 @@ Os dashboards são HTML estáticos, com os dados embutidos — basta abrir no na
 |---|---|
 | **Fundamentus** (`resultado.php`, `fii_resultado.php`, `detalhes.php`, `proventos.php`, `fii_proventos.php`) | Indicadores de todas as ações/FIIs, detalhes por ativo e histórico de proventos |
 | **B3** (`GetListedCashDividends`, `GetListedSupplementFunds`, `GetDetail`) | Conferência independente dos proventos e classificação setorial oficial |
-| **Yahoo Finance** (`query1.finance.yahoo.com/v8/finance/chart`) | Fechamentos diários de ativos, Ibovespa, SMAL11, XFIX11 e dólar |
+| **Yahoo Finance** (`query1.finance.yahoo.com/v8/finance/chart`) | Fechamentos diários de ativos, Ibovespa, SMAL11, XFIX11 e dólar; no painel ao vivo, o gráfico intradiário de 5 min (atraso de até 15 min) |
 | **CVM** (`dados.cvm.gov.br`, DFP consolidado) | Payout contábil (proventos declarados ÷ lucro) e confronto FCF × dividendos pagos |
 | **Pesquisas eleitorais** (Datafolha, Quaest, Atlas etc.) | Probabilidade de vitória no 2º turno, calculada em código |
 
@@ -213,6 +216,44 @@ ajustá-la manualmente e recalcula a exposição esperada de cada ativo.
 série completa de cada ativo de 02/10 até o último pregão: acumulado por ativo, por setor da B3 e por fator, contra
 Ibovespa, small caps (SMAL11), FIIs (XFIX11, aproximação do IFIX) e dólar. Saída:
 [`resultados/dashboard_pos_eleicao.html`](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html).
+
+### 6. Painel ao vivo
+
+[`painel_ao_vivo.py`](painel_ao_vivo.py) acompanha o pregão com cotações do Yahoo Finance (gráfico intradiário de
+5 min, ticker com `.SA`, **atraso de até 15 min**), sem o cache diário de `fetch` (download direto por
+`b3lib.http.baixar`). O universo são os mesmos tickers dos outros painéis: ativos do painel pós-eleição (ações e
+FIIs), ações de `resultados/resultado_dividendos.csv` e a lista BESST de `painel_besst.py`. O setor é a
+classificação oficial da B3 (setor econômico / subsetor / segmento), a mesma de `b3lib/setores.py`; FIIs ficam em
+“Fundos imobiliários”.
+
+O painel tem:
+
+- **indicador de coleta no topo** — coletando agora, coletor ativo aguardando, ou coletor parado; data/hora da
+  última coleta (e quanto ela levou), da próxima (com contagem regressiva), situação do mercado e falhas;
+- referências (Ibovespa, SMAL11, XFIX11, dólar) e a amplitude do universo (quantos sobem, caem ou ficam estáveis);
+- **mapa setorial** (só ações; os FIIs ficam na tabela e nas altas/baixas): três níveis, como no painel
+  pós-eleição — setor econômico da B3 → subsetor → empresas. Os setores ficam em volta do Ibovespa; clicar num setor
+  abre os subsetores dele, e clicar num subsetor abre as empresas (ex.: Financeiro → Intermediários Financeiros →
+  BBAS3). Setores, subsetores e empresas são caixas coloridas pela variação do dia (média simples no caso de setor e
+  subsetor): verde subindo, vermelho caindo, cinza em 0%, cor cheia a partir de ±3%. Arestas tracejadas ligam
+  empresas relacionadas: ON/PN/units da mesma companhia (pela raiz do ticker) e uma lista curta escrita à mão de
+  controladora/controlada (`RELACOES_CURADAS`). Setores podem ser arrastados; clicar numa empresa filtra a tabela por
+  ela. Com muitos setores abertos (“Abrir todos”), os blocos são empilhados em prateleiras para não se sobreporem;
+- **10 maiores altas e 10 maiores baixas** do dia;
+- **tabela** com ticker, empresa, setor, último preço, variação % e em R$, fechamento anterior, abertura,
+  mínima/máxima, quantidade negociada, volume financeiro (aproximado pelas barras de 5 min), linha intradiária e
+  horário da cotação; ordenável, com filtro por setor, por classe (ações/FIIs) e busca. O filtro de setor vale
+  também para as altas/baixas e abre o setor no mapa.
+
+**Como a atualização funciona.** O script roda em loop. Antes de cada coleta regrava
+`resultados_ao_vivo/painel_ao_vivo_dados.js` com o status “coletando”; ao fim, regrava o `.js` com as cotações e o
+horário da próxima coleta, e regrava `resultados_ao_vivo/painel_ao_vivo.html` com os dados embutidos (retrato que
+abre sozinho). A página recarrega o `.js` a cada 15 s por uma tag `<script>`, o que funciona abrindo o HTML direto do
+disco (`file://`), sem servidor. Durante o pregão (horário informado pelo próprio Yahoo, 10h–17h) e até 15 min depois
+do fechamento a coleta é a cada `--intervalo` segundos (padrão 120); fora disso o coletor dorme até a abertura do
+próximo dia útil (feriados não são conhecidos: no feriado ele coleta, vê que nada mudou e volta a dormir). Se o
+script parar, a página passa a mostrar “coletor parado” quando a próxima coleta prevista não chega. Um ticker que
+falha mantém a cotação anterior marcada com `*`.
 
 ## Onde o Jev foi aplicado
 
@@ -323,6 +364,10 @@ python leituras/2026_10_29/leitura_pos_eleicao.py    # leitura de um pregão (us
 python painel_pos_eleicao.py    # painel acumulado de todas as leituras
 ```
 
+```bash
+python painel_ao_vivo.py        # [--intervalo 120] [--uma-vez]; deixe rodando e abra resultados_ao_vivo/painel_ao_vivo.html
+```
+
 `--sem-jev` roda só a parte determinística (sem chave de API). `--sem-cvm` não baixa o DFP
 (`dfp_cia_aberta_AAAA.zip` em `cache/cvm/`, cerca de 13 MB por ano) e deixa o payout como DY × P/L.
 Os downloads ficam em `cache/` com validade de um dia; as páginas baixadas **não** são versionadas, então reproduzir um snapshot antigo (o `--snapshot 2026-10-05` das leituras diárias)
@@ -349,6 +394,8 @@ python -m pytest
   no score nem no Jev.
 - **Bancos e seguradoras** não têm EBIT; o indicador de alavancagem fica ausente e o pilar é renormalizado.
 - **FFO contábil** do Fundamentus vs. distribuição por caixa nos FIIs (ver regra de decisão).
+- **Painel ao vivo:** cotações do Yahoo com atraso de até 15 min, não da B3 em tempo real; tickers que o Yahoo não
+  tem mais (ex.: ELET3, BPAN4) aparecem como falha no indicador de coleta.
 - **XFIX11** é uma aproximação do IFIX, que não tem série no Yahoo.
 - **Probabilidade eleitoral** é uma conta simples sobre a média das pesquisas com erro assumido de 3 p.p., não um
   modelo eleitoral.

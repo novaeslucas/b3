@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel ao vivo B3</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f9f9f7; --surface: #fcfcfb; --surface-2: #f0efec; --border: rgba(11, 11, 11, .10);
+  --text: #0b0b0b; --text-2: #52514e; --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7;
+  --pos-txt: #137a3a; --neg-txt: #b8312f; --accent: #2a78d6; --ok: #1a9a4b; --warn: #c98500; --bad: #d03b3b;
+  --map-bg: #f3f2ee; --edge: rgba(11, 11, 11, .16);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
+    --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
+    --pos-txt: #5cc98a; --neg-txt: #f08c8b; --accent: #3987e5; --ok: #34c06a; --warn: #e0a225; --bad: #e66767;
+    --map-bg: #111110; --edge: rgba(255, 255, 255, .16);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
+  --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
+  --pos-txt: #5cc98a; --neg-txt: #f08c8b; --accent: #3987e5; --ok: #34c06a; --warn: #e0a225; --bad: #e66767;
+  --map-bg: #111110; --edge: rgba(255, 255, 255, .16);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.wrap { max-width: 1400px; margin: 0 auto; padding: 0 16px 40px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -.01em; }
+h2 { font-size: 15px; margin: 0; font-weight: 650; }
+.sub, .muted { color: var(--muted); }
+.sub { font-size: 13px; }
+button, select, input { font: inherit; color: var(--text); }
+.btn { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 5px 11px; cursor: pointer; font-size: 13px; }
+.btn:hover { background: var(--surface-2); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.cardhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+.full { margin-top: 12px; }
+.note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.pos { color: var(--pos-txt); } .neg { color: var(--neg-txt); }
+
+/* Barra de status da coleta */
+.status { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--border);
+  display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center; padding: 9px 16px; font-size: 13px; }
+.status .estado { display: inline-flex; align-items: center; gap: 8px; font-weight: 650; }
+.status .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
+.status .dot.coletando { background: var(--accent); animation: pulso 1s ease-in-out infinite; }
+.status .dot.ok { background: var(--ok); }
+.status .dot.parado { background: var(--bad); }
+@keyframes pulso { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); }
+  50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 0%, transparent); } }
+.status .it { color: var(--text-2); font-variant-numeric: tabular-nums; }
+.status .it b { color: var(--text); font-weight: 600; }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-top: 14px; }
+.kpi .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.kpi .v { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.kpi .d { font-size: 13px; font-variant-numeric: tabular-nums; }
+.amp { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; background: var(--grid); }
+.amp i { display: block; height: 100%; }
+
+/* Mapa setorial */
+.mapa { position: relative; background: var(--map-bg); border-radius: 10px; overflow: hidden; touch-action: none; }
+.mapa svg { display: block; width: 100%; user-select: none; }
+.mapa .edge { stroke: var(--edge); stroke-width: 1; }
+.mapa .edge.rel { stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 4 3; }
+.mapa .no { cursor: pointer; }
+.mapa .no text { pointer-events: none; fill: #fff; font-variant-numeric: tabular-nums; }
+.mapa .cab rect { stroke: rgba(0, 0, 0, .25); stroke-width: 1; }
+.mapa .setor.aberto .cab rect { stroke: var(--text); stroke-width: 2; }
+.mapa .sub rect { stroke: rgba(0, 0, 0, .25); stroke-width: 1; }
+.mapa .sub.aberto rect { stroke: var(--text); stroke-width: 1.6; }
+.mapa .sub, .mapa .cab { cursor: pointer; }
+.mapa .bloco { fill: var(--surface); stroke: var(--border); stroke-width: 1; }
+.mapa .hub { cursor: default; }
+.mapa .emp rect { stroke: rgba(0, 0, 0, .3); stroke-width: .8; }
+.mapa .emp.velha rect { stroke-dasharray: 3 2; opacity: .6; }
+.mapa .emp.foco rect { stroke: var(--text); stroke-width: 2; }
+.mapa .hub circle { stroke: var(--text); stroke-width: 1.5; }
+.legenda { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-2); flex-wrap: wrap; }
+.legenda .esc { width: 180px; height: 10px; border-radius: 3px; }
+.legenda .rel { display: inline-block; width: 22px; border-top: 2px dashed var(--accent); vertical-align: middle; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .18); min-width: 190px; max-width: 300px; display: none; z-index: 3; }
+.tip .h { font-weight: 650; margin-bottom: 4px; }
+.tip .r { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
+
+/* Altas e baixas */
+.top { display: grid; gap: 2px; font-size: 13px; }
+.top .r { display: grid; grid-template-columns: 22px 64px 1fr 78px 70px; gap: 8px; align-items: center; padding: 4px 2px; border-bottom: 1px solid var(--grid); }
+.top .r:last-child { border-bottom: 0; }
+.top .k { color: var(--muted); font-variant-numeric: tabular-nums; }
+.top .t { font-weight: 650; }
+.top .e { color: var(--text-2); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.top .n { text-align: right; font-variant-numeric: tabular-nums; }
+.top .vb { text-align: right; font-weight: 650; font-variant-numeric: tabular-nums; border-radius: 4px; padding: 1px 6px; color: #fff; }
+
+/* Tabela */
+.filtros { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.filtros select, .filtros input { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 5px 9px; font-size: 13px; }
+.chips { display: inline-flex; gap: 4px; }
+.chip { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 3px 11px; font-size: 13px; cursor: pointer; color: var(--text-2); }
+.chip.on { background: var(--text); color: var(--surface); border-color: var(--text); }
+.tabwrap { overflow-x: auto; margin-top: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 6px 8px; border-bottom: 1px solid var(--grid); text-align: left; white-space: nowrap; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; cursor: pointer; position: sticky; top: 0; background: var(--surface); }
+th.on { color: var(--text); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+td.emp { max-width: 260px; overflow: hidden; text-overflow: ellipsis; color: var(--text-2); }
+td.set { max-width: 200px; overflow: hidden; text-overflow: ellipsis; color: var(--text-2); }
+td.tk { font-weight: 650; }
+tr.velha td { opacity: .55; }
+tbody tr:hover td { background: var(--surface-2); }
+.pill { display: inline-block; min-width: 62px; text-align: right; border-radius: 4px; padding: 1px 6px; color: #fff; font-weight: 650; }
+footer { margin-top: 18px; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="status" id="status" aria-live="polite"></div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Painel ao vivo B3</h1>
+      <div class="sub" id="subtitulo"></div>
+    </div>
+    <button class="btn" id="tema" type="button">Tema</button>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section class="card full">
+    <div class="cardhead">
+      <div>
+        <h2>Mapa setorial</h2>
+        <div class="sub">Ações por setor econômico → subsetor da B3 (FIIs ficam só na tabela). Clique num setor para abrir os subsetores e num subsetor para abrir as empresas; arraste um setor para reorganizar; clique numa empresa para filtrar a tabela.</div>
+      </div>
+      <div class="filtros">
+        <button class="btn" id="abrirTodos" type="button">Abrir todos</button>
+        <button class="btn" id="fecharTodos" type="button">Fechar todos</button>
+        <button class="btn" id="reorganizar" type="button">Reorganizar</button>
+      </div>
+    </div>
+    <div class="legenda" id="legenda"></div>
+    <div class="mapa full" id="mapa"><svg id="svg"></svg><div class="tip" id="tip"></div></div>
+  </section>
+
+  <div class="grid2">
+    <section class="card"><div class="cardhead"><h2>Maiores altas do dia</h2><span class="sub" id="topAltasSub"></span></div><div class="top" id="altas"></div></section>
+    <section class="card"><div class="cardhead"><h2>Maiores baixas do dia</h2><span class="sub" id="topBaixasSub"></span></div><div class="top" id="baixas"></div></section>
+  </div>
+
+  <section class="card full">
+    <div class="cardhead">
+      <h2>Cotações</h2>
+      <div class="filtros">
+        <span class="chips" id="classes"></span>
+        <select id="filtroSetor" aria-label="Filtrar por setor"></select>
+        <input id="busca" type="search" placeholder="Ticker ou empresa" aria-label="Buscar ticker ou empresa">
+      </div>
+    </div>
+    <div class="sub" id="contagem"></div>
+    <div class="tabwrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+  </section>
+
+  <footer>
+    Cotações do Yahoo Finance (gráfico intradiário de 5 min), com atraso de até 15 min em relação à B3. Variação contra o
+    fechamento anterior. Volume financeiro aproximado (soma de preço × quantidade das barras de 5 min). Setores pela
+    classificação oficial da B3 (setor econômico / subsetor / segmento). Arestas tracejadas: mesma companhia (ON/PN/unit)
+    ou controladora/controlada de uma lista escrita à mão. Não é recomendação de investimento.
+  </footer>
+</div>
+
+<script>
+let DADOS = /*__DADOS__*/null;
+const ARQUIVO_DADOS = "painel_ao_vivo_dados.js";
+const RECARGA_MS = 15000;
+const TZ = "America/Sao_Paulo";
+const CINZA = [110, 110, 106], VERDE = [15, 138, 62], VERMELHO = [198, 40, 40];
+const ESCALA = 0.03;  // ±3% já é a cor cheia
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const nf = (v, d = 2) => v == null ? "–" : v.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (v, d = 2) => v == null ? "–" : (v > 0 ? "+" : "") + nf(100 * v, d) + "%";
+const sinal = (v) => v == null || Math.abs(v) < 0.0005 ? "" : v > 0 ? "pos" : "neg";
+function grande(v) {
+  if (v == null) return "–";
+  const a = Math.abs(v);
+  if (a >= 1e9) return nf(v / 1e9, 2) + " bi";
+  if (a >= 1e6) return nf(v / 1e6, 1) + " mi";
+  if (a >= 1e3) return nf(v / 1e3, 0) + " mil";
+  return nf(v, 0);
+}
+function hora(iso, comData) {
+  if (!iso) return "–";
+  const o = { timeZone: TZ, hour: "2-digit", minute: "2-digit" };
+  if (comData) Object.assign(o, { day: "2-digit", month: "2-digit", second: "2-digit" });
+  return new Date(iso).toLocaleString("pt-BR", o);
+}
+function cor(v) {
+  if (v == null) return "rgb(90,90,88)";
+  if (Math.abs(v) < 0.0005) return `rgb(${CINZA})`;
+  const t = Math.pow(Math.min(1, Math.abs(v) / ESCALA), 0.75), alvo = v > 0 ? VERDE : VERMELHO;
+  return `rgb(${CINZA.map((c, i) => Math.round(c + (alvo[i] - c) * t))})`;
+}
+const media = (xs) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+
+/* Estado da página */
+const filtro = { classe: "todas", setor: "", busca: "" };
+let ordem = { col: "var", dir: -1 };
+let ultimaRenderizada = null, arquivoOk = null, ultimaRecepcao = null;
+
+/* ---------- Status da coleta ---------- */
+function renderStatus() {
+  const s = (DADOS && DADOS.status) || {};
+  const agora = Date.now();
+  let classe = "ok", texto;
+  const prox = s.proxima_coleta ? new Date(s.proxima_coleta).getTime() : null;
+  const tolerancia = 180000 + 1000 * (s.intervalo_s || 120);
+  if (s.coletando && s.inicio_coleta && agora - new Date(s.inicio_coleta).getTime() < 600000) {
+    classe = "coletando"; texto = "Coletando agora";
+  } else if (prox && agora <= prox + tolerancia) {
+    texto = "Coletor ativo, aguardando a próxima coleta";
+  } else {
+    classe = "parado";
+    texto = prox ? "Coletor parado (a próxima coleta não chegou)" : "Coletor parado: retrato da última coleta";
+  }
+  let falta = "";
+  if (prox && classe !== "parado") {
+    const seg = Math.max(0, Math.round((prox - agora) / 1000));
+    falta = seg >= 3600 ? ` (em ${Math.floor(seg / 3600)} h ${Math.floor(seg % 3600 / 60)} min)`
+      : ` (em ${Math.floor(seg / 60)}m ${String(seg % 60).padStart(2, "0")}s)`;
+  }
+  const arq = arquivoOk === null ? "" : arquivoOk
+    ? `<span class="it">Página lê <b>${ARQUIVO_DADOS}</b> a cada ${RECARGA_MS / 1000} s</span>`
+    : `<span class="it">Sem <b>${ARQUIVO_DADOS}</b> ao lado da página: dados embutidos</span>`;
+  $("status").innerHTML = `
+    <span class="estado"><span class="dot ${classe}"></span>${texto}</span>
+    <span class="it">Última coleta: <b>${hora(s.ultima_coleta, true)}</b>${s.duracao_s ? ` (${nf(s.duracao_s, 0)} s)` : ""}</span>
+    <span class="it">Próxima: <b>${s.proxima_coleta ? hora(s.proxima_coleta, true) : "–"}</b>${falta}</span>
+    <span class="it">Mercado: <b>${esc(s.mercado || "–")}</b>${s.pregao ? ` (pregão ${s.pregao[0]}–${s.pregao[1]})` : ""}</span>
+    <span class="it">Cotações: <b>${s.n_cotacoes ?? "–"}/${s.n_universo ?? "–"}</b>${s.falhas && s.falhas.length ? ` · ${s.falhas.length} falha(s)` : ""}</span>
+    ${arq}`;
+  if (s.falhas && s.falhas.length) $("status").title = "Falhas na última coleta: " + s.falhas.join(", ");
+}
+
+/* ---------- KPIs ---------- */
+function renderKpis() {
+  const refs = DADOS.referencias || [];
+  const linhas = DADOS.cotacoes || [];
+  const altas = linhas.filter((c) => sinal(c.var) === "pos").length;
+  const baixas = linhas.filter((c) => sinal(c.var) === "neg").length;
+  const est = linhas.length - altas - baixas;
+  const tot = Math.max(1, linhas.length);
+  $("kpis").innerHTML = refs.map((r) => `
+    <div class="card kpi"><div class="l">${esc(r.nome)}</div>
+      <div class="v">${r.id === "ibov" ? nf(r.preco, 0) : nf(r.preco, r.id === "dolar" ? 4 : 2)}</div>
+      <div class="d ${sinal(r.var)}">${pct(r.var)} <span class="muted">· ${hora(r.hora)}</span></div></div>`).join("") + `
+    <div class="card kpi"><div class="l">Amplitude do universo</div>
+      <div class="v"><span class="pos">${altas}</span> <span class="muted" style="font-size:15px">/</span> <span class="neg">${baixas}</span></div>
+      <div class="d muted">${altas} em alta, ${baixas} em baixa, ${est} estáveis</div>
+      <div class="amp"><i style="width:${100 * altas / tot}%;background:${cor(ESCALA)}"></i><i style="width:${100 * est / tot}%;background:${cor(0)}"></i><i style="width:${100 * baixas / tot}%;background:${cor(-ESCALA)}"></i></div></div>`;
+}
+
+/* ---------- Filtros, top 10 e tabela ---------- */
+function setoresDe(linhas) {
+  const m = new Map();
+  for (const c of linhas) {
+    const k = c.setor_economico || "Sem classificação B3";
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push(c);
+  }
+  return m;
+}
+function filtradas(semBusca) {
+  const b = filtro.busca.trim().toUpperCase();
+  return (DADOS.cotacoes || []).filter((c) =>
+    (filtro.classe === "todas" || c.classe === filtro.classe) &&
+    (!filtro.setor || c.setor_economico === filtro.setor) &&
+    (semBusca || !b || c.ticker.includes(b) || String(c.empresa || "").toUpperCase().includes(b)));
+}
+function renderFiltros() {
+  const setores = [...setoresDe(DADOS.cotacoes || []).keys()].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  if (filtro.setor && !setores.includes(filtro.setor)) filtro.setor = "";
+  $("filtroSetor").innerHTML = `<option value="">Todos os setores</option>` +
+    setores.map((s) => `<option ${s === filtro.setor ? "selected" : ""}>${esc(s)}</option>`).join("");
+  $("classes").innerHTML = [["todas", "Todos"], ["acao", "Ações"], ["fii", "FIIs"]].map(([k, n]) =>
+    `<button type="button" class="chip ${filtro.classe === k ? "on" : ""}" data-classe="${k}">${n}</button>`).join("");
+}
+function renderTop() {
+  const base = filtradas(true).filter((c) => c.var != null && !c.desatualizada);
+  const linha = (c, i) => `<div class="r" title="${esc(c.empresa)} · ${esc(c.setor_economico)}">
+    <span class="k">${i + 1}</span><span class="t">${esc(c.ticker)}</span><span class="e">${esc(c.empresa)}</span>
+    <span class="n">R$ ${nf(c.preco)}</span><span class="vb" style="background:${cor(c.var)}">${pct(c.var)}</span></div>`;
+  const altas = base.filter((c) => c.var > 0).sort((a, b) => b.var - a.var).slice(0, 10);
+  const baixas = base.filter((c) => c.var < 0).sort((a, b) => a.var - b.var).slice(0, 10);
+  $("altas").innerHTML = altas.map(linha).join("") || `<div class="muted">Nenhuma alta no filtro atual.</div>`;
+  $("baixas").innerHTML = baixas.map(linha).join("") || `<div class="muted">Nenhuma baixa no filtro atual.</div>`;
+  const rot = filtro.setor || (filtro.classe === "todas" ? "todo o universo" : filtro.classe === "fii" ? "FIIs" : "ações");
+  $("topAltasSub").textContent = $("topBaixasSub").textContent = rot;
+}
+const COLUNAS = [
+  ["ticker", "Ticker", false], ["empresa", "Empresa", false], ["setor_economico", "Setor B3", false],
+  ["preco", "Último", true], ["var", "Var. %", true], ["var_rs", "Var. R$", true], ["anterior", "Fech. ant.", true],
+  ["abertura", "Abertura", true], ["minima", "Mínima", true], ["maxima", "Máxima", true],
+  ["volume", "Qtd. negociada", true], ["financeiro", "Volume R$", true], ["spark", "Intradia", false], ["hora", "Hora", true],
+];
+function spark(c) {
+  const p = c.spark || [];
+  if (p.length < 2) return "";
+  const w = 76, h = 20, lo = Math.min(...p, c.anterior ?? Infinity), hi = Math.max(...p, c.anterior ?? -Infinity);
+  const y = (v) => hi === lo ? h / 2 : h - 2 - (h - 4) * (v - lo) / (hi - lo);
+  const pts = p.map((v, i) => `${(w * i / (p.length - 1)).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const ref = c.anterior != null ? `<line x1="0" x2="${w}" y1="${y(c.anterior)}" y2="${y(c.anterior)}" stroke="var(--axis)" stroke-dasharray="2 2"/>` : "";
+  return `<svg width="${w}" height="${h}" aria-hidden="true">${ref}<polyline fill="none" stroke="${cor(c.var)}" stroke-width="1.5" points="${pts}"/></svg>`;
+}
+function renderTabela() {
+  $("thead").innerHTML = "<tr>" + COLUNAS.map(([k, n, num]) =>
+    `<th class="${num ? "n" : ""} ${ordem.col === k ? "on" : ""}" data-col="${k}">${n}${ordem.col === k ? (ordem.dir > 0 ? " ▲" : " ▼") : ""}</th>`).join("") + "</tr>";
+  const linhas = filtradas(false).slice().sort((a, b) => {
+    const x = a[ordem.col], y = b[ordem.col];
+    if (x == null) return 1;
+    if (y == null) return -1;
+    return (typeof x === "string" ? x.localeCompare(y, "pt-BR") : x - y) * ordem.dir;
+  });
+  $("tbody").innerHTML = linhas.map((c) => `<tr class="${c.desatualizada ? "velha" : ""}">
+    <td class="tk">${esc(c.ticker)}</td>
+    <td class="emp" title="${esc(c.empresa)}">${esc(c.empresa)}</td>
+    <td class="set" title="${esc([c.setor_economico, c.subsetor, c.segmento].filter(Boolean).join(" / "))}">${esc(c.setor_economico)}</td>
+    <td class="n">${nf(c.preco)}</td>
+    <td class="n"><span class="pill" style="background:${cor(c.var)}">${pct(c.var)}</span></td>
+    <td class="n ${sinal(c.var)}">${c.var_rs == null ? "–" : (c.var_rs > 0 ? "+" : "") + nf(c.var_rs)}</td>
+    <td class="n">${nf(c.anterior)}</td><td class="n">${nf(c.abertura)}</td>
+    <td class="n">${nf(c.minima)}</td><td class="n">${nf(c.maxima)}</td>
+    <td class="n">${grande(c.volume)}</td><td class="n">${grande(c.financeiro)}</td>
+    <td>${spark(c)}</td><td class="n" title="${c.desatualizada ? "Falhou na última coleta; cotação anterior" : ""}">${hora(c.hora)}${c.desatualizada ? " *" : ""}</td></tr>`).join("");
+  $("contagem").textContent = `${linhas.length} de ${(DADOS.cotacoes || []).length} ativos` +
+    (linhas.some((c) => c.desatualizada) ? " · * cotação da coleta anterior (falhou agora)" : "");
+}
+
+/* ---------- Mapa setorial ----------
+   Três níveis, como o painel pós-eleição: setor econômico da B3 → subsetor → empresas. FIIs ficam fora do mapa.
+   Simulação de forças simples (sem biblioteca) entre o Ibovespa, no centro, e os setores. Setor aberto vira um bloco
+   rígido: o cabeçalho do setor liga por um tronco aos subsetores; subsetor aberto liga por um barramento às caixas
+   das empresas, da maior alta para a maior baixa. */
+const svg = $("svg"), NS = "http://www.w3.org/2000/svg";
+const G = { nos: new Map(), emp: new Map(), relacoes: [], abertos: new Set(), subAbertos: new Set(), alpha: 0,
+  W: 1000, H: 620, raf: null, arrasto: null, foco: null };
+const EMP_W = 74, EMP_H = 34, PASSO_X = 78, PASSO_Y = 38, CAB_H = 44, SUB_H = 30, PAD = 10, BARRA = 16, RECUO = 22, ESPACO = 10;
+const chaveSub = (setor, sub) => setor + "|" + sub;
+function el(tag, attrs, pai) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (pai) pai.appendChild(e);
+  return e;
+}
+function acoesDoMapa() { return (DADOS.cotacoes || []).filter((c) => c.classe !== "fii"); }
+function porVar(a, b) { return (b.var ?? -9) - (a.var ?? -9); }
+function colunas(n) {
+  return Math.max(1, Math.min(n, Math.ceil(Math.sqrt(n * 2.4)), Math.floor((G.W - 2 * PAD - RECUO - 24) / PASSO_X)));
+}
+function resumo(membros) {
+  const vars = membros.map((c) => c.var).filter((v) => v != null);
+  return { v: media(vars), altas: vars.filter((v) => v >= 0.0005).length, baixas: vars.filter((v) => v <= -0.0005).length };
+}
+function layoutSetor(nome, membros) {
+  /* Tamanho do bloco e posição (relativa ao centro do bloco) de subsetores e empresas. */
+  const cab = Math.max(118, Math.min(230, 7.2 * nome.length + 26));
+  if (!G.abertos.has(nome)) return { w: cab, h: CAB_H, cab, subs: [] };
+  const grupos = new Map();
+  for (const c of membros) {
+    const k = c.subsetor || "Sem subsetor";
+    if (!grupos.has(k)) grupos.set(k, []);
+    grupos.get(k).push(c);
+  }
+  const subs = [...grupos.entries()].sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], "pt-BR"))
+    .map(([sub, ms]) => ({ nome: sub, setor: nome, membros: ms.slice().sort(porVar), aberto: G.subAbertos.has(chaveSub(nome, sub)), ...resumo(ms) }));
+  // coordenadas a partir do canto superior esquerdo do bloco; centralizadas no fim
+  let y = CAB_H + ESPACO, larg = cab;
+  const x0 = PAD + RECUO;
+  for (const s of subs) {
+    s.w = Math.max(150, Math.min(260, 6.8 * s.nome.length + 40));
+    s.x = x0; s.y = y;
+    s.tiles = [];
+    let h = SUB_H, w = s.w;
+    if (s.aberto) {
+      s.cols = colunas(s.membros.length);
+      const linhas = Math.ceil(s.membros.length / s.cols);
+      s.membros.forEach((c, j) => s.tiles.push({ c, x: x0 + EMP_W / 2 + (j % s.cols) * PASSO_X,
+        y: y + SUB_H + BARRA + EMP_H / 2 + Math.floor(j / s.cols) * PASSO_Y }));
+      h += BARRA + linhas * PASSO_Y - 4;
+      w = Math.max(w, s.cols * PASSO_X - 4);
+    }
+    larg = Math.max(larg, RECUO + w);
+    y += h + ESPACO;
+  }
+  const W = larg + 2 * PAD, H = y - ESPACO + PAD;
+  const dx = -W / 2, dy = -H / 2;
+  for (const s of subs) {
+    s.x += dx; s.y += dy;
+    for (const t of s.tiles) { t.x += dx; t.y += dy; }
+  }
+  return { w: W, h: H, cab, subs };
+}
+function medir() {
+  G.W = Math.max(320, $("mapa").clientWidth);
+  let area = 0;
+  setoresDe(acoesDoMapa()).forEach((m, s) => {
+    const t = layoutSetor(s, m);
+    area += (t.w + 30) * (t.h + 30);
+  });
+  G.H = Math.round(Math.min(3000, Math.max(G.W < 600 ? 520 : 600, 1.6 * area / G.W + 160)));
+  svg.setAttribute("viewBox", `0 0 ${G.W} ${G.H}`);
+  svg.setAttribute("height", G.H);
+}
+function estruturaGrafo() {
+  /* Nós a partir dos dados e do que está aberto; posições dos setores preservadas por id. */
+  const setores = setoresDe(acoesDoMapa());
+  const antigos = G.nos, novos = new Map();
+  const cx = G.W / 2, cy = G.H / 2;
+  const ibov = (DADOS.referencias || []).find((r) => r.id === "ibov");
+  const hub = Object.assign(antigos.get("hub") || {}, { id: "hub", tipo: "hub", fixo: true, w: 76, h: 76, v: ibov ? ibov.var : null });
+  if (!G.empacotado) Object.assign(hub, { x: cx, y: cy });
+  novos.set("hub", hub);
+  const nomes = [...setores.keys()].sort((a, b) => setores.get(b).length - setores.get(a).length);
+  G.emp = new Map();
+  G.subs = new Map();
+  nomes.forEach((s, i) => {
+    const membros = setores.get(s);
+    const ang = -Math.PI / 2 + 2 * Math.PI * i / nomes.length;
+    const n = Object.assign(antigos.get("s:" + s) || { x: cx + G.W * 0.36 * Math.cos(ang), y: cy + G.H * 0.36 * Math.sin(ang), vx: 0, vy: 0 }, {
+      id: "s:" + s, tipo: "setor", nome: s, membros: membros.slice().sort(porVar), aberto: G.abertos.has(s),
+      ...resumo(membros), ...layoutSetor(s, membros),
+    });
+    novos.set(n.id, n);
+    for (const sub of n.subs) {
+      sub.id = "u:" + chaveSub(s, sub.nome); sub.tipo = "sub"; sub.no = n;
+      G.subs.set(sub.id, sub);
+      for (const t of sub.tiles) G.emp.set("e:" + t.c.ticker, { id: "e:" + t.c.ticker, tipo: "emp", c: t.c, v: t.c.var, setor: n, rx: t.x, ry: t.y });
+    }
+  });
+  G.nos = novos;
+  G.relacoes = (DADOS.relacoes || []).filter((r) => G.emp.has("e:" + r.a) && G.emp.has("e:" + r.b));
+}
+function caixa(pai, cls, x, y, w, h, rx, v, l1, l2, id) {
+  /* Retângulo colorido pela variação com duas linhas de texto, centrado em (x, y). */
+  const g = el("g", { class: cls }, pai);
+  if (id) g.dataset.id = id;
+  el("rect", { x: x - w / 2, y: y - h / 2, width: w, height: h, rx, fill: cor(v) }, g);
+  el("text", { "text-anchor": "middle", x, y: y - (h > 32 ? 4 : 2), "font-size": h > 32 ? 12 : 11.5, "font-weight": 700 }, g).textContent = l1;
+  el("text", { "text-anchor": "middle", x, y: y + (h > 32 ? 12 : 11), "font-size": h > 32 ? 11 : 10 }, g).textContent = l2;
+  return g;
+}
+function desenharGrafo() {
+  svg.innerHTML = "";
+  const gE = el("g", {}, svg), gN = el("g", {}, svg), gR = el("g", {}, svg);
+  for (const n of G.nos.values()) if (n.tipo === "setor") n.linha = el("line", { class: "edge" }, gE);
+  for (const n of G.nos.values()) {
+    const g = el("g", { class: "no " + n.tipo + (n.aberto ? " aberto" : "") }, gN);
+    g.dataset.id = n.id;
+    n.el = g;
+    if (n.tipo === "hub") {
+      el("circle", { r: 36, fill: cor(n.v) }, g);
+      el("text", { "text-anchor": "middle", y: -4, "font-size": 12, "font-weight": 700 }, g).textContent = "Ibovespa";
+      el("text", { "text-anchor": "middle", y: 12, "font-size": 12 }, g).textContent = pct(n.v);
+      continue;
+    }
+    if (!n.aberto) {
+      caixa(g, "cab", 0, 0, n.cab, CAB_H, 7, n.v, "+ " + n.nome, `${n.membros.length} ações · média ${pct(n.v)}`);
+      continue;
+    }
+    el("rect", { class: "bloco", x: -n.w / 2, y: -n.h / 2, width: n.w, height: n.h, rx: 10 }, g);
+    const cabX = -n.w / 2 + PAD + n.cab / 2, topo = -n.h / 2;
+    // tronco: cabeçalho do setor → cada subsetor
+    const tx = -n.w / 2 + PAD + RECUO / 2, ult = n.subs[n.subs.length - 1];
+    el("line", { class: "edge", x1: tx, y1: topo + CAB_H, x2: tx, y2: ult.y + SUB_H / 2 }, g);
+    for (const s of n.subs) {
+      el("line", { class: "edge", x1: tx, y1: s.y + SUB_H / 2, x2: s.x, y2: s.y + SUB_H / 2 }, g);
+      if (s.aberto) {  // barramento do subsetor: uma descida por coluna de empresas
+        const yb = s.y + SUB_H + BARRA / 2, xs = s.tiles.slice(0, s.cols).map((t) => t.x);
+        el("line", { class: "edge", x1: xs[0], y1: s.y + SUB_H, x2: xs[0], y2: yb }, g);
+        el("line", { class: "edge", x1: Math.min(...xs), y1: yb, x2: Math.max(...xs), y2: yb }, g);
+        xs.forEach((x, k) => {
+          const fim = s.tiles.filter((_, j) => j % s.cols === k).pop();
+          el("line", { class: "edge", x1: x, y1: yb, x2: x, y2: fim.y }, g);
+        });
+      }
+      caixa(g, "sub" + (s.aberto ? " aberto" : ""), s.x + s.w / 2, s.y + SUB_H / 2, s.w, SUB_H, 6, s.v,
+        (s.aberto ? "− " : "+ ") + s.nome, `${s.membros.length} · média ${pct(s.v)}`, s.id);
+      for (const t of s.tiles) {
+        const c = t.c;
+        caixa(g, "no emp" + (c.desatualizada ? " velha" : "") + (G.foco === c.ticker ? " foco" : ""),
+          t.x, t.y, EMP_W, EMP_H, 4, c.var, c.ticker, pct(c.var), "e:" + c.ticker);
+      }
+    }
+    caixa(g, "cab", cabX, topo + CAB_H / 2, n.cab, CAB_H, 7, n.v, "− " + n.nome, `${n.membros.length} ações · média ${pct(n.v)}`);
+  }
+  for (const r of G.relacoes) {
+    r.el = el("line", { class: "edge rel" }, gR);
+    el("title", {}, r.el).textContent = `${r.a} – ${r.b}: ${r.tipo}`;
+  }
+  posicionar();
+}
+function posicionar() {
+  const hub = G.nos.get("hub");
+  for (const n of G.nos.values()) {
+    n.el.setAttribute("transform", `translate(${n.x.toFixed(1)},${n.y.toFixed(1)})`);
+    if (n.linha) {
+      const x = n.aberto ? n.x - n.w / 2 + PAD + n.cab / 2 : n.x, y = n.aberto ? n.y - n.h / 2 + CAB_H / 2 : n.y;
+      n.linha.setAttribute("x1", hub.x); n.linha.setAttribute("y1", hub.y); n.linha.setAttribute("x2", x); n.linha.setAttribute("y2", y);
+    }
+  }
+  for (const r of G.relacoes) {
+    const a = G.emp.get("e:" + r.a), b = G.emp.get("e:" + r.b);
+    r.el.setAttribute("x1", a.setor.x + a.rx); r.el.setAttribute("y1", a.setor.y + a.ry);
+    r.el.setAttribute("x2", b.setor.x + b.rx); r.el.setAttribute("y2", b.setor.y + b.ry);
+  }
+}
+function passo() {
+  if (G.empacotado) return;  // prateleiras: posições fixas, só o arrasto mexe
+  const nos = [...G.nos.values()], al = G.alpha, hub = G.nos.get("hub");
+  for (const n of nos) {
+    if (n.fixo) continue;
+    // mola até o Ibovespa, no comprimento que deixa o bloco encostar sem sobrepor
+    const dx = n.x - hub.x, dy = n.y - hub.y, d = Math.hypot(dx, dy) || 1;
+    const L = 70 + Math.hypot(n.w, n.h) / 2.4;
+    n.vx -= dx / d * (d - L) * 0.03 * al; n.vy -= dy / d * (d - L) * 0.03 * al;
+  }
+  for (let i = 0; i < nos.length; i++) {
+    for (let j = i + 1; j < nos.length; j++) {
+      const p = nos[i], q = nos[j];
+      const dx = q.x - p.x, dy = q.y - p.y, d2 = Math.max(dx * dx + dy * dy, 100), d = Math.sqrt(d2);
+      const f = Math.min(6, 4000 / d2) * al;
+      if (!p.fixo) { p.vx -= dx / d * f; p.vy -= dy / d * f; }
+      if (!q.fixo) { q.vx += dx / d * f; q.vy += dy / d * f; }
+      const ox = (p.w + q.w) / 2 + 14 - Math.abs(dx), oy = (p.h + q.h) / 2 + 14 - Math.abs(dy);
+      if (ox > 0 && oy > 0) {  // colisão entre retângulos: separa pelo eixo de menor sobreposição
+        const pf = p.fixo ? 0 : q.fixo ? 1 : 0.5, qf = 1 - pf;
+        if (ox < oy) { const s = (dx >= 0 ? 1 : -1) * ox; p.x -= s * pf; q.x += s * qf; }
+        else { const s = (dy >= 0 ? 1 : -1) * oy; p.y -= s * pf; q.y += s * qf; }
+      }
+    }
+  }
+  for (const n of nos) {
+    if (n.fixo) continue;
+    n.vx *= 0.6; n.vy *= 0.6;
+    n.x += n.vx; n.y += n.vy;
+    const mw = Math.min(n.w / 2 + 4, G.W / 2), mh = Math.min(n.h / 2 + 4, G.H / 2);
+    n.x = Math.max(mw, Math.min(G.W - mw, n.x)); n.y = Math.max(mh, Math.min(G.H - mh, n.y));
+  }
+}
+function separar(vezes) {
+  /* Só colisão, sem forças: tira a sobreposição que a mola e os limites da área deixarem. */
+  const nos = [...G.nos.values()];
+  for (let k = 0; k < vezes; k++) {
+    let mexeu = false;
+    for (let i = 0; i < nos.length; i++) {
+      for (let j = i + 1; j < nos.length; j++) {
+        const p = nos[i], q = nos[j], dx = q.x - p.x, dy = q.y - p.y;
+        const ox = (p.w + q.w) / 2 + 14 - Math.abs(dx), oy = (p.h + q.h) / 2 + 14 - Math.abs(dy);
+        if (ox <= 0 || oy <= 0) continue;
+        mexeu = true;
+        const pf = p.fixo ? 0 : q.fixo ? 1 : 0.5, qf = 1 - pf;
+        // pelo eixo de menor sobreposição; se não resolver em 40 voltas (blocos largos presos nas bordas), na vertical,
+        // que sempre tem espaço porque a altura do mapa cresce com os blocos abertos
+        if (ox < oy && k < 40) { const s = (dx >= 0 ? 1 : -1) * ox; p.x -= s * pf; q.x += s * qf; }
+        else { const s = (dy >= 0 ? 1 : -1) * oy; p.y -= s * pf; q.y += s * qf; }
+      }
+    }
+    for (const n of nos) {
+      const mw = Math.min(n.w / 2 + 4, G.W / 2), mh = Math.min(n.h / 2 + 4, G.H / 2);
+      n.x = Math.max(mw, Math.min(G.W - mw, n.x)); n.y = Math.max(mh, Math.min(G.H - mh, n.y));
+    }
+    if (!mexeu) return true;
+  }
+  return false;
+}
+function assentar() {
+  /* Separa de vez. Se os blocos abertos não cabem em volta do Ibovespa, empacota em prateleiras: Ibovespa no topo,
+     setores da esquerda para a direita, do bloco mais alto para o mais baixo. */
+  if (separar(200)) return;
+  const hub = G.nos.get("hub"), setores = [...G.nos.values()].filter((n) => n.tipo === "setor").sort((a, b) => b.h - a.h);
+  hub.x = G.W / 2; hub.y = 50;
+  G.empacotado = true;
+  let x = 12, y = 110, alt = 0;
+  for (const n of setores) {
+    if (x > 12 && x + n.w > G.W - 12) { x = 12; y += alt + 14; alt = 0; }
+    n.x = x + n.w / 2; n.y = y + n.h / 2; n.vx = n.vy = 0;
+    x += n.w + 14; alt = Math.max(alt, n.h);
+  }
+  G.H = Math.round(y + alt + 16);
+  G.alpha = 0;
+  svg.setAttribute("viewBox", `0 0 ${G.W} ${G.H}`);
+  svg.setAttribute("height", G.H);
+}
+function animar() {
+  cancelAnimationFrame(G.raf);
+  const quadro = () => {
+    for (let k = 0; k < 3; k++) passo();
+    G.alpha *= 0.97;
+    const segue = G.alpha > 0.01 || G.arrasto;
+    if (segue && !G.empacotado) separar(4); else if (!G.empacotado) assentar();
+    posicionar();
+    if (segue) G.raf = requestAnimationFrame(quadro);
+  };
+  G.raf = requestAnimationFrame(quadro);
+}
+function aquecer(a) { G.alpha = Math.max(G.alpha, a); animar(); }
+function reconstruir(alpha) {
+  /* alpha 0: só redesenha com as posições atuais (chegada de dados); maior: reorganiza (ação de quem usa). */
+  if (alpha > 0) G.empacotado = false;
+  const H = G.H;
+  medir();
+  if (G.empacotado) { G.H = H; svg.setAttribute("viewBox", `0 0 ${G.W} ${G.H}`); svg.setAttribute("height", G.H); }
+  estruturaGrafo();
+  // começa perto do equilíbrio: são poucas dezenas de nós, a conta é barata
+  G.alpha = alpha;
+  for (let k = 0; k < 160 * alpha; k++) { passo(); G.alpha *= 0.985; }
+  if (!G.empacotado) assentar();
+  desenharGrafo();
+  if (alpha > 0) aquecer(Math.max(G.alpha, 0.05));
+}
+function renderLegenda() {
+  const stops = [-1, -0.5, 0, 0.5, 1].map((t) => cor(t * ESCALA)).join(",");
+  $("legenda").innerHTML = `<span>${pct(-ESCALA, 0)}</span><span class="esc" style="background:linear-gradient(90deg,${stops})"></span>
+    <span>${pct(ESCALA, 0)} ou mais</span><span class="muted">· cinza = 0%</span>
+    ${(DADOS.relacoes || []).length ? `<span><span class="rel"></span> empresas relacionadas</span>` : ""}`;
+}
+function ponto(ev) {
+  const r = svg.getBoundingClientRect();
+  return { x: (ev.clientX - r.left) * G.W / r.width, y: (ev.clientY - r.top) * G.H / r.height };
+}
+function tooltip(n, ev) {
+  const tip = $("tip");
+  if (!n || n.tipo === "hub") { tip.style.display = "none"; return; }
+  if (n.tipo === "setor" || n.tipo === "sub") {
+    const ord = n.membros.filter((c) => c.var != null);
+    tip.innerHTML = `<div class="h">${esc(n.nome)}</div>
+      ${n.tipo === "sub" ? `<div class="muted" style="margin-bottom:4px">Subsetor de ${esc(n.setor)}</div>` : ""}
+      <div class="r"><span>Ações</span><span>${n.membros.length}</span></div>
+      <div class="r"><span>Média do dia</span><span class="${sinal(n.v)}">${pct(n.v)}</span></div>
+      <div class="r"><span>Em alta / em baixa</span><span>${n.altas} / ${n.baixas}</span></div>
+      ${ord.length ? `<div class="r"><span>Maior alta</span><span>${esc(ord[0].ticker)} ${pct(ord[0].var)}</span></div>
+      <div class="r"><span>Maior baixa</span><span>${esc(ord[ord.length - 1].ticker)} ${pct(ord[ord.length - 1].var)}</span></div>` : ""}
+      <div class="note">Clique para ${n.aberto ? "fechar" : "abrir"} ${n.tipo === "setor" ? "os subsetores" : "as empresas"}.</div>`;
+  } else {
+    const c = n.c;
+    const rel = (DADOS.relacoes || []).filter((r) => r.a === c.ticker || r.b === c.ticker)
+      .map((r) => `${r.a === c.ticker ? r.b : r.a}: ${r.tipo}`);
+    tip.innerHTML = `<div class="h">${esc(c.ticker)} · ${esc(c.empresa)}</div>
+      <div class="muted" style="margin-bottom:4px">${esc([c.subsetor, c.segmento].filter(Boolean).join(" / "))}</div>
+      <div class="r"><span>Último</span><span>R$ ${nf(c.preco)}</span></div>
+      <div class="r"><span>Variação</span><span class="${sinal(c.var)}">${pct(c.var)} (${c.var_rs == null ? "–" : (c.var_rs > 0 ? "+" : "") + nf(c.var_rs)})</span></div>
+      <div class="r"><span>Mínima / máxima</span><span>${nf(c.minima)} / ${nf(c.maxima)}</span></div>
+      <div class="r"><span>Volume</span><span>R$ ${grande(c.financeiro)}</span></div>
+      <div class="r"><span>Hora</span><span>${hora(c.hora)}${c.desatualizada ? " (coleta anterior)" : ""}</span></div>
+      ${rel.length ? `<div class="note">Relacionadas: ${esc(rel.join("; "))}</div>` : ""}
+      <div class="note">Clique para ${G.foco === c.ticker ? "limpar o filtro" : "filtrar a tabela"}.</div>`;
+  }
+  const box = $("mapa").getBoundingClientRect();
+  tip.style.display = "block";
+  const x = ev.clientX - box.left + 14, y = ev.clientY - box.top + 14;
+  tip.style.left = Math.max(4, Math.min(x, box.width - tip.offsetWidth - 6)) + "px";
+  tip.style.top = Math.max(4, Math.min(y, box.height - tip.offsetHeight - 6)) + "px";
+}
+function noDoEvento(ev) {
+  const g = ev.target.closest && ev.target.closest(".emp, .sub, .cab, .hub");
+  if (!g) return null;
+  if (g.classList.contains("cab")) return G.nos.get(g.parentNode.dataset.id) || null;
+  const id = g.dataset.id;
+  return G.emp.get(id) || G.subs.get(id) || G.nos.get(id) || null;
+}
+svg.addEventListener("pointerdown", (ev) => {
+  const n = noDoEvento(ev);
+  if (!n || n.tipo === "hub") return;
+  const alvo = n.tipo === "emp" ? n.setor : n.tipo === "sub" ? n.no : n, p = ponto(ev);
+  G.arrasto = { n, alvo, dx: alvo.x - p.x, dy: alvo.y - p.y, x0: ev.clientX, y0: ev.clientY, moveu: false };
+  svg.setPointerCapture(ev.pointerId);
+});
+svg.addEventListener("pointermove", (ev) => {
+  if (!G.arrasto) { tooltip(noDoEvento(ev), ev); return; }
+  const a = G.arrasto, p = ponto(ev);
+  if (Math.hypot(ev.clientX - a.x0, ev.clientY - a.y0) > 4) a.moveu = true;
+  if (!a.moveu) return;
+  a.alvo.fixo = true; a.alvo.x = p.x + a.dx; a.alvo.y = p.y + a.dy; a.alvo.vx = a.alvo.vy = 0;
+  $("tip").style.display = "none";
+  aquecer(0.3);
+});
+svg.addEventListener("pointerup", () => {
+  const a = G.arrasto;
+  G.arrasto = null;
+  if (!a) return;
+  a.alvo.fixo = false;
+  if (a.moveu) return;
+  $("tip").style.display = "none";
+  if (a.n.tipo === "setor") {
+    G.abertos.has(a.n.nome) ? G.abertos.delete(a.n.nome) : G.abertos.add(a.n.nome);
+    reconstruir(0.6);
+  } else if (a.n.tipo === "sub") {
+    const k = chaveSub(a.n.setor, a.n.nome);
+    G.subAbertos.has(k) ? G.subAbertos.delete(k) : G.subAbertos.add(k);
+    reconstruir(0.4);
+  } else {
+    G.foco = G.foco === a.n.c.ticker ? null : a.n.c.ticker;
+    filtro.busca = G.foco || ""; $("busca").value = filtro.busca;
+    renderTabela(); desenharGrafo();
+  }
+});
+svg.addEventListener("pointerleave", () => { if (!G.arrasto) $("tip").style.display = "none"; });
+
+/* ---------- Atualização ---------- */
+function renderTudo() {
+  if (!DADOS) return;
+  $("subtitulo").textContent = `${(DADOS.cotacoes || []).length} ativos dos painéis do repositório (ações da análise de dividendos, painel pós-eleição e BESST, e os FIIs) · cotações do Yahoo Finance com atraso de até 15 min`;
+  renderStatus(); renderKpis(); renderFiltros(); renderTop(); renderTabela(); renderLegenda();
+  if (filtro.setor && !G.abertos.has(filtro.setor)) G.abertos.add(filtro.setor);
+  reconstruir(G.nos.size ? 0 : 1);
+}
+window.receberDados = function (d) {
+  arquivoOk = true;
+  ultimaRecepcao = Date.now();
+  const mudou = !DADOS || d.status.ultima_coleta !== (DADOS.status || {}).ultima_coleta || !ultimaRenderizada;
+  DADOS = d;
+  if (mudou) { ultimaRenderizada = d.status.ultima_coleta; renderTudo(); } else renderStatus();
+};
+function recarregar() {
+  const velho = document.getElementById("dadosAoVivo");
+  if (velho) velho.remove();
+  const s = document.createElement("script");
+  s.id = "dadosAoVivo";
+  s.src = ARQUIVO_DADOS + "?t=" + Date.now();
+  s.onerror = () => { if (arquivoOk !== true) arquivoOk = false; renderStatus(); };
+  document.head.appendChild(s);
+}
+
+$("filtroSetor").addEventListener("change", (e) => {
+  filtro.setor = e.target.value;
+  if (filtro.setor) { G.abertos.add(filtro.setor); reconstruir(0.8); }
+  renderTop(); renderTabela();
+});
+$("busca").addEventListener("input", (e) => { filtro.busca = e.target.value; renderTabela(); });
+$("classes").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-classe]");
+  if (!b) return;
+  filtro.classe = b.dataset.classe; renderFiltros(); renderTop(); renderTabela();
+});
+$("thead").addEventListener("click", (e) => {
+  const th = e.target.closest("th");
+  if (!th || th.dataset.col === "spark") return;
+  const col = th.dataset.col;
+  ordem = ordem.col === col ? { col, dir: -ordem.dir } : { col, dir: ["ticker", "empresa", "setor_economico"].includes(col) ? 1 : -1 };
+  renderTabela();
+});
+$("abrirTodos").addEventListener("click", () => {
+  for (const c of acoesDoMapa()) {
+    const s = c.setor_economico || "Sem classificação B3";
+    G.abertos.add(s); G.subAbertos.add(chaveSub(s, c.subsetor || "Sem subsetor"));
+  }
+  reconstruir(1);
+});
+$("fecharTodos").addEventListener("click", () => { G.abertos.clear(); G.subAbertos.clear(); reconstruir(0.8); });
+$("reorganizar").addEventListener("click", () => { G.nos = new Map(); reconstruir(1); });
+$("tema").addEventListener("click", () => {
+  const r = document.documentElement;
+  const escuro = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  r.dataset.theme = escuro ? "light" : "dark";
+});
+let larguraAnterior = 0;
+new ResizeObserver(() => {
+  const w = $("mapa").clientWidth;
+  if (DADOS && Math.abs(w - larguraAnterior) > 20) { larguraAnterior = w; reconstruir(0.5); }
+}).observe($("mapa"));
+
+renderTudo();
+recarregar();
+setInterval(recarregar, RECARGA_MS);
+setInterval(renderStatus, 1000);
+</script>
+</body>
+</html>
