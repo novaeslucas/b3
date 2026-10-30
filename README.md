@@ -209,6 +209,10 @@ Base congelada: dados do Fundamentus e respostas do Jev do **snapshot de 05/10**
    vale a B3 ([`setores_b3.py`](leituras/2026_10_26/setores_b3.py)).
 
 Cada dashboard diário traz no topo o contexto do pregão (notícias, com link da fonte). A partir da leitura de 29/10,
+o topo mostra só a linha do pregão analisado, e o botão **Contexto e fontes de todos os pregões** abre num modal a
+lista completa desde o 1º turno, com o link de cada fonte; o card do 2º turno (simulador de quem ganha ou perde com
+cada resultado) saiu, porque a eleição já passou — os fatores eleitorais do Jev continuam no detalhe de cada ação e no
+card “O que explicou o dia”. Também a partir de 29/10,
 o botão **Mapa setorial** abre, num modal de tela cheia, o mapa do pregão em três níveis, como o do painel ao vivo:
 Ibovespa no centro → setores econômicos da B3 (e os FIIs) → subsetor da B3 (FIIs: tipo) → ativos, com as caixas
 coloridas pela variação do **dia** ou do **acumulado** (abas no topo do modal) e setores/subsetores pela média simples.

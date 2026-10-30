@@ -98,19 +98,26 @@ svg text { fill: var(--muted); font-size: 11px; }
 .row .track i { display: block; height: 100%; background: var(--c, var(--accent)); border-radius: 4px; }
 .row .n { text-align: right; color: var(--text); }
 .sec { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 14px 0 8px; }
-.t2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.t2 ol { margin: 0; padding-left: 18px; font-size: 12px; display: grid; gap: 3px; }
-.t2 ol li span { color: var(--muted); }
-.t2h { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
-.slider { display: flex; align-items: center; gap: 10px; font-size: 13px; margin: 4px 0 10px; flex-wrap: wrap; }
-.slider .mini { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
-.slider input { flex: 1; min-width: 140px; accent-color: var(--accent); }
-@media (max-width: 640px) { .t2 { grid-template-columns: 1fr; } }
 .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
 footer { color: var(--faint); font-size: 12px; margin-top: 20px; }
 .context { display: grid; gap: 4px; margin-top: 14px; font-size: 13px; color: var(--muted); }
 .context b { color: var(--text); font-weight: 600; }
 .context a { color: var(--accent); text-decoration: none; }
+.context .fontes-btn { justify-self: start; border: 1px solid var(--border); background: var(--surface); color: var(--accent); border-radius: 8px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+.context .fontes-btn:hover { border-color: var(--accent); }
+/* Modal de contexto e fontes */
+.fx-fundo { position: fixed; inset: 0; z-index: 40; background: rgba(0, 0, 0, .55); display: none; align-items: center; justify-content: center; padding: 16px; }
+.fx-fundo.aberto { display: flex; }
+.fx-caixa { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; width: min(900px, 100%); max-height: min(85vh, 100%); display: flex; flex-direction: column; box-shadow: 0 12px 40px rgba(0, 0, 0, .35); }
+.fx-topo { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.fx-topo h2 { margin: 0; flex: 1; font-size: 17px; }
+.fx-lista { overflow-y: auto; padding: 8px 16px 16px; margin: 0; list-style: none; display: grid; gap: 2px; }
+.fx-lista li { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.fx-lista li:last-child { border-bottom: 0; }
+.fx-lista li.hoje { font-weight: 600; }
+.fx-lista a { color: var(--accent); text-decoration: none; white-space: nowrap; }
+.fx-lista a:hover { text-decoration: underline; }
+.fx-nota { padding: 0 16px 14px; }
 .tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); }
 .tabs button { border: 0; background: transparent; color: var(--muted); font: inherit; padding: 7px 16px; cursor: pointer; }
 .tabs button.on { background: var(--accent); color: #fff; }
@@ -212,19 +219,6 @@ body.ms-travado { overflow: hidden; }
     </div>
   </div>
 
-  <div class="card" style="margin-top: 12px">
-    <div class="cardhead"><h2>2º turno (25/10) — quem ganha ou perde com cada resultado (Jev)</h2></div>
-    <div class="note" id="pesq" style="margin-top:0"></div>
-    <div class="slider"><label for="pOp">P(vitória de Flávio) considerada:</label>
-      <input type="range" id="pOp" min="0" max="100" step="1"><b id="pOpV"></b>
-      <button type="button" id="pOpReset" class="mini">voltar às pesquisas</button></div>
-    <div class="t2" id="t2"></div>
-    <div class="note">Efeito de uma vitória de Flávio, comparada à reeleição de Lula, julgado pelo Jev de −2 (muito pior) a +2 (muito melhor)
-      com base no negócio de cada empresa, sem ver preços. Se o mercado já precifica a probabilidade P, o que falta acontecer é
-      (1 − P) × efeito quando Flávio vence e −P × efeito quando Lula vence — em pontos da escala do Jev, não em %.
-      P vem da média das pesquisas (votos válidos) com erro assumido; ajuste no controle.</div>
-  </div>
-
   <div class="filters">
     <div class="tabs" id="tabs"><button data-t="acoes" class="on" type="button">Ações</button><button data-t="fiis" type="button">FIIs</button></div>
     <input id="q" type="search" placeholder="Buscar ticker, nome, setor ou segmento">
@@ -278,6 +272,14 @@ body.ms-travado { overflow: hidden; }
   <div class="ms-area" id="msArea"><svg id="msSvg"></svg><div class="ms-tip" id="msTip"></div></div>
 </div>
 
+<div class="fx-fundo" id="fxFundo">
+  <div class="fx-caixa" role="dialog" aria-modal="true" aria-labelledby="fxTitulo">
+    <div class="fx-topo"><h2 id="fxTitulo"></h2><button class="ms-fechar" id="fxFechar" type="button" aria-label="Fechar contexto e fontes">✕ Fechar</button></div>
+    <ol class="fx-lista" id="fxLista"></ol>
+    <div class="note fx-nota">Resumo do pregão e do noticiário em cada data, com o link da fonte (abre em nova aba).</div>
+  </div>
+</div>
+
 <script>
 const DADOS = /*__DADOS__*/null;
 
@@ -309,7 +311,21 @@ const REFF = () => estado.h === "var_dia" ? DADOS.ifix_dia : DADOS.ifix_acum;
 const ROTULO = () => estado.h === "var_dia" ? `dia (${DADOS.data_pregao.slice(0, 5)} vs ${DADOS.data_anterior.slice(0, 5)})` : `acumulado desde ${DADOS.data_base.slice(0, 5)}`;
 $("#hDia").textContent = `Dia — ${DADOS.data_pregao.slice(0, 5)} vs ${DADOS.data_anterior.slice(0, 5)}`;
 $("#hAcum").textContent = `Acumulado — desde ${DADOS.data_base.slice(0, 5)} (pré-eleição)`;
-$("#contexto").innerHTML = DADOS.contexto.map(c => `<span>${esc(c.texto)} · <a href="${esc(c.url)}" target="_blank" rel="noopener">fonte</a></span>`).join("");
+// Contexto: na página, só a linha do pregão analisado; a lista inteira, com as fontes, fica no modal
+const doPregao = c => c.texto.startsWith(DADOS.data_pregao.slice(0, 5));
+const linhaCtx = c => `${esc(c.texto)} · <a href="${esc(c.url)}" target="_blank" rel="noopener">fonte</a>`;
+const ctxHoje = DADOS.contexto.filter(doPregao);
+$("#contexto").innerHTML = ctxHoje.map(c => `<span>${linhaCtx(c)}</span>`).join("") +
+  (DADOS.contexto.length ? `<button class="fontes-btn" id="abrirFontes" type="button">Contexto e fontes de todos os pregões (${DADOS.contexto.length})</button>` : "");
+$("#fxTitulo").textContent = `Contexto e fontes — de ${DADOS.data_base.slice(0, 5)} a ${DADOS.data_pregao.slice(0, 5)}`;
+$("#fxLista").innerHTML = DADOS.contexto.map(c => `<li class="${doPregao(c) ? "hoje" : ""}"><span>${esc(c.texto)}</span><a href="${esc(c.url)}" target="_blank" rel="noopener">fonte ↗</a></li>`).join("");
+const fxAberto = () => $("#fxFundo").classList.contains("aberto");
+function fxAbrir() { $("#fxFundo").classList.add("aberto"); document.body.classList.add("ms-travado"); $("#fxFechar").focus(); }
+function fxFechar() { $("#fxFundo").classList.remove("aberto"); document.body.classList.remove("ms-travado"); $("#abrirFontes")?.focus(); }
+$("#abrirFontes")?.addEventListener("click", fxAbrir);
+$("#fxFechar").onclick = fxFechar;
+$("#fxFundo").addEventListener("click", ev => { if (ev.target === $("#fxFundo")) fxFechar(); });
+document.addEventListener("keydown", ev => { if (ev.key === "Escape" && fxAberto()) fxFechar(); });
 $("#dPregao").textContent = DADOS.data_pregao;
 $("#sub").textContent = `${DADOS.acoes.length} ações e ${DADOS.fiis.length} FIIs já analisados · pré-eleição ${DADOS.data_base} · anterior ${DADOS.data_anterior} · gerado em ${DADOS.gerado_em}` +
   (DADOS.sem_preco.length ? ` · sem cotação: ${DADOS.sem_preco.join(", ")}` : "");
@@ -513,31 +529,6 @@ function detalhe() {
     <div class="note">A classe de qualidade não foi refeita: reflete os fundamentos, que não mudam em um pregão.</div>`;
 }
 
-// P(Flávio vence) = Φ((média dos válidos − 50%) / erro), a mesma conta de fatores_2turno.py
-const VALIDOS = media(DADOS.pesquisas.map(q => q.flavio / (q.flavio + q.lula)));
-const erf = x => { const t = 1 / (1 + .3275911 * Math.abs(x)), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - .284496736) * t + .254829592) * t * Math.exp(-x * x); return x >= 0 ? y : -y; };
-const P_PESQ = Math.round(100 * .5 * (1 + erf((VALIDOS - .5) / (DADOS.erro_pesquisa * Math.SQRT2))));
-$("#pOp").value = P_PESQ;
-$("#pesq").textContent = "Pesquisas: " + DADOS.pesquisas.map(q => `${q.instituto} (${q.data}) Flávio ${n2(q.flavio, 1)} × Lula ${n2(q.lula, 1)}`).join(" · ") +
-  ` — média de ${pct(VALIDOS)} dos válidos para Flávio; com erro de ${pct(DADOS.erro_pesquisa, 0)}, P ≈ ${P_PESQ}%.`;
-
-function segundoTurno() {
-  const P = $("#pOp").value / 100;
-  $("#pOpV").textContent = `${Math.round(100 * P)}%`;
-  const A = DADOS.acoes;
-  const sn = v => `<span class="${v >= 0 ? "pos" : "neg"}">${(v > 0 ? "+" : "") + n2(v)}</span>`;
-  const item = e => `<li data-t="${esc(e.ticker)}" style="cursor:pointer"><b>${esc(e.ticker)}</b>
-    efeito ${(e.oposicao > 0 ? "+" : "") + n2(e.oposicao, 1)} · Flávio vence ${sn((1 - P) * e.oposicao)} · Lula vence ${sn(-P * e.oposicao)}
-    <span>· acum. ${sp(e.var_acum, 1)} · ${esc(e.setor || "")}</span></li>`;
-  const bloco = (titulo, l) => `<div><div class="t2h">${titulo}</div><ol>${l.map(item).join("") || "<li>nenhuma</li>"}</ol></div>`;
-  $("#t2").innerHTML =
-    bloco("Ganham com vitória de Flávio", A.filter(e => e.oposicao >= .5).sort((a, b) => b.oposicao - a.oposicao).slice(0, 10)) +
-    bloco("Ganham com vitória de Lula", A.filter(e => e.oposicao <= -.5).sort((a, b) => a.oposicao - b.oposicao).slice(0, 10));
-  document.querySelectorAll("#t2 li[data-t]").forEach(li => li.onclick = () => { estado.aba = "acoes"; selecionar(li.dataset.t); });
-}
-$("#pOp").addEventListener("input", segundoTurno);
-$("#pOpReset").onclick = () => { $("#pOp").value = P_PESQ; segundoTurno(); };
-
 function selecionar(t) { estado.sel = t; render(); }
 
 function render() {
@@ -545,7 +536,7 @@ function render() {
   document.querySelectorAll("#horizonte button").forEach(b => b.classList.toggle("on", b.dataset.h === estado.h));
   $("#fDy").parentElement.lastChild.textContent = ` só quem ficou abaixo do DY mínimo (${pct(DY_MIN[estado.aba], 0)})`;
   const l = lista();
-  kpis(); fatores(); scatter(); segundoTurno(); grupos(l); tabela(l); detalhe();
+  kpis(); fatores(); scatter(); grupos(l); tabela(l); detalhe();
 }
 
 document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => {
