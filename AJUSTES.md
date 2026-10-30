@@ -448,4 +448,24 @@ Com o `.env`, na raiz, para não reaproveitar resposta antiga:
 python comparacoes/comparar_ranking.py --limpar-cache-jev
 ```
 
+## Rodada 7
+
+O flag `antecipacao_tributacao_2026` só marca o evento de 01/11/2025 a 31/12/2025 cujo valor por ação passa da mediana dos anos fechados. JCP de dezembro no tamanho dessa mediana não entra: BBDC4, TAEE11 e CMIG4 ficam sem o flag. ITSA4 tem JCP de R$ 0,02 em dezembro, também sem flag; o que marca é o dividendo de R$ 0,78 em 09/12, acima da mediana de R$ 0,61.
+
+`dy_recorrente` = min(provento de 12 meses, mediana) / preço, e só quando há esse evento. Sai o excesso, não o pagamento inteiro. Sem antecipação acima da mediana, o DY bruto permanece. Não entra no score.
+
+| Papel | DY bruto | DY recorrente | Base |
+|---|---:|---:|---|
+| ITUB4 | 7,5% | 3,0% | mediana R$ 1,26 por ação (P12 era R$ 3,17) |
+| UGPA3 | 5,7% | 1,8% | limitado à mediana |
+| TGMA3 | 9,2% | 9,2% | o de 02/12 não passa da mediana |
+| CURY3 | 15,4% | 4,0% | limitado à mediana |
+| PLPL3 | 9,3% | 3,7% | mediana R$ 0,20 por ação, não zero |
+
+Nesta execução, 19 papéis com o flag: UGPA3, MOVI3, POMO4, PLPL3, DIRR3, VULC3, CURY3, TEND3, LAVV3, INTB3, CYRE3, RIAA3, RDOR3, BMOB3, SMFT3, ITUB4, ITSA4, LOGG3, YDUQ3. O Jev não foi chamado. Com o `.env`, na raiz:
+
+```bash
+python comparacoes/comparar_ranking.py --limpar-cache-jev
+```
+
 

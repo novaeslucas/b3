@@ -475,7 +475,8 @@ def main():
         "Antecipação nov/dez 2025: " + ", ".join(
             x["ticker"] for x in linhas if "antecipacao_tributacao_2026" in (x["gatilho_natureza"] or "")) + ".",
         "A oscilação de 12 meses vai no estado do Jev (detalhes.php desta execução) e não entra no score.",
-        "dy_recorrente é o DY bruto sem os proventos de nov/dez de 2025 acima da mediana; também não entra no score.",
+        "dy_recorrente limita o provento de 12 meses à mediana quando há antecipação acima dela "
+        "(só o excesso sai) e não entra no score. JCP de dezembro no tamanho da mediana não leva o flag.",
         "",
         "## Natureza nos papéis pedidos",
         "",

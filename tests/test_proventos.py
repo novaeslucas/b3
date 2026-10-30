@@ -136,22 +136,62 @@ def test_mediana_zero_e_retomada_e_nao_extraordinario():
     assert "retomada" in nat["gatilho_natureza"]
 
 
-def test_antecipacao_de_nov_dez_2025_sai_do_dy_recorrente_se_passa_da_mediana():
+def test_jcp_de_dezembro_no_tamanho_da_mediana_nao_e_antecipacao():
+    """BBDC4, ITSA4, TAEE11, CMIG4: JCP de dezembro menor que a mediana não leva o flag."""
     hoje = dt.date(2026, 10, 26)
     eventos = [_ev(ano, 1.0) for ano in (2021, 2022, 2023, 2024)]
-    eventos.append(_ev(2025, 1.87, mes=12, dia=9))
-    eventos.append(_ev(2026, 0.2, mes=6))
+    eventos.append({
+        "data_com": dt.date(2025, 12, 15), "classe": "jcp", "tipo": "JRS CAP PROPRIO",
+        "valor_bruto": 0.15, "valor_liquido": 0.15, "extraordinario": False, "fator": None,
+        "data_pagamento": dt.date(2026, 1, 15),
+    })
     nat = classificar_natureza(eventos, hoje)
-    assert any(e["antecipacao_tributacao_2026"] for e in nat["eventos_caixa_12m"])
-    assert "antecipacao_tributacao_2026" in nat["gatilho_natureza"]
-    assert nat["proventos_12m_antecipados_acima_mediana"] == pytest.approx(1.87)
-    # DY bruto 0,10; dos 2,07 por ação na janela, 1,87 é a antecipação acima da mediana 1.
-    assert dy_recorrente(0.10, nat["proventos_12m_bruto"], nat["proventos_12m_antecipados_acima_mediana"]) == pytest.approx(
-        0.10 * 0.2 / (1.87 + 0.2))
-    pequeno = classificar_natureza(
-        [_ev(ano, 1.0) for ano in (2021, 2022, 2023, 2024)] + [_ev(2025, 0.4, mes=12, dia=9)], hoje)
-    assert pequeno["proventos_12m_antecipados_acima_mediana"] == 0
-    assert dy_recorrente(0.10, pequeno["proventos_12m_bruto"], 0) == pytest.approx(0.10)
+    marcado = [e for e in nat["eventos_caixa_12m"] if e["antecipacao_tributacao_2026"]]
+    assert marcado == []
+    assert "antecipacao_tributacao_2026" not in nat["gatilho_natureza"]
+    assert nat["proventos_12m_antecipados_acima_mediana"] == 0
+
+
+def test_dy_recorrente_tira_so_o_excesso_sobre_a_mediana():
+    """PLPL3 fica na mediana (~0,20), não em zero. ITUB4 usa a mediana de 1,26. Sem antecipação, o DY não muda."""
+    hoje = dt.date(2026, 10, 26)
+
+    def serie(anuais, extra):
+        eventos = [_ev(ano, valor) for ano, valor in anuais.items()]
+        eventos.extend(extra)
+        return classificar_natureza(eventos, hoje)
+
+    # Um único provento de 0,49 em dez/2025 contra mediana 0,20 dos anos anteriores.
+    plpl = serie(
+        {2021: 0.20, 2022: 0.16, 2023: 0.16, 2024: 0.50, 2025: 0.20},
+        [_ev(2025, 0.49, mes=12, dia=29)],
+    )
+    # 2025 já tem 0,20 em junho, fora da janela de 12 meses que começa em 26/10/2025.
+    # Fechados: 0,16, 0,16, 0,20, 0,20, 0,50 → mediana 0,20. P12 = 0,49.
+    assert plpl["mediana_proventos_acao"] == pytest.approx(0.20)
+    assert plpl["proventos_12m_bruto"] == pytest.approx(0.49)
+    assert any(e["antecipacao_tributacao_2026"] for e in plpl["eventos_caixa_12m"])
+    assert plpl["proventos_12m_antecipados_acima_mediana"] == pytest.approx(0.49 - 0.20)
+    recorrente_plpl = dy_recorrente(0.0934, plpl["proventos_12m_bruto"], plpl["proventos_12m_antecipados_acima_mediana"])
+    assert recorrente_plpl == pytest.approx(0.0934 * 0.20 / 0.49)
+    assert recorrente_plpl > 0
+
+    # ITUB4: mediana 1,26; o de 12 meses passa disso. A base recorrente é 1,26 por ação.
+    itub_p12 = 4.0
+    itub = serie(
+        {2021: 0.91, 2022: 1.02, 2023: 1.26, 2024: 2.41, 2025: 1.26},
+        [_ev(2025, 1.87, mes=12, dia=9), _ev(2026, itub_p12 - 1.87, mes=6)],
+    )
+    assert itub["mediana_proventos_acao"] == pytest.approx(1.26)
+    assert itub["proventos_12m_bruto"] == pytest.approx(itub_p12)
+    assert itub["proventos_12m_antecipados_acima_mediana"] == pytest.approx(itub_p12 - 1.26)
+    assert dy_recorrente(0.0747, itub["proventos_12m_bruto"], itub["proventos_12m_antecipados_acima_mediana"]) == pytest.approx(
+        0.0747 * 1.26 / itub_p12)
+
+    sem_antecipar = serie({2021: 1.0, 2022: 1.0, 2023: 1.0, 2024: 1.0, 2025: 1.2}, [_ev(2026, 1.5, mes=6)])
+    assert "antecipacao_tributacao_2026" not in sem_antecipar["gatilho_natureza"]
+    assert sem_antecipar["proventos_12m_antecipados_acima_mediana"] == 0
+    assert dy_recorrente(0.08, sem_antecipar["proventos_12m_bruto"], 0) == pytest.approx(0.08)
 
 
 def test_seer3_parcelas_com_pagamento_diferente_contam_as_duas():

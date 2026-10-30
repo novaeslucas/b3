@@ -119,9 +119,11 @@ def eh_antecipacao_tributacao_2026(data_com):
 
 
 def dy_recorrente(dy_bruto, proventos_12m, excluidos):
-    """DY bruto de 12 meses sem os proventos de nov/dez de 2025 que passam da mediana.
+    """DY bruto de 12 meses limitado à mediana dos anos anteriores.
 
-    Não entra no score. ``excluidos`` é a soma, por ação, desses eventos.
+    ``excluidos`` é só o excesso de P12 sobre a mediana (não o evento inteiro).
+    Sem antecipação acima da mediana, ``excluidos`` é zero e o DY não muda.
+    Não entra no score.
     """
     if dy_bruto is None:
         return None
@@ -238,21 +240,24 @@ def classificar_natureza(eventos, hoje, _anos_completos=None, pago_de_reserva=Fa
     # Mediana zero com provento agora é retomada. Razão infinita não vira extraordinário.
     retomada = mediana == 0 and ttm > 0
 
-    excluidos = 0.0
     eventos_12m = []
-    antecipou = any(eh_antecipacao_tributacao_2026(e["data_com"]) for e in caixa)
     for e in janela:
         valor = bruto(e)
-        if mediana and mediana > 0 and eh_antecipacao_tributacao_2026(e["data_com"]) and valor > mediana:
-            excluidos += valor
+        # JCP mensal de dezembro, do tamanho da mediana, não é antecipação.
+        acima = bool(
+            mediana and mediana > 0 and eh_antecipacao_tributacao_2026(e["data_com"]) and valor > mediana
+        )
         pagamento = e.get("data_pagamento")
         eventos_12m.append({
             "date": e["data_com"].isoformat(),
             "payment_date": pagamento.isoformat() if pagamento else None,
             "type": e.get("tipo"),
             "gross_per_share": round(valor, 4),
-            "antecipacao_tributacao_2026": eh_antecipacao_tributacao_2026(e["data_com"]),
+            "antecipacao_tributacao_2026": acima,
         })
+    antecipou = any(e["antecipacao_tributacao_2026"] for e in eventos_12m)
+    # Só o excesso de P12 sobre a mediana. Quem não antecipou fica com o P12 inteiro.
+    excluidos = max(0.0, ttm - mediana) if antecipou and mediana and mediana > 0 else 0.0
 
     gatilhos = []
     if pago_de_reserva:
