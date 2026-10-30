@@ -6,16 +6,20 @@ Fluxo:
   3. Fundamentus (detalhes.php e proventos.php) por candidata: setor, dívida, lucro, EBIT,
      oscilação de 12 meses e proventos por ano.
   4. Dividend Quality Score (0-100) calculado aqui no código, com pesos explícitos.
+     O payout do score prefere a soma de 5 anos da CVM (proventos declarados ÷ lucro da
+     controladora); sem DFP suficiente, ou se o lucro não foi lido, cai para DY × P/L.
   5. Jev classifica cada empresa (SUSTENTAVEL / ATENCAO / FRAGIL) e diz se o DY atual parece
-     inflado por um pagamento extraordinário ou por queda da cotação.
-  6. Conferência: proventos por ano do Fundamentus x B3 (GetListedCashDividends, por espécie ON/PN).
+    inflado por um pagamento extraordinário ou por queda da cotação. O estado inclui a fonte
+    do payout (o hash do cache muda quando esse estado muda).
+  6. Conferência: proventos por ano do Fundamentus (brutos) x B3 (GetListedCashDividends, por espécie ON/PN).
   7. Saídas: tabela no console, resultado_dividendos.csv e dashboard.html (gerado de dashboard_template.html).
 
 O Jev não calcula nada: recebe os indicadores já calculados e devolve julgamentos com probabilidades.
 Downloads ficam em cache/ (válidos no dia) e respostas do Jev em cache/jev.json (por conteúdo).
+Funções compartilhadas ficam em b3lib/.
 
 Uso:  python dividendos.py [--dy-min 5] [--liq-min 2000000] [--limite 80] [--sem-jev] [--sem-b3]
-                          [--precos-yahoo AAAA-MM-DD]
+                          [--sem-cvm] [--precos-yahoo AAAA-MM-DD]
 Com --precos-yahoo, a cotação de cada ação é trocada pelo fechamento do Yahoo Finance naquela data antes dos filtros, e
 os indicadores que dependem do preço (DY, P/L, P/VP, EV/EBITDA aproximado, oscilação de 12 meses) são reajustados.
 Serve para analisar depois de um pregão que o Fundamentus ainda não incorporou (ele atualiza de madrugada).
@@ -27,26 +31,31 @@ import base64
 import csv
 import datetime as dt
 import hashlib
-import html
 import json
 import os
-import re
-import ssl
 import sys
 import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
+from b3lib.cvm import (
+    MIN_ANOS_SCORE, anos_exercicio, lucro_diverge_do_fundamentus, norm_cd, pacotes_por_cd,
+    resumo_empresa, setor_financeiro,
+)
+from b3lib.fundamentus import parse_campos_detalhe, parse_resultado_acoes
+from b3lib.http import B3, CACHE_DIR, fetch as _fetch, load_env
+from b3lib.log import configurar, registrar_falha, resumo_falhas
+from b3lib.numeros import lin, media, num
+from b3lib.proventos import agregar_por_ano, parse_proventos_html, tabela_anual
+from b3lib.yahoo import chart_resultado, fechamentos_brasilia
+
 PROVIDERS = {  # variável de ambiente -> (endpoint, modelo)
     "OPENROUTER_API_KEY": ("https://openrouter.ai/api/alpha/decisions", "~typesafe/jev-latest"),
     "TYPESAFE_API_KEY": ("https://api.typesafe.ai/v1/systemone", "jev-latest"),
 }
 FUNDAMENTUS = "https://www.fundamentus.com.br"
-B3 = "https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall"
-SSL_B3 = ssl._create_unverified_context()  # o certificado do endpoint da B3 costuma falhar na validação
 ESPECIES = {"3": "ON", "4": "PN", "5": "PNA", "6": "PNB"}  # sufixo do ticker -> espécie na B3
-CACHE_DIR = "cache"
 JEV_CACHE = os.path.join(CACHE_DIR, "jev.json")
 SAIDA_CSV = os.path.join("resultados", "resultado_dividendos.csv")
 SAIDA_HTML = os.path.join("resultados", "dashboard.html")
@@ -74,77 +83,20 @@ CLASSES = {
 
 # ---------------------------------------------------------------- utilidades
 
-def load_env(path=".env"):
-    if os.path.exists(path):
-        for line in open(path, encoding="utf-8"):
-            if "=" in line and not line.lstrip().startswith("#"):
-                k, v = line.split("=", 1)
-                os.environ.setdefault(k.strip(), v.strip().strip('"'))
+def fetch(path, url=None, encoding="latin-1", nome=None, dia=None):
+    """Mesma assinatura de antes, com ``dia`` opcional. O padrão é ``HOJE`` deste módulo.
 
-
-def num(s):
-    """'1.234,5%' -> 0.012345 ; '1.234,5' -> 1234.5 ; '-' / '' -> None"""
-    s = html.unescape(s or "").strip()
-    if s in ("", "-"):
-        return None
-    pct = s.endswith("%")
-    s = s.rstrip("%").replace(".", "").replace(",", ".")
-    try:
-        v = float(s)
-    except ValueError:
-        return None
-    return v / 100 if pct else v
-
-
-def fetch(path, url=None, encoding="latin-1", nome=None):
-    """GET (Fundamentus por padrão) com cache diário em disco."""
-    os.makedirs(CACHE_DIR, exist_ok=True)
-    fn = os.path.join(CACHE_DIR, re.sub(r"[^\w]+", "_", nome or path) + f"_{HOJE:%Y%m%d}.html")
-    if os.path.exists(fn):
-        return open(fn, encoding="utf-8").read()
-    req = urllib.request.Request(url or FUNDAMENTUS + path, headers={"User-Agent": "Mozilla/5.0"})
-    for tentativa in range(3):
-        try:
-            text = urllib.request.urlopen(req, timeout=30, context=SSL_B3 if url else None).read().decode(encoding)
-            break
-        except (urllib.error.URLError, TimeoutError):
-            if tentativa == 2:
-                raise
-            time.sleep(2 ** tentativa)
-    with open(fn, "w", encoding="utf-8") as f:
-        f.write(text)
-    return text
-
-
-def lin(x, ruim, bom):
-    """Mapeia x linearmente para 0..1 (ruim -> 0, bom -> 1), com saturação. Funciona nos dois sentidos."""
-    if x is None:
-        return None
-    t = (x - ruim) / (bom - ruim)
-    return max(0.0, min(1.0, t))
-
-
-def media(vals):
-    vals = [v for v in vals if v is not None]
-    return sum(vals) / len(vals) if vals else None
+    As leituras em ``leituras/`` fazem ``acoes.HOJE = data`` e chamam ``fetch`` sem o
+    argumento: o dia é lido aqui na hora da chamada, não num global de ``b3lib``.
+    """
+    return _fetch(path, url, encoding, nome, dia=dia or HOJE)
 
 
 # ---------------------------------------------------------------- coleta
 
 def carregar_mercado():
     """Tabela resultado.php: uma linha por ticker com os principais indicadores."""
-    page = fetch("/resultado.php")
-    cols = ["ticker", "cotacao", "pl", "pvp", "psr", "dy", "p_ativo", "p_capgiro", "p_ebit", "p_acl",
-            "ev_ebit", "ev_ebitda", "mrg_bruta", "mrg_ebit", "mrg_liq", "liq_corr", "roic", "roe",
-            "liq_2m", "patrim_liq", "div_liq_patrim", "cresc_rec_5a"]
-    rows = []
-    for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", page, re.S):
-        tds = re.findall(r"<td[^>]*>(.*?)</td>", tr, re.S)
-        if len(tds) != len(cols):
-            continue
-        ticker = re.sub(r"<[^>]+>", "", tds[0]).strip()
-        rows.append({"ticker": ticker, **{c: num(re.sub(r"<[^>]+>", "", v)) for c, v in zip(cols[1:], tds[1:])}})
-    return rows
+    return parse_resultado_acoes(fetch("/resultado.php"))
 
 
 def csv_da_analise(data):
@@ -157,12 +109,12 @@ def csv_da_analise(data):
 def fechamento_yahoo(ticker, data):
     """(fechamento na data, fechamento do pregão anterior) no Yahoo Finance; (None, None) se não houver."""
     try:
-        r = json.loads(fetch(None, YAHOO.format(ticker), "utf-8", f"yahoo_div_{ticker}_{data:%Y%m%d}"))["chart"]["result"][0]
-        fech = {dt.datetime.fromtimestamp(t, dt.timezone(dt.timedelta(hours=-3))).date(): c
-                for t, c in zip(r["timestamp"], r["indicators"]["quote"][0]["close"]) if c is not None}
+        texto = fetch(None, YAHOO.format(ticker), "utf-8", f"yahoo_div_{ticker}_{data:%Y%m%d}")
+        fech = fechamentos_brasilia(chart_resultado(texto))
         antes = [d for d in fech if d < data]
         return fech.get(data), fech[max(antes)] if antes else None
-    except Exception:
+    except Exception as e:
+        registrar_falha(ticker, "yahoo", e)
         return None, None
 
 
@@ -205,12 +157,7 @@ def filtrar(rows, dy_min, liq_min, limite):
 
 
 def detalhes(ticker):
-    page = fetch(f"/detalhes.php?papel={ticker}")
-    campos = {}
-    pares = re.findall(r'<span class="txt">([^<]+)</span></td>\s*<td class="data[^"]*">\s*'
-                       r'<span class="(?:txt|oscil)">(?:<a[^>]*>|<font[^>]*>)?\s*([^<]*)', page, re.S)
-    for label, valor in pares:
-        campos.setdefault(html.unescape(label).strip(), html.unescape(valor).strip())  # 1ª ocorrência = 12 meses
+    campos = parse_campos_detalhe(fetch(f"/detalhes.php?papel={ticker}"))
     return {
         "setor": campos.get("Setor"),
         "subsetor": campos.get("Subsetor"),
@@ -220,19 +167,14 @@ def detalhes(ticker):
         "div_liquida": num(campos.get("Dív. Líquida")),
         "lucro_12m": num(campos.get("Lucro Líquido")),
         "ebit_12m": num(campos.get("EBIT")),
+        "valor_mercado": num(campos.get("Valor de mercado")),
     }
 
 
 def proventos_por_ano(ticker):
     """Tabela 'por ano' de proventos.php (R$ por ação, dividendos + JCP)."""
     page = fetch(f"/proventos.php?papel={ticker}&tipo=2")
-    anos = {}
-    for tbody in re.findall(r"<tbody>(.*?)</tbody>", page, re.S):
-        for tr in re.findall(r"<tr[^>]*>(.*?)</tr>", tbody, re.S):
-            tds = [re.sub(r"<[^>]+>", "", t).strip() for t in re.findall(r"<td[^>]*>(.*?)</td>", tr, re.S)]
-            if len(tds) == 2 and re.fullmatch(r"\d{4}", tds[0]):
-                anos[int(tds[0])] = num(tds[1]) or 0.0
-    return anos
+    return tabela_anual(page) or agregar_por_ano(parse_proventos_html(page), liquido=False)
 
 
 def b3_get(metodo, params):
@@ -245,7 +187,7 @@ def proventos_b3(ticker):
     """Proventos em dinheiro por ano (data-com) segundo a B3, para a espécie do ticker.
 
     Retorna (anos, situação). Units não são comparáveis: a B3 informa só ON/PN e a composição da unit
-    varia por empresa. JCP é bruto, como no Fundamentus.
+    varia por empresa. A série da B3 é bruta, como a tabela anual do Fundamentus.
     """
     especie = ESPECIES.get(ticker[4:])
     if not especie:
@@ -283,6 +225,7 @@ def conferir(r):
     try:
         b3, situacao = proventos_b3(r["ticker"])
     except Exception as e:  # endpoint não oficial: falha não deve parar a análise
+        registrar_falha(r["ticker"], "conferência B3", e)
         b3, situacao = {}, f"erro B3: {type(e).__name__}"
     r["proventos_b3"] = b3
     if situacao != "ok":
@@ -297,6 +240,10 @@ def conferir(r):
 
 # ---------------------------------------------------------------- métricas e score
 
+# Cada exercício com prejuízo e provento declarado tira isto da nota de payout (0 a 1), até zerar.
+PENALIDADE_PREJUIZO_COM_PROVENTO = 0.5
+
+
 def metricas(r):
     anos = r["proventos_ano"]
     completos = [HOJE.year - i for i in range(ANOS_HIST, 0, -1)]  # ex.: 2020..2025
@@ -305,20 +252,60 @@ def metricas(r):
     cortes = sum(1 for a, b in zip(serie, serie[1:]) if a > 0 and b < a * 0.8)  # queda > 20% a/a
     ini, fim = serie[0], serie[-1]
     cagr = (fim / ini) ** (1 / (len(serie) - 1)) - 1 if ini > 0 and fim > 0 else None
-    payout = r["dy"] * r["pl"] if r["dy"] is not None and r["pl"] else None  # dividendos / lucro
+    payout_aprox = r["dy"] * r["pl"] if r["dy"] is not None and r["pl"] else None
+    cvm = r.get("cvm") or {}
+    diverge = bool(cvm.get("lucro_diverge_do_fundamentus")) or lucro_diverge_do_fundamentus(
+        cvm.get("lucro_recente"), r.get("valor_mercado"), r.get("pl"))
+    if cvm.get("lucro_nao_encontrado"):
+        payout, fonte = payout_aprox, "lucro_nao_encontrado"
+    elif diverge:
+        payout, fonte = payout_aprox, "lucro_diverge"
+    elif cvm.get("sem_base_de_lucro") or cvm.get("sem_cobertura"):
+        # Sem base não entra no score: nota ausente, pesos restantes se renormalizam.
+        payout, fonte = None, "sem_base_de_lucro"
+    elif cvm.get("util_no_score"):
+        payout, fonte = cvm["payout_agregado"], "cvm"
+    else:
+        payout, fonte = payout_aprox, "dy_x_pl"
+    # A penalidade de prejuízo só vale quando o payout usado é a soma da CVM.
+    # Lucro não lido, divergente ou pequeno demais não é tratado como ano de perda.
+    if fonte == "cvm":
+        prejuizo = cvm.get("anos_prejuizo_com_provento") or 0
+    else:
+        prejuizo = 0
+    sem_cobertura = fonte == "sem_base_de_lucro"
     ebit = r.get("ebit_12m")
     alav = r["div_liquida"] / ebit if r.get("div_liquida") is not None and ebit and ebit > 0 else None
     return {
         "anos_completos": completos, "serie_div": serie, "anos_pagos": pagos, "cortes": cortes,
-        "cagr_div": cagr, "payout": payout, "div_liq_ebit": alav,
+        "cagr_div": cagr, "payout": payout, "payout_dy_pl": payout_aprox, "payout_fonte": fonte,
+        "sem_cobertura": sem_cobertura,
+        "anos_prejuizo_com_provento": prejuizo,
+        "lucro_nao_encontrado": bool(cvm.get("lucro_nao_encontrado")),
+        "lucro_diverge": fonte == "lucro_diverge",
+        "sem_base_de_lucro": fonte == "sem_base_de_lucro",
+        "dividendo_acima_fcf": cvm.get("dividendo_acima_fcf"), "cvm_anos": cvm.get("anos"),
+        "div_liq_ebit": alav,
         "div_ultimo_vs_media": fim / (sum(serie[:-1]) / (len(serie) - 1)) if sum(serie[:-1]) > 0 else None,
     }
 
 
+def _nota_payout(payout):
+    if payout is None:
+        return None
+    if payout > 1.2:
+        return 0.0
+    if payout > 0.9:
+        return lin(payout, 1.2, 0.9)
+    return 1.0
+
+
 def score(r):
     m = r["m"]
-    payout = m["payout"]
-    s_payout = None if payout is None else (0.0 if payout > 1.2 else lin(payout, 1.2, 0.9) if payout > 0.9 else 1.0)
+    # sem base de lucro: o payout sai da média. Zero aqui derrubava o pilar.
+    s_payout = None if m.get("sem_cobertura") else _nota_payout(m["payout"])
+    if s_payout is not None and m.get("anos_prejuizo_com_provento"):
+        s_payout = max(0.0, s_payout - PENALIDADE_PREJUIZO_COM_PROVENTO * m["anos_prejuizo_com_provento"])
     pilares = {
         "sustentabilidade": media([s_payout, lin(m["div_liq_ebit"], 4.0, 1.0), lin(r["liq_corr"], 0.8, 1.5)]),
         "historico": media([lin(m["anos_pagos"], ANOS_HIST - 3, ANOS_HIST), lin(m["cortes"], 3, 0)]),
@@ -342,12 +329,17 @@ def estado_jev(r):
     brl = lambda v: None if v is None else f"R$ {v / 1e9:.2f} bn"
     return {
         "context": "Fundamental indicators of a company listed on the Brazilian stock exchange (B3), computed from "
-                   "public data. Dividends include JCP (interest on capital). Payout = dividend yield x P/E. "
+                   "public data. Dividends include JCP (interest on capital). payout_ratio is gross. When "
+                   "payout_source is 'cvm' it is the sum of declared dividends and JCP over the sum of controlling "
+                   "shareholders' net income in the last five annual CVM filings; otherwise payout = dividend "
+                   "yield x P/E. A null payout_ratio with payout_source 'sem_base_de_lucro' means the five-year "
+                   "profit is too small to measure coverage. "
                    "Banks and insurers do not report EBIT, so EBIT-based leverage is missing for them.",
         "company": {
             "ticker": r["ticker"], "name": r.get("empresa"), "sector": r.get("setor"), "subsector": r.get("subsetor"),
             "dividend_yield_12m": pct(r["dy"]),
             "payout_ratio": pct(m["payout"]),
+            "payout_source": m.get("payout_fonte") or "dy_x_pl",
             "dividends_per_share_by_year_BRL": {str(a): round(v, 4) for a, v in zip(m["anos_completos"], m["serie_div"])},
             "dividends_per_share_current_year_so_far_BRL": round(r["proventos_ano"].get(HOJE.year, 0.0), 4),
             "years_with_dividends": f"{m['anos_pagos']} of {ANOS_HIST}",
@@ -368,6 +360,7 @@ def estado_jev(r):
     }
 
 
+# As perguntas são as da análise de 26/10, sem mudança: o PR do payout não mexe no julgamento.
 PERGUNTAS = {
     "classe": {
         "type": "choice",
@@ -392,14 +385,25 @@ PERGUNTAS = {
 }
 
 
-def ask_jev(state, url, model, key, perguntas=PERGUNTAS):
-    body = json.dumps({"state": state, "model": model, "questions": perguntas}).encode()
-    req = urllib.request.Request(url, data=body, headers={"Authorization": f"Bearer {key}",
-                                                          "Content-Type": "application/json"})
+def ask_jev(state, url, model, key, perguntas=PERGUNTAS, temperature=None):
+    """Uma chamada. ``temperature`` vai no JSON; se a API responder 400, tenta de novo sem ela."""
+    temp = temperature
+
+    def requisicao(temp_envio):
+        payload = {"state": state, "model": model, "questions": perguntas}
+        if temp_envio is not None:
+            payload["temperature"] = temp_envio
+        body = json.dumps(payload).encode()
+        return urllib.request.Request(url, data=body, headers={"Authorization": f"Bearer {key}",
+                                                               "Content-Type": "application/json"})
+
     for tentativa in range(5):
         try:
-            return json.load(urllib.request.urlopen(req, timeout=120))
+            return json.load(urllib.request.urlopen(requisicao(temp), timeout=120))
         except urllib.error.HTTPError as e:
+            if e.code == 400 and temp is not None:
+                temp = None
+                continue
             if e.code in (429, 529, 502, 503) and tentativa < 4:
                 time.sleep(2 ** tentativa)
                 continue
@@ -442,6 +446,8 @@ def classificar(candidatas):
 
 def decisao(r):
     """Política explícita, no código, combinando score e julgamentos do Jev."""
+    if r.get("coleta") == "incompleta":
+        return "coleta incompleta"
     j = r.get("jev")
     if not j:
         return "-"
@@ -453,30 +459,43 @@ def decisao(r):
 
 
 def relatorio(candidatas):
-    ordem = {"estudar": 0, "monitorar": 1, "descartar": 2, "-": 3}
-    candidatas.sort(key=lambda r: (ordem[r["decisao"]], -r["score"]))
+    ordem = {"estudar": 0, "monitorar": 1, "descartar": 2, "coleta incompleta": 3, "-": 4}
+    candidatas.sort(key=lambda r: (ordem.get(r["decisao"], 9), -(r["score"] or 0)))
     curto = {"DIVIDENDO_SUSTENTAVEL": "SUSTENTÁVEL", "DIVIDENDO_ATENCAO": "ATENÇÃO", "DIVIDENDO_FRAGIL": "FRÁGIL"}
     f = lambda v, d=1: "   -" if v is None else f"{100 * v:5.{d}f}%"
-    print(f"\n{'Ticker':<7}{'Setor':<26}{'DY':>7}{'Payout':>8}{'ROE':>7}{'Pagos':>6}{'Cortes':>7}"
+    print(f"\n{'Ticker':<7}{'Setor':<22}{'DY':>7}{'Payout':>8}{'ROE':>7}{'Pagos':>6}{'Cortes':>7}"
           f"{'CAGR div':>9}{'Score':>7}  {'Jev':<12}{'conf':>5}{'P(extra)':>9}  Decisão")
     for r in candidatas:
         m, j = r["m"], r.get("jev") or {}
-        print(f"{r['ticker']:<7}{(r.get('setor') or '')[:25]:<26}{f(r['dy'])}{f(m['payout'], 0):>8}{f(r['roe'], 0):>7}"
-              f"{m['anos_pagos']:>4}/{ANOS_HIST}{m['cortes']:>7}{f(m['cagr_div']):>9}{r['score']:>7.1f}  "
+        fonte = {
+            "cvm": " CVM",
+            "lucro_nao_encontrado": " sem lucro",
+            "lucro_diverge": " diverge",
+            "sem_base_de_lucro": " sem base",
+        }.get(m.get("payout_fonte"), "")
+        score_txt = "   -" if r.get("score") is None else f"{r['score']:>7.1f}"
+        payout_txt = "    n/d" if m.get("payout_fonte") == "sem_base_de_lucro" else f"{f(m.get('payout'), 0):>8}"
+        print(f"{r['ticker']:<7}{(r.get('setor') or '')[:21]:<22}{f(r['dy'])}"
+              f"{payout_txt}{f(r['roe'], 0):>7}"
+              f"{(m.get('anos_pagos') or 0):>4}/{ANOS_HIST}{(m.get('cortes') or 0):>7}{f(m.get('cagr_div')):>9}{score_txt}  "
               f"{curto.get(j.get('classe'), '-'):<12}{j.get('confianca', 0):>5.2f}{j.get('p_extraordinario', 0):>9.2f}"
-              f"  {r['decisao']}")
+              f"  {r['decisao']}{fonte}")
 
     with open(SAIDA_CSV, "w", newline="", encoding="utf-8-sig") as fh:
         w = csv.writer(fh, delimiter=";")
         w.writerow(["ticker", "empresa", "setor", "dy", "payout", "roe", "roic", "pl", "pvp", "div_liq_ebit",
                     "anos_pagos", "cortes", "cagr_div", "score", *PESOS, "jev_classe", "jev_confianca",
-                    "jev_p_extraordinario", "decisao", "conferencia_b3"])
+                    "jev_p_extraordinario", "decisao", "conferencia_b3", "payout_fonte", "payout_dy_pl",
+                    "dividendo_acima_fcf", "cvm_anos", "coleta"])
         for r in candidatas:
             m, j = r["m"], r.get("jev") or {}
-            w.writerow([r["ticker"], r.get("empresa"), r.get("setor"), r["dy"], m["payout"], r["roe"], r["roic"],
-                        r["pl"], r["pvp"], m["div_liq_ebit"], m["anos_pagos"], m["cortes"], m["cagr_div"],
-                        r["score"], *(r["pilares"][k] for k in PESOS), j.get("classe"), j.get("confianca"),
-                        j.get("p_extraordinario"), r["decisao"], r.get("conferencia_b3")])
+            acima = {True: "sim", False: "nao"}.get(m.get("dividendo_acima_fcf"), "")
+            payout_csv = "n/d (sem base de lucro)" if m.get("payout_fonte") == "sem_base_de_lucro" else m.get("payout")
+            w.writerow([r["ticker"], r.get("empresa"), r.get("setor"), r["dy"], payout_csv, r["roe"], r["roic"],
+                        r["pl"], r["pvp"], m.get("div_liq_ebit"), m.get("anos_pagos"), m.get("cortes"), m.get("cagr_div"),
+                        r.get("score"), *(r["pilares"][k] for k in PESOS), j.get("classe"), j.get("confianca"),
+                        j.get("p_extraordinario"), r["decisao"], r.get("conferencia_b3"),
+                        m.get("payout_fonte"), m.get("payout_dy_pl"), acima, m.get("cvm_anos"), r.get("coleta") or "ok"])
 
     divergentes = [f"{r['ticker']} ({r['conferencia_b3']})" for r in candidatas
                    if (r.get("conferencia_b3") or "").startswith(("diverge", "erro"))]
@@ -495,14 +514,17 @@ def gerar_dashboard(candidatas):
         "anos": anos, "ano_corrente": HOJE.year, "pesos": PESOS,
         "empresas": [{
             "ticker": r["ticker"], "empresa": r.get("empresa"), "setor": r.get("setor"),
-            "subsetor": r.get("subsetor"), "cotacao": r["cotacao"], "dy": r["dy"], "payout": r["m"]["payout"],
+            "subsetor": r.get("subsetor"), "cotacao": r["cotacao"], "dy": r["dy"],
+            "payout": r["m"]["payout"], "payout_fonte": r["m"].get("payout_fonte"),
+            "payout_dy_pl": r["m"].get("payout_dy_pl"), "dividendo_acima_fcf": r["m"].get("dividendo_acima_fcf"),
+            "cvm_anos": r["m"].get("cvm_anos"), "coleta": r.get("coleta") or "ok",
             "roe": r["roe"], "roic": r["roic"], "mrg_liq": r["mrg_liq"], "pl": r["pl"], "pvp": r["pvp"],
             "ev_ebitda": r["ev_ebitda"], "div_liq_ebit": r["m"]["div_liq_ebit"], "liq_2m": r["liq_2m"],
             "oscil_12m": r.get("oscil_12m"), "cresc_rec_5a": r["cresc_rec_5a"],
             "anos_pagos": r["m"]["anos_pagos"], "cortes": r["m"]["cortes"], "cagr_div": r["m"]["cagr_div"],
-            "div_fundamentus": [round(r["proventos_ano"].get(a, 0.0), 4) for a in anos],
+            "div_fundamentus": [round((r.get("proventos_ano") or {}).get(a, 0.0), 4) for a in anos],
             "div_b3": [round(r.get("proventos_b3", {}).get(a, 0.0), 4) for a in anos] if r.get("proventos_b3") else None,
-            "div_ano_corrente": round(r["proventos_ano"].get(HOJE.year, 0.0), 4),
+            "div_ano_corrente": round((r.get("proventos_ano") or {}).get(HOJE.year, 0.0), 4),
             "score": r["score"], "pilares": r["pilares"], "jev": r.get("jev"),
             "decisao": r["decisao"], "conferencia_b3": r.get("conferencia_b3"),
         } for r in candidatas],
@@ -513,6 +535,68 @@ def gerar_dashboard(candidatas):
         f.write(template.replace("/*__DADOS__*/null", payload))
 
 
+def codigo_cvm(ticker):
+    """Código CVM do emissor na B3 (cadastro GetInitialCompanies), ou None."""
+    raiz = ticker[:4]
+    empresas = b3_get("GetInitialCompanies", {"language": "pt-br", "pageNumber": 1, "pageSize": 20, "company": raiz})
+    for e in empresas.get("results") or []:
+        if e.get("issuingCompany") == raiz and e.get("codeCVM"):
+            return norm_cd(e["codeCVM"])
+    return None
+
+
+def anexar_cvm(candidatas):
+    """Preenche r['cvm'] com o payout do DFP. Falha de rede não derruba a análise."""
+    def um(r):
+        try:
+            return codigo_cvm(r["ticker"])
+        except Exception as e:
+            registrar_falha(r["ticker"], "cadastro B3 (CVM)", e)
+            return None
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        codigos = list(pool.map(um, candidatas))
+    cds = {cd for cd in codigos if cd}
+    if not cds:
+        print("CVM: nenhum código CVM obtido; payout segue como DY × P/L.")
+        return
+    try:
+        pacote = pacotes_por_cd(cds, HOJE, os.path.join(CACHE_DIR, "cvm"))
+    except Exception as e:
+        registrar_falha("-", "download DFP da CVM", e)
+        print("CVM: download ou leitura do DFP falhou; payout segue como DY × P/L.")
+        return
+    anos, consolidado, individual = pacote
+    sem = []
+    for r, cd in zip(candidatas, codigos):
+        if not cd or (cd not in consolidado and cd not in individual):
+            sem.append(r["ticker"])
+            continue
+        resumo = resumo_empresa(consolidado.get(cd), individual.get(cd), anos,
+                                financeiro=setor_financeiro(r.get("setor"), r.get("subsetor")))
+        if not resumo:
+            sem.append(r["ticker"])
+            continue
+        if not resumo.get("anos") and not resumo.get("lucro_nao_encontrado") and not resumo.get("sem_base_de_lucro"):
+            sem.append(r["ticker"])
+            continue
+        r["cd_cvm"] = cd
+        r["cvm"] = resumo
+        if resumo.get("lucro_nao_encontrado"):
+            print(f"  aviso: {r['ticker']} lucro não encontrado na CVM (zero ou ausente na maioria dos anos); "
+                  "payout volta a DY × P/L, sem penalidade de prejuízo")
+        elif lucro_diverge_do_fundamentus(resumo.get("lucro_recente"), r.get("valor_mercado"), r.get("pl")):
+            resumo["lucro_diverge_do_fundamentus"] = True
+            print(f"  aviso: {r['ticker']} lucro da CVM diverge mais de 30% do implícito "
+                  "(valor de mercado ÷ P/L); payout volta a DY × P/L, sem penalidade de prejuízo")
+        elif resumo.get("sem_base_de_lucro"):
+            print(f"  aviso: {r['ticker']} sem base de lucro; payout fica n/d e sai do score, sem penalidade")
+    janela = anos_exercicio(HOJE)
+    print(f"CVM: payout de {len(candidatas) - len(sem)} empresas (DFP {janela[0]}–{janela[-1]}, "
+          f"média usada no score com pelo menos {MIN_ANOS_SCORE} anos)"
+          + (f"; sem demonstração: {', '.join(sem)}" if sem else ""))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--dy-min", type=float, default=5.0, help="DY mínimo em %% (padrão 5)")
@@ -520,9 +604,11 @@ def main():
     ap.add_argument("--limite", type=int, default=80, help="máximo de empresas analisadas (mais líquidas)")
     ap.add_argument("--sem-jev", action="store_true", help="só o score determinístico")
     ap.add_argument("--sem-b3", action="store_true", help="não confere os proventos com a B3")
+    ap.add_argument("--sem-cvm", action="store_true", help="não baixa o DFP da CVM; payout fica DY × P/L")
     ap.add_argument("--precos-yahoo", help="usa o fechamento do Yahoo desta data (AAAA-MM-DD) no lugar da cotação")
     args = ap.parse_args()
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    configurar()
     load_env()
 
     global PRECOS_EM
@@ -536,26 +622,47 @@ def main():
           f"(DY >= {args.dy_min:g}%, liquidez >= R$ {args.liq_min:,.0f}, P/L > 0).")
 
     def enriquecer(r):
-        r.update(detalhes(r["ticker"]))
-        if r.get("fator_preco") and r.get("oscil_12m") is not None:
-            r["oscil_12m"] = (1 + r["oscil_12m"]) * r["fator_preco"] - 1
-        r["proventos_ano"] = proventos_por_ano(r["ticker"])
-        return r
+        try:
+            r.update(detalhes(r["ticker"]))
+            if r.get("fator_preco") and r.get("oscil_12m") is not None:
+                r["oscil_12m"] = (1 + r["oscil_12m"]) * r["fator_preco"] - 1
+            page = fetch(f"/proventos.php?papel={r['ticker']}&tipo=2")
+            r["proventos_ano"] = tabela_anual(page) or agregar_por_ano(parse_proventos_html(page), liquido=False)
+            r["coleta"] = "ok"
+            return r
+        except Exception as e:
+            registrar_falha(r["ticker"], "coleta", e)
+            r["coleta"] = "incompleta"
+            r["coleta_erro"] = f"{type(e).__name__}: {e}"
+            return r
     with ThreadPoolExecutor(max_workers=4) as pool:
         candidatas = list(pool.map(enriquecer, candidatas))
-    for r in candidatas:
+    incompletas = [r for r in candidatas if r.get("coleta") == "incompleta"]
+    completas = [r for r in candidatas if r.get("coleta") != "incompleta"]
+    if not completas and not incompletas:
+        resumo_falhas()
+        sys.exit("Nenhuma empresa com coleta completa.")
+    if not args.sem_cvm and completas:
+        anexar_cvm(completas)
+    for r in incompletas:
+        r["m"] = {"payout": None, "payout_fonte": None, "payout_dy_pl": None, "div_liq_ebit": None,
+                  "anos_pagos": None, "cortes": None, "cagr_div": None, "dividendo_acima_fcf": None, "cvm_anos": None}
+        r["score"] = None
+        r["pilares"] = {k: None for k in PESOS}
+    for r in completas:
         r["m"] = metricas(r)
         r["score"], r["pilares"] = score(r)
-    if not args.sem_b3:
+    if not args.sem_b3 and completas:
         with ThreadPoolExecutor(max_workers=4) as pool:
-            for r, situacao in zip(candidatas, pool.map(conferir, candidatas)):
+            for r, situacao in zip(completas, pool.map(conferir, completas)):
                 r["conferencia_b3"] = situacao
 
-    if not args.sem_jev:
-        classificar(candidatas)
+    if not args.sem_jev and completas:
+        classificar(completas)
     for r in candidatas:
         r["decisao"] = decisao(r)
     relatorio(candidatas)
+    resumo_falhas()
 
 
 if __name__ == "__main__":

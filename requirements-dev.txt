@@ -1,0 +1,2 @@
+# Dependência só de desenvolvimento. A execução dos estudos continua na biblioteca padrão.
+pytest>=8

@@ -33,6 +33,8 @@ sys.path.insert(0, RAIZ)
 os.chdir(RAIZ)
 
 from dividendos import fetch  # noqa: E402
+from b3lib.log import configurar, registrar_falha, resumo_falhas  # noqa: E402
+from b3lib.yahoo import chart_resultado, serie_painel  # noqa: E402
 
 YAHOO = "https://query1.finance.yahoo.com/v8/finance/chart/{}?range=3mo&interval=1d"
 TEMPLATE_HTML = os.path.join(RAIZ, "templates", "dashboard_pos_eleicao_template.html")
@@ -48,25 +50,11 @@ def serie(simbolo, parcial=False):
     """{data: fechamento} do Yahoo Finance; {} se não houver. parcial=True: cache só desta execução (por minuto)."""
     try:
         nome = f"yahoo3m_{simbolo}" + (f"_{AGORA:%H%M}" if parcial else "")
-        r = json.loads(fetch(None, YAHOO.format(simbolo), "utf-8", nome))["chart"]["result"][0]
-        # Data em UTC − 2h. Barras da B3 vêm às 13h UTC do próprio dia. As de câmbio (BRL=X) vêm às 23h UTC e, conferidas
-        # com o fechamento do dólar comercial, correspondem ao dia em UTC; barras de sábado (cotação ao vivo
-        # lida no fim de semana) e de domingo trazem o fechamento de sexta. A
-        # cotação ao vivo da noite chega com hora de 0h–1h UTC do dia seguinte: o −2h a mantém no pregão de hoje.
-        # A última barra é a cotação corrente e pode vir com hora de outro dia (BRL=X na segunda à noite chega como
-        # domingo 0h UTC, o que a jogaria sobre a sexta): ela vale para o dia de meta.regularMarketTime, em Brasília.
-        out = {}
-        tss, closes = r["timestamp"], r["indicators"]["quote"][0]["close"]
-        ult = r["meta"].get("regularMarketTime")
-        for k, (t, c) in enumerate(zip(tss, closes)):
-            if k == len(tss) - 1 and ult:
-                d = dt.datetime.fromtimestamp(ult, dt.timezone(dt.timedelta(hours=-3))).date()
-            else:
-                d = dt.datetime.fromtimestamp(t - 7200, dt.timezone.utc).date()
-            if c is not None:
-                out[d - dt.timedelta(days=max(0, d.weekday() - 4))] = c  # sáb −1, dom −2
+        resultado = chart_resultado(fetch(None, YAHOO.format(simbolo), "utf-8", nome))
+        out, _hora = serie_painel(resultado)
         return out
-    except Exception:
+    except Exception as e:
+        registrar_falha(simbolo, "yahoo", e)
         return {}
 
 
@@ -98,6 +86,7 @@ def main():
     ap.add_argument("--data-base", default="2026-10-02", help="pregão pré-eleição (base do acumulado)")
     ap.add_argument("--em-andamento", help="inclui o pregão não finalizado desta data (saída em outro diretório)")
     args = ap.parse_args()
+    configurar()
     base = dt.date.fromisoformat(args.data_base)
     andamento = dt.date.fromisoformat(args.em_andamento) if args.em_andamento else None
 
@@ -195,6 +184,7 @@ def main():
     print(f"{len(dias)} pregões ({rotulos[0]} a {rotulos[-1]}); Ibovespa acumulado {100 * ib[-1]:+.2f}%; "
           f"{len(saida_ativos)} ativos" + (f"; sem série: {', '.join(sem_serie)}" if sem_serie else ""))
     print(f"Painel em {os.path.relpath(saida)}. Não é recomendação de investimento.")
+    resumo_falhas()
 
 
 if __name__ == "__main__":

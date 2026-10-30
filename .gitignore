@@ -3,11 +3,14 @@
 
 # Downloads do Fundamentus, B3 e Yahoo (refeitos a cada execução)
 cache/*
-# ...exceto as respostas do Jev usadas nas análises
+# ...exceto as respostas do Jev da análise principal
 !cache/jev*.json
+# caches de comparação (jev_ranking_…) não entram no git
+cache/jev_*.json
 
 __pycache__/
 *.pyc
+.pytest_cache/
 .venv/
 .vscode/
 .idea/

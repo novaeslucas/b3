@@ -35,6 +35,8 @@ os.chdir(RAIZ)
 
 import dividendos as acoes  # noqa: E402
 from dividendos import fetch  # noqa: E402
+from b3lib.log import configurar, registrar_falha, resumo_falhas  # noqa: E402
+from b3lib.yahoo import chart_resultado, serie_painel  # noqa: E402
 
 YAHOO = "https://query1.finance.yahoo.com/v8/finance/chart/{}?range=3mo&interval=1d"
 TEMPLATE_HTML = os.path.join(RAIZ, "templates", "painel_besst_template.html")
@@ -85,24 +87,15 @@ REFERENCIAS = [("ibov", "Ibovespa", "^BVSP"), ("dolar", "Dólar (R$/US$)", "BRL=
 
 
 def serie(simbolo):
-    """({data: fechamento}, horário do último negócio) do Yahoo; ({}, None) se não houver. Mesma regra de datas do
-    painel_pos_eleicao.py (UTC − 2h; barras de sábado/domingo do câmbio contam como sexta; a última barra vale para o
-    dia de meta.regularMarketTime)."""
+    """({data: fechamento}, horário do último negócio) do Yahoo; ({}, None) se não houver.
+
+    A regra de datas está em b3lib.yahoo.serie_painel (a mesma do painel pós-eleição).
+    """
     try:
-        r = json.loads(fetch(None, YAHOO.format(simbolo), "utf-8", f"yahoo3m_{simbolo}_{AGORA:%H%M}"))["chart"]["result"][0]
-        out = {}
-        tss, closes, ult = r["timestamp"], r["indicators"]["quote"][0]["close"], r["meta"].get("regularMarketTime")
-        for k, (t, c) in enumerate(zip(tss, closes)):
-            if k == len(tss) - 1 and ult:  # cotação corrente: vale para o dia de regularMarketTime em Brasília
-                d = dt.datetime.fromtimestamp(ult, dt.timezone(dt.timedelta(hours=-3))).date()
-            else:
-                d = dt.datetime.fromtimestamp(t - 7200, dt.timezone.utc).date()
-            if c is not None:
-                out[d - dt.timedelta(days=max(0, d.weekday() - 4))] = c
-        ts = ult
-        hora = dt.datetime.fromtimestamp(ts, dt.timezone(dt.timedelta(hours=-3))).strftime("%H:%M") if ts else None
-        return out, hora
-    except Exception:
+        resultado = chart_resultado(fetch(None, YAHOO.format(simbolo), "utf-8", f"yahoo3m_{simbolo}_{AGORA:%H%M}"))
+        return serie_painel(resultado)
+    except Exception as e:
+        registrar_falha(simbolo, "yahoo", e)
         return {}, None
 
 
@@ -122,6 +115,7 @@ def main():
     ap.add_argument("--finalizado", action="store_true", help="pregão já fechado: preço de fechamento, saída em resultados/")
     args = ap.parse_args()
     base, anterior, pregao = (dt.date.fromisoformat(d) for d in (args.data_base, args.data_anterior, args.pregao))
+    configurar()
 
     acoes.HOJE = dt.date.fromisoformat(args.snapshot)  # resultado.php do snapshot, já em cache
     fundamentus = {r["ticker"]: r for r in acoes.carregar_mercado()}
@@ -207,6 +201,7 @@ def main():
     if sem_preco:
         print(f"Sem cotação no Yahoo (fora do painel): {', '.join(sem_preco)}")
     print(f"Painel em {os.path.relpath(saida)}. Não é recomendação de investimento.")
+    resumo_falhas()
 
 
 if __name__ == "__main__":
