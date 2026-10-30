@@ -424,6 +424,7 @@ def resumir(anos_montados, financeiro=False):
         "util_no_score": (not lucro_nao_encontrado) and (not sem_base) and agregado is not None and len(com_dados) >= MIN_ANOS_SCORE,
         "sem_cobertura": sem_base and not lucro_nao_encontrado,
         "sem_base_de_lucro": sem_base,
+        "soma_proventos": soma_prov,
         "lucro_nao_encontrado": lucro_nao_encontrado,
         "anos_prejuizo_com_provento": prejuizo_com,
         "lucro_recente": None if ultimo is None else ultimo["lucro"],

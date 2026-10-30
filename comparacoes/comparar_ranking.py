@@ -86,9 +86,9 @@ def score_misturado(sust, hist, cresc, rent_antigo, val_antigo):
 
 
 def notas_isoladas(payout, sem_cobertura, prejuizo, div_liq, anos_pagos, cortes, cagr, penalizar):
-    """Subnotas do score isolado. Sem base de lucro deixa o payout de fora (None, não zero)."""
+    """Subnotas do score isolado. Provento sem base de lucro leva nota de payout 0, como no score."""
     if sem_cobertura:
-        s_payout = None
+        s_payout = 0.0
     else:
         s_payout = acoes._nota_payout(payout)
         if penalizar and s_payout is not None and prejuizo:

@@ -48,8 +48,9 @@ Em `b3lib/cvm.py`, com os ZIP anuais de `https://dados.cvm.gov.br/dados/CIA_ABER
 - **Quando não confiar no lucro da CVM**, o payout volta a DY × P/L, sem penalidade:
   lucro zero ou ausente na maioria dos anos (`lucro_nao_encontrado`), ou lucro recente a mais de 30% do
   implícito no Fundamentus, valor de mercado ÷ P/L (`lucro_diverge`).
-- **Sem base de lucro:** soma do lucro ≤ 0 ou payout agregado acima de 300%. O payout fica `n/d` e sai
-  do score; os pesos restantes se renormalizam.
+- **Sem base de lucro:** soma do lucro ≤ 0 ou payout agregado acima de 300%. O payout exibido fica `n/d`
+  e, havendo provento, a nota de payout é 0, como acima de 120%: cobertura pior nunca rende score
+  maior. Sem provento nenhum, o payout sai da média e os pesos restantes se renormalizam.
 - A faixa do score não mudou: nota cheia até 90% de payout, zero acima de 120%.
 
 **Conferência com números divulgados (exercício de 2025):**

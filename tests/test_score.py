@@ -128,7 +128,7 @@ def test_lucro_que_diverge_do_fundamentus_nao_entra_no_score():
     assert m["anos_prejuizo_com_provento"] == 0
 
 
-def test_sem_base_de_lucro_tira_a_nota_e_nao_soma_penalidade():
+def test_sem_base_de_lucro_com_provento_zera_a_nota_de_payout():
     import dividendos
     dividendos.HOJE = dt.date(2026, 10, 30)
     r = {
@@ -148,15 +148,32 @@ def test_sem_base_de_lucro_tira_a_nota_e_nao_soma_penalidade():
     assert m["sem_cobertura"] is True
     assert m["anos_prejuizo_com_provento"] == 0
     r["m"] = m
-    total, pilares = dividendos.score(r)
-    # payout de fora; alavancagem ausente; liquidez corrente no topo → pilar 100
+    _, pilares = dividendos.score(r)
+    # payout 0; alavancagem ausente; liquidez corrente no topo → média de 0 e 1
+    assert pilares["sustentabilidade"] == 50
+    # Nunca melhor que um payout de 130%, que também leva nota 0.
+    acima_de_120 = dict(r)
+    acima_de_120["m"] = dict(m, sem_cobertura=False, payout=1.3, payout_fonte="cvm")
+    assert dividendos.score(acima_de_120) == dividendos.score(r)
+
+
+def test_sem_base_de_lucro_sem_provento_tira_o_payout_da_media():
+    import dividendos
+    dividendos.HOJE = dt.date(2026, 10, 30)
+    r = {
+        "dy": 0.08, "pl": 8, "roe": 0.2, "roic": 0.15, "mrg_liq": 0.2,
+        "liq_corr": 1.5, "cresc_rec_5a": 0.15, "pvp": 1, "ev_ebitda": 4,
+        "proventos_ano": {ano: 1.0 for ano in range(2020, 2026)},
+        "div_liquida": None, "ebit_12m": None,
+        "cvm": {
+            "sem_base_de_lucro": True, "sem_cobertura": True, "util_no_score": False,
+            "payout_agregado": None, "soma_proventos": 0.0, "lucro_recente": -1_000_000,
+        },
+    }
+    r["m"] = dividendos.metricas(r)
+    assert r["m"]["sem_cobertura"] is False
+    _, pilares = dividendos.score(r)
     assert pilares["sustentabilidade"] == 100
-    sem_payout = dict(r)
-    sem_payout["m"] = dict(m)
-    sem_payout["m"]["sem_cobertura"] = False
-    sem_payout["m"]["payout"] = None
-    sem_payout["m"]["anos_prejuizo_com_provento"] = 0
-    assert dividendos.score(sem_payout)[0] == total
 
 
 def test_estado_do_jev_e_o_de_26_10_mais_a_fonte_do_payout():

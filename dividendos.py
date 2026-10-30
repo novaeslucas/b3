@@ -261,7 +261,7 @@ def metricas(r):
     elif diverge:
         payout, fonte = payout_aprox, "lucro_diverge"
     elif cvm.get("sem_base_de_lucro") or cvm.get("sem_cobertura"):
-        # Sem base não entra no score: nota ausente, pesos restantes se renormalizam.
+        # Lucro de 5 anos ≤ 0 ou pequeno demais para os proventos: payout exibido n/d, nota 0 no score.
         payout, fonte = None, "sem_base_de_lucro"
     elif cvm.get("util_no_score"):
         payout, fonte = cvm["payout_agregado"], "cvm"
@@ -273,7 +273,8 @@ def metricas(r):
         prejuizo = cvm.get("anos_prejuizo_com_provento") or 0
     else:
         prejuizo = 0
-    sem_cobertura = fonte == "sem_base_de_lucro"
+    # Sem base e sem provento não é cobertura ruim: aí o payout sai da média.
+    sem_cobertura = fonte == "sem_base_de_lucro" and cvm.get("soma_proventos") != 0
     ebit = r.get("ebit_12m")
     alav = r["div_liquida"] / ebit if r.get("div_liquida") is not None and ebit and ebit > 0 else None
     return {
@@ -302,8 +303,8 @@ def _nota_payout(payout):
 
 def score(r):
     m = r["m"]
-    # sem base de lucro: o payout sai da média. Zero aqui derrubava o pilar.
-    s_payout = None if m.get("sem_cobertura") else _nota_payout(m["payout"])
+    # Provento sem base de lucro é cobertura pior que payout de 120%: nota 0, não neutra.
+    s_payout = 0.0 if m.get("sem_cobertura") else _nota_payout(m["payout"])
     if s_payout is not None and m.get("anos_prejuizo_com_provento"):
         s_payout = max(0.0, s_payout - PENALIDADE_PREJUIZO_COM_PROVENTO * m["anos_prejuizo_com_provento"])
     pilares = {
@@ -590,7 +591,7 @@ def anexar_cvm(candidatas):
             print(f"  aviso: {r['ticker']} lucro da CVM diverge mais de 30% do implícito "
                   "(valor de mercado ÷ P/L); payout volta a DY × P/L, sem penalidade de prejuízo")
         elif resumo.get("sem_base_de_lucro"):
-            print(f"  aviso: {r['ticker']} sem base de lucro; payout fica n/d e sai do score, sem penalidade")
+            print(f"  aviso: {r['ticker']} sem base de lucro; payout fica n/d e a nota de payout é 0")
     janela = anos_exercicio(HOJE)
     print(f"CVM: payout de {len(candidatas) - len(sem)} empresas (DFP {janela[0]}–{janela[-1]}, "
           f"média usada no score com pelo menos {MIN_ANOS_SCORE} anos)"
