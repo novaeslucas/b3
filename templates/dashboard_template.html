@@ -165,6 +165,8 @@ const brl = v => v == null ? "–" : "R$ " + n2(v, 2);
 const CLASSE = { DIVIDENDO_SUSTENTAVEL: "Sustentável", DIVIDENDO_ATENCAO: "Atenção", DIVIDENDO_FRAGIL: "Frágil" };
 const CLASSE_COR = { DIVIDENDO_SUSTENTAVEL: "estudar", DIVIDENDO_ATENCAO: "monitorar", DIVIDENDO_FRAGIL: "descartar" };
 const PILAR = { sustentabilidade: "Sustentabilidade", historico: "Histórico", rentabilidade: "Rentabilidade", crescimento: "Crescimento", valuation: "Valuation" };
+const NAT = { recorrente: "recorrente", misto: "misto", extraordinario: "extraordinário" };
+const DIVIDA = { true: "sim", false: "não" };
 const divB3 = e => /^(diverge|erro)/.test(e.conferencia_b3 || "");
 
 // tema: preferência por visitante, opcional
@@ -178,7 +180,7 @@ $("#theme").onclick = () => {
 
 const estado = { decisao: "", sort: "score", dir: -1, sel: null };
 const empresas = DADOS.empresas;
-$("#sub").textContent = `${empresas.length} empresas · gerado em ${DADOS.gerado_em} · histórico ${DADOS.anos[0]}–${DADOS.anos.at(-1)}` +
+$("#sub").textContent = `${empresas.length} empresas · gerado em ${DADOS.gerado_em} · DY líquido de IR sobre JCP · histórico ${DADOS.anos[0]}–${DADOS.anos.at(-1)}` +
   (DADOS.precos_em ? ` · cotações: ${DADOS.precos_em}` : "");
 
 for (const s of [...new Set(empresas.map(e => e.setor).filter(Boolean))].sort())
@@ -217,6 +219,7 @@ const COLS = [
   ["ticker", "Ticker", "l", e => e.ticker],
   ["setor", "Setor", "l", e => e.setor || ""],
   ["dy", "DY", "", e => e.dy],
+  ["natureza", "Proventos", "l", e => e.natureza_proventos || ""],
   ["payout", "Payout", "", e => e.payout],
   ["roe", "ROE", "", e => e.roe],
   ["anos_pagos", "Pagou", "", e => e.anos_pagos],
@@ -257,6 +260,7 @@ function tabela(lista) {
       <td class="l tk">${esc(e.ticker)}</td>
       <td class="l setor" title="${esc(e.setor)}">${esc(e.setor)}</td>
       <td>${pct(e.dy)}</td>
+      <td class="l">${esc(NAT[e.natureza_proventos] || "–")}</td>
       <td class="${e.payout > 1 ? "warn" : ""}">${pct(e.payout, 0)}</td>
       <td>${pct(e.roe, 0)}</td>
       <td>${e.anos_pagos}/${DADOS.anos.length}</td>
@@ -329,8 +333,13 @@ function detalhe() {
       <span class="badge b-${e.decisao === "-" ? "neutro" : e.decisao}">${esc(e.decisao)}</span>
     </div>
     <div class="facts">
-      <div>Cotação<b>${brl(e.cotacao)}</b></div><div>DY 12m<b>${pct(e.dy)}</b></div>
-      <div>Payout<b class="${e.payout > 1 ? "warn" : ""}">${pct(e.payout, 0)}</b></div><div>ROE<b>${pct(e.roe)}</b></div>
+      <div>Cotação<b>${brl(e.cotacao)}</b></div><div>DY líquido<b>${pct(e.dy)}</b></div>
+      <div>DY bruto<b>${pct(e.dy_bruto)}</b></div>
+      <div>Proventos<b>${esc(NAT[e.natureza_proventos] || "–")}</b></div>
+      <div>Payout<b class="${e.payout > 1 ? "warn" : ""}">${pct(e.payout, 0)}</b></div>
+      <div>Fonte do payout<b>${e.payout_fonte === "cvm" ? "CVM, média 5a" : e.payout_fonte === "dy_x_pl" ? "DY × P/L" : "–"}</b></div>
+      <div>Paga com dívida<b>${e.paga_com_divida == null ? "–" : DIVIDA[e.paga_com_divida]}</b></div>
+      <div>ROE<b>${pct(e.roe)}</b></div>
       <div>P/L<b>${n2(e.pl)}</b></div><div>P/VP<b>${n2(e.pvp)}</b></div>
       <div>Dív. líq./EBIT<b>${e.div_liq_ebit == null ? "–" : n2(e.div_liq_ebit) + "x"}</b></div>
       <div>Oscilação 12m<b>${pct(e.oscil_12m)}</b></div>
@@ -346,7 +355,9 @@ function detalhe() {
     ], 1, v => v == null ? "–" : n2(v)) : `<div class="muted">Sem classificação do Jev nesta execução.</div>`}
     <div class="sec">Proventos por ação (R$, por data-com)</div>
     ${historico(e)}
-    <div class="note">Conferência com a B3: ${b3Cell(e)}</div>`;
+    <div class="note">Conferência com a B3 (valores brutos): ${b3Cell(e)}. DY da tabela é líquido de IR sobre JCP.
+      ${e.natureza_proventos === "extraordinario" || e.natureza_proventos === "misto"
+        ? ` Parcela extraordinária do último ano completo: ${pct(e.parcela_extraordinaria, 0)}.` : ""}</div>`;
 }
 
 function selecionar(t) { estado.sel = t; render(); }

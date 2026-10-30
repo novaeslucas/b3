@@ -78,6 +78,11 @@ nenhuma das duas entra no painel consolidado de `resultados/`, que só usa preg�
 ├── leitura_pos_eleicao.py     # 1ª leitura do pregão pós-1º turno (05/10)   → resultados/
 ├── painel_pos_eleicao.py      # painel acumulado de todas as leituras diárias → resultados/
 ├── painel_besst.py            # bancos, energia, saneamento, seguros e telecom → resultados/ ou resultados_pregao_em_andamento/
+├── setores_b3.py              # classificação setorial atual (a lógica mora em b3lib/setores.py)
+├── b3lib/                     # HTTP, números, proventos, CVM, Yahoo e setores compartilhados
+├── tests/                     # pytest, só com fixtures locais (sem rede)
+├── AJUSTES.md                 # o que mudou na robustez e na metodologia, e o que ficou para depois
+├── requirements-dev.txt       # pytest; a execução dos estudos segue só com a biblioteca padrão
 ├── templates/                 # HTML dos dashboards (os scripts embutem os dados neles)
 ├── resultados/                # CSVs e dashboards gerados pelos scripts da raiz
 │   ├── resultado_dividendos.csv / dashboard.html   (análise mais recente: 26/10)
@@ -107,6 +112,7 @@ Os dashboards são HTML estáticos, com os dados embutidos — basta abrir no na
 | **Fundamentus** (`resultado.php`, `fii_resultado.php`, `detalhes.php`, `proventos.php`, `fii_proventos.php`) | Indicadores de todas as ações/FIIs, detalhes por ativo e histórico de proventos |
 | **B3** (`GetListedCashDividends`, `GetListedSupplementFunds`, `GetDetail`) | Conferência independente dos proventos e classificação setorial oficial |
 | **Yahoo Finance** (`query1.finance.yahoo.com/v8/finance/chart`) | Fechamentos diários de ativos, Ibovespa, SMAL11, XFIX11 e dólar |
+| **CVM** (`dados.cvm.gov.br`, DFP consolidado) | Payout contábil (proventos declarados ÷ lucro) e confronto FCF × dividendos pagos |
 | **Pesquisas eleitorais** (Datafolha, Quaest, Atlas etc.) | Probabilidade de vitória no 2º turno, calculada em código |
 
 Os endpoints da B3 não são documentados; o levantamento de por que foram escolhidos (e das armadilhas deles) está em
@@ -122,15 +128,19 @@ Os endpoints da B3 não são documentados; o levantamento de por que foram escol
 2. **Filtros rígidos:** liquidez média ≥ R$ 2 milhões/dia, DY ≥ 5%, P/L > 0 (lucro positivo) e **um ticker por
    empresa** (o mais líquido entre ON/PN/units). Ficam as 80 mais líquidas.
 3. **Detalhes por candidata:** setor, dívida líquida, lucro e EBIT de 12 meses, oscilação de 12 meses e proventos
-   por ano (dividendos + JCP).
+   por ano (dividendos + JCP; o DY e o histórico do score descontam o IR do JCP).
 4. **Métricas** sobre os 6 últimos anos completos: anos com pagamento, cortes (queda > 20% a/a), CAGR dos
-   dividendos, payout (= DY × P/L), dívida líquida/EBIT, último ano vs. média anterior.
+   dividendos e último ano vs. média anterior, na série **líquida de IR sobre JCP**. O payout do score é a média
+   de até 5 exercícios do DFP da CVM (proventos declarados ÷ lucro da controladora), quando há pelo menos 3 anos;
+   sem isso, cai para DY líquido × P/L. Há também a natureza do provento (recorrente, misto, extraordinário) e,
+   fora de banco e seguradora, a marca de dividendo pago acima do fluxo de caixa livre. O detalhe e o que ainda
+   não entrou estão em [AJUSTES.md](AJUSTES.md).
 5. **Score 0–100**, média ponderada de cinco pilares. Cada sub-indicador é mapeado linearmente de um valor “ruim”
    (0) a um “bom” (1), com saturação; pilares sem dado saem da média e os pesos são renormalizados.
 
    | Pilar | Peso | Sub-indicadores (ruim → bom) |
    |---|---:|---|
-   | Sustentabilidade | 25% | payout (> 120% → ≤ 90%), dív. líq./EBIT (4× → 1×), liquidez corrente (0,8 → 1,5) |
+   | Sustentabilidade | 25% | payout (> 120% → ≤ 90%; CVM se houver 3 anos, senão DY líquido × P/L), dív. líq./EBIT (4× → 1×), liquidez corrente (0,8 → 1,5) |
    | Histórico | 20% | anos pagos (3 → 6 de 6), cortes (3 → 0) |
    | Rentabilidade | 20% | ROE (5% → 20%), ROIC (5% → 15%), margem líquida (0% → 20%) |
    | Crescimento | 20% | receita 5a (0% → 15%), CAGR dos dividendos (−5% → 10%) |
@@ -141,7 +151,7 @@ Os endpoints da B3 não são documentados; o levantamento de por que foram escol
    - `descartar` se o Jev classifica como **FRÁGIL** ou P(DY inflado) ≥ 0,7;
    - `estudar` se **SUSTENTÁVEL**, score ≥ 60 e P(DY inflado) < 0,5;
    - `monitorar` nos demais casos.
-8. **Conferência:** proventos por ano do Fundamentus × B3 (por espécie ON/PN; units não são comparáveis).
+8. **Conferência:** proventos por ano do Fundamentus (brutos) × B3 (por espécie ON/PN; units não são comparáveis).
    Divergência > 10% num ano completo é sinalizada.
 
 ### 2. FIIs: score de qualidade do rendimento
@@ -297,7 +307,7 @@ cp .env.example .env    # e preencha OPENROUTER_API_KEY ou TYPESAFE_API_KEY
 ```
 
 ```bash
-python dividendos.py            # [--dy-min 5] [--liq-min 2000000] [--limite 80] [--sem-jev] [--sem-b3] [--precos-yahoo AAAA-MM-DD]
+python dividendos.py            # [--dy-min 5] [--liq-min 2000000] [--limite 80] [--sem-jev] [--sem-b3] [--sem-cvm] [--precos-yahoo AAAA-MM-DD]
 ```
 
 ```bash
@@ -312,17 +322,32 @@ python leituras/2026_10_26/leitura_pos_eleicao.py    # leitura de um pregão (us
 python painel_pos_eleicao.py    # painel acumulado de todas as leituras
 ```
 
-`--sem-jev` roda só a parte determinística (sem chave de API). Os downloads ficam em `cache/` com validade de um
-dia; as páginas baixadas **não** são versionadas, então reproduzir um snapshot antigo (o `--snapshot 2026-10-05` das leituras diárias)
+`--sem-jev` roda só a parte determinística (sem chave de API). `--sem-cvm` não baixa o DFP
+(`dfp_cia_aberta_AAAA.zip` em `cache/cvm/`, cerca de 13 MB por ano) e deixa o payout como DY × P/L.
+Os downloads ficam em `cache/` com validade de um dia; as páginas baixadas **não** são versionadas, então reproduzir um snapshot antigo (o `--snapshot 2026-10-05` das leituras diárias)
 exige baixar de novo, e os números do Fundamentus podem ter mudado desde então. As respostas do Jev estão
-versionadas, mas só são reaproveitadas se o estado for idêntico.
+versionadas, mas só são reaproveitadas se o estado for idêntico. A pergunta de dividendos passou a incluir
+natureza do provento, payout da CVM e DY líquido: a próxima execução **com** Jev não reaproveita `cache/jev.json`
+e chama a API de novo. As chaves da eleição e do 2º turno não usam esse estado inteiro e continuam válidas.
+
+Os testes não baixam nada:
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest
+```
 
 ## Limitações
 
 - **Fontes não oficiais:** Fundamentus e Yahoo Finance são agregadores; os endpoints da B3 não são documentados e
   já tiveram comportamentos silenciosos (página grande omite registros, nomes com “/” voltam vazios).
-- **JCP bruto:** proventos somam dividendos e JCP pelo valor bruto, como nas fontes.
-- **Payout aproximado:** DY × P/L, sem ajuste para lucros não recorrentes.
+- **JCP líquido no DY:** o rendimento e a série por ação do score descontam 15% de IRRF até 2025 e 17,5%
+  no JCP pago a partir de 2026 (LC 224/2025). O payout contábil da CVM continua no valor bruto declarado.
+  A retenção de 10% sobre dividendos acima de R$ 50 mil/mês depende do investidor e não entra na conta.
+- **Payout:** média do DFP quando há pelo menos três exercícios com lucro positivo; senão DY líquido × P/L,
+  que ainda mistura lucro contábil de 12 meses com o preço. O ITR do ano corrente não entra.
+- **FCF:** caixa operacional menos aquisições de imobilizado e intangível. É uma aproximação, e não se aplica
+  a banco e seguradora.
 - **Bancos e seguradoras** não têm EBIT; o indicador de alavancagem fica ausente e o pilar é renormalizado.
 - **FFO contábil** do Fundamentus vs. distribuição por caixa nos FIIs (ver regra de decisão).
 - **XFIX11** é uma aproximação do IFIX, que não tem série no Yahoo.

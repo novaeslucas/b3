@@ -32,6 +32,7 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 
 from dividendos import CACHE_DIR, HOJE, PROVIDERS, ask_jev, fetch, lin, load_env, media, num, pct
+from b3lib.log import configurar, registrar_falha, resumo_falhas
 
 B3_FUNDOS = "https://sistemaswebb3-listados.b3.com.br/fundsProxy/fundsCall/GetListedSupplementFunds"
 JEV_CACHE = os.path.join(CACHE_DIR, "jev_fiis.json")
@@ -176,6 +177,7 @@ def conferir(r):
     try:
         b3 = rendimentos_b3(r["ticker"])
     except Exception as e:  # endpoint não oficial: falha não deve parar a análise
+        registrar_falha(r["ticker"], "conferência B3", e)
         return f"erro B3: {type(e).__name__}"
     if b3 is None:
         return "sem cadastro na B3"
@@ -416,6 +418,7 @@ def main():
     ap.add_argument("--sem-b3", action="store_true", help="não confere os rendimentos com a B3")
     args = ap.parse_args()
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    configurar()
     load_env()
 
     mercado = carregar_mercado()
@@ -424,11 +427,15 @@ def main():
           f"(DY >= {args.dy_min:g}%, liquidez >= R$ {args.liq_min:,.0f}, P/VP > 0).")
 
     def enriquecer(r):
-        r.update(detalhes(r["ticker"]))
-        r["rendimentos"], r["amortizacoes_12m"] = rendimentos(r["ticker"])
-        return r
+        try:
+            r.update(detalhes(r["ticker"]))
+            r["rendimentos"], r["amortizacoes_12m"] = rendimentos(r["ticker"])
+            return r
+        except Exception as e:
+            registrar_falha(r["ticker"], "coleta", e)
+            return None
     with ThreadPoolExecutor(max_workers=4) as pool:
-        candidatas = list(pool.map(enriquecer, candidatas))
+        candidatas = [r for r in pool.map(enriquecer, candidatas) if r]
     corte = HOJE - dt.timedelta(days=730)
     sem_hist = [r["ticker"] for r in candidatas if not any(d >= corte for d, _ in r["rendimentos"])]
     if sem_hist:
@@ -447,6 +454,7 @@ def main():
     for r in candidatas:
         r["decisao"] = decisao(r)
     relatorio(candidatas)
+    resumo_falhas()
 
 
 if __name__ == "__main__":
