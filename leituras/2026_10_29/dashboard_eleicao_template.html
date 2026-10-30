@@ -131,6 +131,38 @@ footer { color: var(--faint); font-size: 12px; margin-top: 20px; }
 .pos { color: var(--estudar); } .neg { color: var(--descartar); }
 .note a { color: var(--accent); }
 .grid2 + .grid2 { margin-top: 12px; }
+
+/* Mapa setorial em modal de tela cheia */
+.topo-acoes { display: flex; gap: 8px; align-items: center; }
+.theme.mapa-btn { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.ms-modal { position: fixed; inset: 0; z-index: 50; background: var(--bg); display: none; flex-direction: column; }
+.ms-modal.aberto { display: flex; }
+.ms-topo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.ms-topo h2 { margin: 0; font-size: 17px; flex: 1 1 auto; }
+.ms-topo .sub { flex-basis: 100%; order: 3; }
+.ms-fechar { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 8px; padding: 6px 14px; font: inherit; font-weight: 600; cursor: pointer; }
+.ms-fechar:hover { border-color: var(--descartar); color: var(--descartar); }
+.ms-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; }
+.ms-nav button.mig { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font: inherit; }
+.ms-nav button.mig:hover { text-decoration: underline; }
+.ms-nav .voltar { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 3px 10px; font: inherit; cursor: pointer; }
+.ms-nav .voltar:disabled { opacity: .45; cursor: default; }
+.ms-leg { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.ms-leg i { display: inline-block; width: 140px; height: 9px; border-radius: 3px; }
+.ms-area { position: relative; flex: 1 1 auto; min-height: 0; overflow-x: hidden; overflow-y: hidden; }
+.ms-area svg { display: block; user-select: none; }
+.ms-area .ms-edge { stroke: var(--border); stroke-width: 1.4; transition: opacity .45s ease; }
+.ms-area .ms-no { cursor: pointer; transition: transform .45s ease; }
+.ms-area .ms-no rect { stroke: rgba(0, 0, 0, .25); stroke-width: 1; }
+.ms-area .ms-no.centro rect { stroke: var(--text); stroke-width: 2; }
+.ms-area .ms-no.centro.raiz { cursor: default; }
+.ms-area .ms-no text { fill: #fff; pointer-events: none; }
+.ms-tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .18); min-width: 200px; max-width: 300px; display: none; z-index: 3; }
+.ms-tip .h { font-weight: 650; margin-bottom: 4px; }
+.ms-tip .r { display: flex; justify-content: space-between; gap: 12px; }
+.ms-tip .nota { color: var(--muted); margin-top: 6px; }
+body.ms-travado { overflow: hidden; }
 </style>
 </head>
 <body>
@@ -140,7 +172,7 @@ footer { color: var(--faint); font-size: 12px; margin-top: 20px; }
       <h1>Leitura pós-eleição — pregão de <span id="dPregao"></span></h1>
       <div class="sub" id="sub"></div>
     </div>
-    <button class="theme" id="theme" type="button">Tema</button>
+    <div class="topo-acoes"><button class="theme mapa-btn" id="abrirMapa" type="button" title="Abrir o mapa setorial do pregão em tela cheia">Mapa setorial</button><button class="theme" id="theme" type="button">Tema</button></div>
   </header>
   <div class="context" id="contexto"></div>
   <div class="filters" style="margin-top:14px">
@@ -233,6 +265,17 @@ footer { color: var(--faint); font-size: 12px; margin-top: 20px; }
     Setores das ações: classificação setorial oficial da B3 (Setor Econômico / Subsetor / Segmento); em divergência com o Fundamentus, vale a B3.
     Poucos pregões, antes do 2º turno. Não é recomendação de investimento.
   </footer>
+</div>
+
+<div class="ms-modal" id="msModal" role="dialog" aria-modal="true" aria-labelledby="msTitulo">
+  <div class="ms-topo">
+    <h2 id="msTitulo"></h2>
+    <div class="tabs" id="msHorizonte"><button data-h="var_dia" type="button">Dia</button><button data-h="var_acum" type="button">Acumulado</button></div>
+    <div class="ms-leg" id="msLeg"></div>
+    <button class="ms-fechar" id="msFechar" type="button" aria-label="Fechar o mapa setorial">✕ Fechar</button>
+    <div class="sub ms-nav"><button class="voltar" id="msVoltar" type="button">↑ Voltar</button><span id="msCaminho"></span><span id="msDica"></span></div>
+  </div>
+  <div class="ms-area" id="msArea"><svg id="msSvg"></svg><div class="ms-tip" id="msTip"></div></div>
 </div>
 
 <script>
@@ -518,6 +561,210 @@ document.querySelectorAll("#horizonte button").forEach(b => b.onclick = () => {
 });
 estado.sel = DADOS.acoes.find(e => e.decisao === "estudar")?.ticker ?? DADOS.acoes[0]?.ticker;
 render();
+
+/* ---------- Mapa setorial (modal de tela cheia) ----------
+   Três níveis com um nó no centro e os filhos em volta, numa elipse que ocupa a tela: pregão (Ibovespa) → setores
+   econômicos da B3 (e Fundos imobiliários) → subsetor da B3 (FIIs: tipo) → ativos. Clicar num filho recarrega o mapa
+   com ele no centro; clicar no centro sobe um nível; clicar num ativo fecha o mapa e abre o detalhe dele. */
+const MS = { caminho: [], h: "var_dia", nos: new Map(), NS: "http://www.w3.org/2000/svg" };
+const FII = "Fundos imobiliários";
+function msAtivos() {
+  return DADOS.acoes.map(e => ({ e, aba: "acoes", setor: e.setor_economico || "Sem classificação B3", sub: e.setor || "Sem subsetor" }))
+    .concat(DADOS.fiis.map(e => ({ e, aba: "fiis", setor: FII, sub: TIPO[e.tipo] || e.tipo || "Outro" })));
+}
+const msEscala = () => MS.h === "var_dia" ? 0.03 : 0.10;
+function msCor(v) {
+  const cinza = [110, 110, 106];
+  if (v == null) return "rgb(90,90,88)";
+  if (Math.abs(v) < 0.0005) return `rgb(${cinza})`;
+  const t = Math.pow(Math.min(1, Math.abs(v) / msEscala()), 0.75), alvo = v > 0 ? [15, 138, 62] : [198, 40, 40];
+  return `rgb(${cinza.map((c, i) => Math.round(c + (alvo[i] - c) * t))})`;
+}
+function msGrupo(lista, chave) {
+  const m = new Map();
+  for (const a of lista) { const k = chave(a); if (!m.has(k)) m.set(k, []); m.get(k).push(a); }
+  return [...m.entries()].sort((x, y) => y[1].length - x[1].length || x[0].localeCompare(y[0], "pt-BR"));
+}
+function msResumo(ms) {
+  const vs = ms.map(a => a.e[MS.h]).filter(v => v != null);
+  return { v: media(vs), altas: vs.filter(v => v >= 0.0005).length, baixas: vs.filter(v => v <= -0.0005).length,
+    membros: ms.slice().sort((x, y) => (y.e[MS.h] ?? -9) - (x.e[MS.h] ?? -9)) };
+}
+function msVisao() {
+  const todos = msAtivos(), [setor, sub] = MS.caminho;
+  const doSetor = setor ? todos.filter(a => a.setor === setor) : [], doSub = sub ? doSetor.filter(a => a.sub === sub) : [];
+  if ((setor && !doSetor.length) || (sub && !doSub.length)) { MS.caminho = []; return msVisao(); }
+  const ibov = MS.h === "var_dia" ? DADOS.ibov_dia : DADOS.ibov_acum;
+  if (!setor) return { centro: { nome: "Ibovespa", l2: sp(ibov), ...msResumo(todos), v: ibov, raiz: true },
+    filhos: msGrupo(todos, a => a.setor).map(([nome, ms]) => ({ id: "s:" + nome, tipo: "setor", nome, ...msResumo(ms) })) };
+  if (!sub) { const r = msResumo(doSetor);
+    return { centro: { nome: setor, l2: `${doSetor.length} ativos · média ${sp(r.v)}`, ...r },
+      filhos: msGrupo(doSetor, a => a.sub).map(([nome, ms]) => ({ id: "u:" + nome, tipo: "sub", nome, setor, ...msResumo(ms) })) }; }
+  const r = msResumo(doSub);
+  return { centro: { nome: sub, setor, l2: `${doSub.length} ativos · média ${sp(r.v)}`, ...r },
+    filhos: r.membros.map(a => ({ id: "e:" + a.e.ticker, tipo: "ativo", nome: a.e.ticker, a, v: a.e[MS.h] })) };
+}
+const msLarg = (t, min, max) => Math.max(min, Math.min(max, 7.2 * t.length + 30));
+function msEl(tag, attrs, pai) {
+  const e = document.createElementNS(MS.NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (pai) pai.appendChild(e);
+  return e;
+}
+function msCaixa(g, w, h, rx, v, l1, l2, grande) {
+  msEl("rect", { x: -w / 2, y: -h / 2, width: w, height: h, rx, fill: msCor(v) }, g);
+  msEl("text", { "text-anchor": "middle", y: grande ? -5 : -3, "font-size": grande ? 15 : 12.5, "font-weight": 700 }, g).textContent = l1;
+  msEl("text", { "text-anchor": "middle", y: grande ? 15 : 12, "font-size": grande ? 12.5 : 11 }, g).textContent = l2;
+}
+function msDesenhar(animar) {
+  const area = $("#msArea"), svg = $("#msSvg"), W = area.clientWidth, H0 = area.clientHeight;
+  const { centro, filhos } = msVisao();
+  const c = Object.assign(centro, { id: "centro", tipo: "centro", w: msLarg(centro.nome, 150, 300), h: 62 });
+  filhos.forEach(f => Object.assign(f, f.tipo === "ativo" ? { w: 86, h: 42 } : { w: msLarg(f.nome, 120, 250), h: 48 }));
+  const fw = Math.max(...filhos.map(f => f.w), 0), fh = Math.max(...filhos.map(f => f.h), 0);
+  let H = H0;
+  if (W >= 640) {
+    // elipse do tamanho da área: Rx/Ry deixam a caixa inteira dentro da tela
+    // raio pela volta que os filhos precisam (sem encostar), limitado ao tamanho da tela
+    const volta = filhos.length * (fw + 26) / (2 * Math.PI);
+    const Rx = Math.min(W / 2 - fw / 2 - 16, Math.max(260, volta * 1.25));
+    const Ry = Math.max(c.h / 2 + fh / 2 + 30, Math.min(H / 2 - fh / 2 - 16, Math.max(170, volta * 0.8)));
+    filhos.forEach((f, i) => { const t = -Math.PI / 2 + 2 * Math.PI * i / filhos.length; f.x = W / 2 + Rx * Math.cos(t); f.y = H / 2 + Ry * Math.sin(t); });
+    c.x = W / 2; c.y = H / 2;
+    // colisão: afasta pares sobrepostos pelo eixo de menor sobreposição (o centro fica parado)
+    const todos = [c, ...filhos];
+    for (let k = 0; k < 200; k++) {
+      let mexeu = false;
+      for (let i = 0; i < todos.length; i++) for (let j = i + 1; j < todos.length; j++) {
+        const p = todos[i], q = todos[j], dx = q.x - p.x, dy = q.y - p.y;
+        const ox = (p.w + q.w) / 2 + 10 - Math.abs(dx), oy = (p.h + q.h) / 2 + 10 - Math.abs(dy);
+        if (ox <= 0 || oy <= 0) continue;
+        mexeu = true;
+        const pf = p === c ? 0 : 0.5, qf = 1 - pf;
+        if (ox < oy) { const s = (dx >= 0 ? 1 : -1) * ox; p.x -= s * pf; q.x += s * qf; }
+        else { const s = (dy >= 0 ? 1 : -1) * oy; p.y -= s * pf; q.y += s * qf; }
+      }
+      if (!mexeu) break;
+    }
+  } else {
+    // tela estreita: grade com metade dos filhos acima e metade abaixo do centro
+    const px = fw + 10, py = fh + 22, cols = Math.max(1, Math.floor((W - 8) / px));
+    const acima = Math.ceil(Math.ceil(filhos.length / 2) / cols) * cols, la = Math.ceil(Math.min(acima, filhos.length) / cols);
+    const lb = Math.ceil(Math.max(0, filhos.length - acima) / cols);
+    c.x = W / 2; c.y = 20 + la * py + c.h / 2 + 16;
+    H = Math.max(H0, c.y + c.h / 2 + 16 + lb * py + 12);
+    filhos.forEach((f, i) => {
+      const baixo = i >= acima, j = baixo ? i - acima : i, linha = Math.floor(j / cols);
+      const naLinha = Math.min(cols, (baixo ? filhos.length - acima : Math.min(acima, filhos.length)) - linha * cols);
+      f.x = W / 2 - (naLinha - 1) * px / 2 + (j % cols) * px;
+      f.y = baixo ? c.y + c.h / 2 + 16 + py / 2 + linha * py : c.y - c.h / 2 - 16 - py / 2 - (la - 1 - linha) * py;
+    });
+  }
+  svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  area.style.overflowY = H > H0 ? "auto" : "hidden";  // rola só quando a grade da tela estreita não cabe
+  svg.innerHTML = "";
+  const gE = msEl("g", {}, svg), gN = msEl("g", {}, svg);
+  MS.nos = new Map([["centro", c]]);
+  const itens = [];
+  for (const f of filhos) {
+    const linha = msEl("line", { class: "ms-edge", x1: c.x, y1: c.y, x2: f.x, y2: f.y }, gE);
+    const g = msEl("g", { class: "ms-no " + f.tipo }, gN);
+    g.dataset.id = f.id;
+    if (f.tipo === "ativo") msCaixa(g, f.w, f.h, 5, f.v, f.nome, sp(f.v));
+    else msCaixa(g, f.w, f.h, 7, f.v, f.nome, `${f.membros.length} ${f.membros.length === 1 ? "ativo" : "ativos"} · ${sp(f.v)}`);
+    MS.nos.set(f.id, f);
+    itens.push({ g, linha, f });
+  }
+  const gc = msEl("g", { class: "ms-no centro" + (MS.caminho.length ? "" : " raiz"), transform: `translate(${c.x},${c.y})` }, gN);
+  gc.dataset.id = "centro";
+  msCaixa(gc, c.w, c.h, 10, c.v, (MS.caminho.length ? "↑ " : "") + c.nome, c.l2, true);
+  for (const { g, linha, f } of itens) {
+    g.style.transform = animar ? `translate(${c.x}px,${c.y}px) scale(.4)` : `translate(${f.x}px,${f.y}px)`;
+    if (animar) linha.style.opacity = 0;
+  }
+  if (animar) {
+    svg.getBoundingClientRect();  // fixa a posição inicial; a transição CSS leva cada nó até a sua posição
+    for (const { g, linha, f } of itens) { g.style.transform = `translate(${f.x}px,${f.y}px)`; linha.style.opacity = 1; }
+  }
+  msTopo();
+}
+function msTopo() {
+  const rot = MS.h === "var_dia" ? `dia ${DADOS.data_pregao.slice(0, 5)} vs ${DADOS.data_anterior.slice(0, 5)}` : `acumulado desde ${DADOS.data_base.slice(0, 5)}`;
+  $("#msTitulo").textContent = `Mapa setorial — pregão de ${DADOS.data_pregao} (${rot})`;
+  document.querySelectorAll("#msHorizonte button").forEach(b => b.classList.toggle("on", b.dataset.h === MS.h));
+  const e = msEscala(), stops = [-1, -0.5, 0, 0.5, 1].map(t => msCor(t * e)).join(",");
+  $("#msLeg").innerHTML = `<span>${sp(-e, 0)}</span><i style="background:linear-gradient(90deg,${stops})"></i><span>${sp(e, 0)} ou mais · cinza = 0%</span>`;
+  const partes = ["Pregão", ...MS.caminho];
+  $("#msCaminho").innerHTML = partes.map((p, i) => i === partes.length - 1 ? `<b>${esc(p)}</b>`
+    : `<button type="button" class="mig" data-nivel="${i}">${esc(p)}</button>`).join(" › ");
+  $("#msVoltar").disabled = !MS.caminho.length;
+  $("#msDica").textContent = " · " + [
+    "Clique num setor para ver os subsetores (FIIs: tipos); setores e subsetores mostram a média simples dos ativos.",
+    "Clique num subsetor para ver os ativos; no centro, para voltar.",
+    "Clique num ativo para fechar o mapa e abrir o detalhe dele; no centro, para voltar ao setor.",
+  ][MS.caminho.length];
+}
+function msNavegar(caminho) { MS.caminho = caminho; $("#msTip").style.display = "none"; msDesenhar(true); }
+function msAbrir() {
+  MS.h = estado.h;
+  $("#msModal").classList.add("aberto");
+  document.body.classList.add("ms-travado");
+  msDesenhar(true);
+  $("#msFechar").focus();
+}
+function msFechar() {
+  $("#msModal").classList.remove("aberto");
+  document.body.classList.remove("ms-travado");
+  $("#msTip").style.display = "none";
+  $("#abrirMapa").focus();
+}
+function msTooltip(n, ev) {
+  const tip = $("#msTip");
+  if (!n || (n.tipo === "centro" && !n.membros)) { tip.style.display = "none"; return; }
+  if (n.tipo === "ativo") {
+    const e = n.a.e;
+    tip.innerHTML = `<div class="h">${esc(e.ticker)} · ${esc(e.nome)}</div>
+      <div class="r"><span>Dia</span><span class="${e.var_dia > 0 ? "pos" : e.var_dia < 0 ? "neg" : ""}">${sp(e.var_dia)}</span></div>
+      <div class="r"><span>Acumulado desde ${DADOS.data_base.slice(0, 5)}</span><span class="${e.var_acum > 0 ? "pos" : e.var_acum < 0 ? "neg" : ""}">${sp(e.var_acum)}</span></div>
+      <div class="r"><span>Cotação anterior → pregão</span><span>${brl(e.cot_anterior)} → ${brl(e.cot_pregao)}</span></div>
+      <div class="r"><span>DY hoje</span><span>${pct(e.dy_hoje)}</span></div>
+      <div class="r"><span>Score</span><span>${n2(e.score_hoje, 1)}</span></div>
+      <div class="r"><span>Decisão</span><span style="color:${COR(e.decisao || "-")}">${esc(e.decisao || "–")}</span></div>
+      <div class="nota">Clique para fechar o mapa e abrir o detalhe.</div>`;
+  } else {
+    const ord = n.membros.filter(a => a.e[MS.h] != null);
+    tip.innerHTML = `<div class="h">${esc(n.nome)}</div>
+      ${n.raiz ? `<div class="r"><span>Ibovespa</span><span>${sp(n.v)}</span></div>` : `<div class="r"><span>Média</span><span>${sp(n.v)}</span></div>`}
+      <div class="r"><span>Ativos</span><span>${n.membros.length}</span></div>
+      <div class="r"><span>Em alta / em baixa</span><span>${n.altas} / ${n.baixas}</span></div>
+      ${ord.length ? `<div class="r"><span>Maior alta</span><span>${esc(ord[0].e.ticker)} ${sp(ord[0].e[MS.h])}</span></div>
+      <div class="r"><span>Maior baixa</span><span>${esc(ord[ord.length - 1].e.ticker)} ${sp(ord[ord.length - 1].e[MS.h])}</span></div>` : ""}
+      <div class="nota">${n.tipo === "centro" ? (MS.caminho.length ? "Clique para voltar um nível." : "Centro do mapa: média de todos os ativos nos setores.") : "Clique para ver o nível abaixo."}</div>`;
+  }
+  const box = $("#msArea").getBoundingClientRect();
+  tip.style.display = "block";
+  const x = ev.clientX - box.left + $("#msArea").scrollLeft + 14, y = ev.clientY - box.top + $("#msArea").scrollTop + 14;
+  tip.style.left = Math.max(4, Math.min(x, box.width - tip.offsetWidth - 6)) + "px";
+  tip.style.top = Math.max(4, Math.min(y, $("#msArea").scrollTop + box.height - tip.offsetHeight - 6)) + "px";
+}
+const msNo = ev => { const g = ev.target.closest && ev.target.closest(".ms-no"); return g ? MS.nos.get(g.dataset.id) : null; };
+$("#msSvg").addEventListener("mousemove", ev => msTooltip(msNo(ev), ev));
+$("#msSvg").addEventListener("mouseleave", () => { $("#msTip").style.display = "none"; });
+$("#msSvg").addEventListener("click", ev => {
+  const n = msNo(ev);
+  if (!n) return;
+  if (n.tipo === "centro") { if (MS.caminho.length) msNavegar(MS.caminho.slice(0, -1)); }
+  else if (n.tipo === "setor") msNavegar([n.nome]);
+  else if (n.tipo === "sub") msNavegar([n.setor, n.nome]);
+  else { estado.aba = n.a.aba; msFechar(); selecionar(n.a.e.ticker); $("#detail").scrollIntoView({ block: "center" }); }
+});
+$("#msCaminho").addEventListener("click", ev => { const b = ev.target.closest("[data-nivel]"); if (b) msNavegar(MS.caminho.slice(0, +b.dataset.nivel)); });
+$("#msVoltar").onclick = () => { if (MS.caminho.length) msNavegar(MS.caminho.slice(0, -1)); };
+$("#msHorizonte").addEventListener("click", ev => { const b = ev.target.closest("[data-h]"); if (b) { MS.h = b.dataset.h; msDesenhar(false); } });
+$("#abrirMapa").onclick = msAbrir;
+$("#msFechar").onclick = msFechar;
+document.addEventListener("keydown", ev => { if (ev.key === "Escape" && $("#msModal").classList.contains("aberto")) msFechar(); });
+window.addEventListener("resize", () => { if ($("#msModal").classList.contains("aberto")) msDesenhar(false); });
 </script>
 </body>
 </html>

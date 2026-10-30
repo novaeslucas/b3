@@ -208,7 +208,13 @@ Base congelada: dados do Fundamentus e respostas do Jev do **snapshot de 05/10**
 5. Setor oficial da B3 (Setor Econômico / Subsetor / Segmento, via `GetDetail`); quando diverge do Fundamentus,
    vale a B3 ([`setores_b3.py`](leituras/2026_10_26/setores_b3.py)).
 
-Cada dashboard diário traz no topo o contexto do pregão (notícias, com link da fonte).
+Cada dashboard diário traz no topo o contexto do pregão (notícias, com link da fonte). A partir da leitura de 29/10,
+o botão **Mapa setorial** abre, num modal de tela cheia, o mapa do pregão em três níveis, como o do painel ao vivo:
+Ibovespa no centro → setores econômicos da B3 (e os FIIs) → subsetor da B3 (FIIs: tipo) → ativos, com as caixas
+coloridas pela variação do **dia** ou do **acumulado** (abas no topo do modal) e setores/subsetores pela média simples.
+Clicar num ativo fecha o mapa e abre o detalhe dele no dashboard; Esc ou “Fechar” saem do modal. Está no template da
+pasta diária ([`leituras/2026_10_29/dashboard_eleicao_template.html`](leituras/2026_10_29/dashboard_eleicao_template.html)),
+que a próxima leitura copia.
 
 ### 4. Fatores do 2º turno
 
