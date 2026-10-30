@@ -1,5 +1,18 @@
 # Dividendos, FIIs e eleição 2026 na B3 — score determinístico + Jev
 
+> [!CAUTION]
+> ## ⚠️ NÃO É RECOMENDAÇÃO DE INVESTIMENTO ⚠️
+> **Este repositório traz informações da bolsa de valores brasileira (B3) — cotações, indicadores, setores,
+> proventos, rankings e classificações —, mas nada aqui é recomendação de compra, venda ou manutenção de ações,
+> FIIs ou qualquer outro ativo.**
+>
+> É um estudo de metodologia com dados públicos — Yahoo Finance e Fundamentus (agregadores não oficiais), endpoints
+> não documentados do site da B3 e dados abertos da CVM —, que podem estar atrasados, incompletos ou errados. Rótulos como `estudar`, `monitorar`
+> ou `descartar`, scores e classificações do Jev descrevem o resultado de regras e de um modelo, não uma indicação
+> do que fazer com o seu dinheiro. Antes de investir, procure um profissional certificado e consulte as fontes
+> oficiais (B3, CVM e as relações com investidores das empresas). Rentabilidade passada não garante rentabilidade
+> futura.
+
 [![Painel pós-eleição: acumulado de Ibovespa, small caps, média das ações analisadas e dólar de 02/10 a 23/10/2026](docs/img/painel_pos_eleicao.png)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html)
 
 <sub>Painel pós-eleição — clique na imagem para abrir o dashboard interativo.</sub>
@@ -18,8 +31,6 @@ A ideia central é **separar o que é conta do que é julgamento**:
 - a decisão final (`estudar` / `monitorar` / `descartar`) é uma regra escrita no código que combina as duas coisas.
 
 O Jev não calcula nada e não vê preço-alvo: ele classifica a partir dos números que o código lhe entrega.
-
-> ⚠️ **Não é recomendação de investimento.** É um estudo de metodologia com dados públicos, que podem conter erros.
 
 ## Dashboards
 
@@ -233,6 +244,21 @@ pela liquidez) e 69 FIIs; a coleta inteira leva cerca de 15 s. O setor é a clas
 econômico / subsetor / segmento), a mesma de `b3lib/setores.py`, guardada em `cache/setores_b3_ao_vivo.json` e
 refeita depois de 30 dias; FIIs ficam em “Fundos imobiliários”. Na tabela, o filtro “Só pela liquidez” mostra as
 ações que estão fora dos outros painéis.
+
+<table>
+  <tr>
+    <td width="33%"><a href="docs/img/painel_ao_vivo.png"><img src="docs/img/painel_ao_vivo.png" alt="Painel ao vivo: indicador de coleta, referências, amplitude, mapa setorial com o Ibovespa no centro e os setores em volta, e as 10 maiores altas e baixas"></a></td>
+    <td width="33%"><a href="docs/img/painel_ao_vivo_1.png"><img src="docs/img/painel_ao_vivo_1.png" alt="Mapa no nível do subsetor Intermediários Financeiros, com os bancos em volta e as ligações tracejadas entre classes da mesma companhia"></a></td>
+    <td width="33%"><a href="docs/img/painel_ao_vivo_2.png"><img src="docs/img/painel_ao_vivo_2.png" alt="Ficha da BBAS3: cartão central com preço, linha do dia e faixa de 52 semanas, e os grupos de concorrentes, índices e classes e listagem"></a></td>
+  </tr>
+  <tr>
+    <td><sub>Visão geral: status da coleta, referências, mapa setorial (B3 → setores) e maiores altas/baixas.</sub></td>
+    <td><sub>Mapa no subsetor Intermediários Financeiros; tracejado liga classes da mesma companhia.</sub></td>
+    <td><sub>Ficha da ação (BBAS3): concorrentes, índices da B3 e classes/listagem em volta do cartão.</sub></td>
+  </tr>
+</table>
+
+<sub>Capturas de 30/10/2026, com cotações do Yahoo Finance com atraso. Ilustrativas: não é recomendação de investimento.</sub>
 
 O painel tem:
 
