@@ -24,8 +24,10 @@ DATA_NOVA_ALIQUOTA_JCP = dt.date(2026, 1, 1)
 
 _DATA = re.compile(r"\d{2}/\d{2}/\d{4}")
 _EXTRA = ("extraordin", "especial", "nao recorrente")
-# Payout de 12 meses acima disto × a mediana histórica começa a contar como pico.
-FATOR_PICO_PAYOUT = 1.8
+# Pico de provento por ação contra a mediana dos anos fechados, na mesma série.
+FATOR_PICO_PROVENTOS = 1.8
+FATOR_MISTO_PROVENTOS = 1.3
+ANOS_MEDIANA_PROVENTOS = 5
 
 
 def aliquota_jcp(data_ref):
@@ -37,6 +39,8 @@ def aliquota_jcp(data_ref):
 
 def classe_tipo(tipo):
     t = sem_acento(tipo or "").upper()
+    if "DESDOBR" in t or "GRUPAMENT" in t or "BONIFIC" in t:
+        return "ajuste"
     if "JRS CAP" in t or "JUROS SOBRE" in t or t.strip() == "JCP":
         return "jcp"
     if "DIVID" in t:
@@ -83,6 +87,9 @@ def parse_proventos_html(page):
             "valor_bruto": bruto,
             "valor_liquido": bruto * (1 - taxa),
             "extraordinario": classe == "dividendo" and evento_rotulado_extraordinario(tipo),
+            # Desdobramento, grupamento e bonificação: ações novas / ações antigas.
+            # O valor da linha, já dividido por «por quantas ações», é esse fator.
+            "fator": bruto if classe == "ajuste" and bruto > 0 else None,
         })
     return eventos
 
@@ -103,7 +110,9 @@ def agregar_por_ano(eventos, liquido=False, incluir_outros=True):
     chave = "valor_liquido" if liquido else "valor_bruto"
     anos = {}
     for e in eventos:
-        if e["classe"] == "outro" and not incluir_outros:
+        if e["classe"] in ("outro", "ajuste") and not incluir_outros:
+            continue
+        if e["classe"] == "ajuste":
             continue
         if liquido and e["classe"] == "outro":
             continue
@@ -127,51 +136,103 @@ def fator_liquido_12m(eventos, hoje):
     return liquido / bruto
 
 
-def classificar_natureza(eventos, hoje, anos_completos, payouts_por_ano=None, payout_12m=None,
-                         pago_de_reserva=False):
-    """Recorrente, misto ou extraordinário na mesma janela de 12 meses do DY.
+def _fatores_ajuste(eventos):
+    """(data-com, ações novas / ações antigas) de desdobramento, grupamento e bonificação."""
+    fatores = []
+    for e in eventos:
+        if e.get("classe") != "ajuste" and not e.get("fator"):
+            continue
+        tipo = sem_acento(e.get("tipo") or "").lower()
+        if e.get("classe") != "ajuste" and not any(k in tipo for k in ("desdobr", "grupament", "bonific")):
+            continue
+        fator = e.get("fator")
+        if not fator or fator <= 0:
+            continue
+        fatores.append((e["data_com"], float(fator)))
+    return fatores
 
-    Compara o payout de 12 meses (DY bruto × P/L) com a mediana do payout anual dos
-    exercícios encerrados antes da janela. Dividendo que cresceu junto com o lucro
-    — payout perto da mediana — continua recorrente. Extraordinário quando esse
-    payout passa de ``FATOR_PICO_PAYOUT`` vezes a mediana, quando o evento vem
-    rotulado (extraordinário, especial, não recorrente) ou quando a DMPL mostra
-    pagamento além do lucro do ano saindo de reserva de lucros. Sem a série de
-    payout, crescimento do valor por ação não marca pico. JCP não é extraordinário
-    só por ser JCP.
+
+def _valor_ajustado(valor, data, fatores):
+    """Traz o provento por ação para a quantidade de ações de hoje."""
+    mult = 1.0
+    for data_fator, fator in fatores:
+        if data_fator > data:
+            mult *= fator
+    return valor / mult if mult else valor
+
+
+def _provento_caixa(e):
+    return e.get("classe") in ("dividendo", "jcp")
+
+
+def classificar_natureza(eventos, hoje, _anos_completos=None, pago_de_reserva=False):
+    """Recorrente, misto, extraordinário ou histórico insuficiente.
+
+    O pico compara proventos por ação brutos (data-com) dos 12 meses com a mediana
+    dos proventos por ação dos anos-calendário já fechados, no máximo cinco, da
+    mesma série, ajustados por desdobramento, grupamento e bonificação. Não usa
+    lucro nem DY × P/L. Razão acima de 1,8 é extraordinário. Entre 1,3 e 1,8 só
+    vira misto se algum evento da janela vier rotulado; senão, recorrente.
+    Menos de três anos fechados não dispara pico (histórico insuficiente), salvo
+    rótulo da companhia ou débito em reserva de lucros de exercícios anteriores.
     """
     inicio = hoje - dt.timedelta(days=365)
-    payouts_por_ano = payouts_por_ano or {}
+    fatores = _fatores_ajuste(eventos)
+    caixa = [e for e in eventos if _provento_caixa(e)]
 
-    def da_janela(e):
-        return e["classe"] != "outro" and inicio < e["data_com"] <= hoje
+    def bruto(e):
+        return _valor_ajustado(e["valor_bruto"], e["data_com"], fatores)
 
-    janela = [e for e in eventos if da_janela(e)]
-    tot = sum(e["valor_liquido"] for e in janela)
-    rotulado = sum(e["valor_liquido"] for e in janela if e["extraordinario"])
-    anteriores = [payouts_por_ano[a] for a in anos_completos
-                  if dt.date(a, 12, 31) < inicio and payouts_por_ano.get(a) not in (None, 0)]
-    mediana = statistics.median(anteriores) if len(anteriores) >= 3 else None
-    excesso = 0.0
-    if mediana and payout_12m and payout_12m > FATOR_PICO_PAYOUT * mediana and payout_12m > 0:
-        excesso = (payout_12m - mediana) / payout_12m
-    share = rotulado / tot if tot > 0 else 0.0
-    share = max(share, excesso)
-    if pago_de_reserva and tot > 0:
-        share = max(share, 1.0)
-    if tot <= 0 or share <= 0:
-        natureza = "recorrente"
-    elif share > 0.5:
+    por_ano = {}
+    for e in caixa:
+        por_ano[e["data_com"].year] = por_ano.get(e["data_com"].year, 0.0) + bruto(e)
+    primeiro = min(por_ano) if por_ano else None
+    fechados = []
+    if primeiro is not None:
+        for ano in range(hoje.year - ANOS_MEDIANA_PROVENTOS, hoje.year):
+            if ano >= primeiro:
+                fechados.append(por_ano.get(ano, 0.0))
+    mediana = statistics.median(fechados) if len(fechados) >= 3 else None
+    janela = [e for e in caixa if inicio < e["data_com"] <= hoje]
+    ttm = sum(bruto(e) for e in janela)
+    rotulados = [e for e in janela if e.get("extraordinario")]
+    razao = None
+    if mediana is not None and mediana > 0:
+        razao = ttm / mediana
+    elif mediana == 0 and ttm > 0:
+        razao = float("inf")
+
+    gatilhos = []
+    if pago_de_reserva:
+        gatilhos.append("reserva")
+    if razao is not None and razao > FATOR_PICO_PROVENTOS:
+        gatilhos.append("pico_proventos")
+    if rotulados:
+        gatilhos.append("rotulado")
+
+    if "reserva" in gatilhos or "pico_proventos" in gatilhos:
         natureza = "extraordinario"
-    else:
+    elif "rotulado" in gatilhos and razao is not None and FATOR_MISTO_PROVENTOS <= razao <= FATOR_PICO_PROVENTOS:
         natureza = "misto"
+    elif "rotulado" in gatilhos:
+        natureza = "extraordinario"
+    elif mediana is None:
+        natureza = "historico_insuficiente"
+    else:
+        natureza = "recorrente"
     return {
         "natureza_proventos": natureza,
-        "parcela_extraordinaria": share,
-        "proventos_janela_liquido": tot,
-        "mediana_payout_anterior": mediana,
-        "payout_12m": payout_12m,
-        "pago_de_reserva": bool(pago_de_reserva and tot > 0),
+        "gatilho_natureza": "+".join(gatilhos),
+        "parcela_extraordinaria": 0.0 if not ttm or razao is None or razao <= 1 else min(1.0, (razao - 1) / razao),
+        "proventos_12m_bruto": ttm,
+        "mediana_proventos_acao": mediana,
+        "razao_proventos": None if razao is None or razao == float("inf") else razao,
+        "proventos_anuais_bruto": por_ano,
+        "eventos_rotulados_12m": [
+            {"date": e["data_com"].isoformat(), "type": e.get("tipo"), "gross_per_share": round(bruto(e), 4)}
+            for e in rotulados
+        ],
+        "pago_de_reserva": bool(pago_de_reserva),
     }
 
 

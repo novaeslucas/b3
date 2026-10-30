@@ -396,4 +396,38 @@ python comparacoes/comparar_ranking.py --sem-jev
 
 O primeiro é o padrão (três e três). O segundo é uma chamada só, sem taxa de virada. O terceiro regrava o markdown só com o score. Esta passagem usou o terceiro. O resultado está em `comparacoes/ranking_2026_10_26.md`.
 
+## Rodada 5
+
+A natureza deixa de comparar DY bruto × P/L com o payout da CVM. Os dois lados do pico são proventos por ação brutos, pela data-com, da mesma série do Fundamentus, no máximo os cinco anos-calendário já fechados, ajustados quando a série traz desdobramento, grupamento ou bonificação (fator = ações novas / ações antigas). Razão acima de 1,8: extraordinário (`pico_proventos`). Entre 1,3 e 1,8: misto só se houver evento rotulado; senão, recorrente. Menos de três anos: `historico_insuficiente`, que não vira extraordinário. Rótulo da companhia e débito em reserva de lucros de exercícios anteriores continuam gatilhos. O CSV guarda o gatilho (`pico_proventos`, `rotulado`, `reserva`).
+
+O estado do Jev não recebe o rótulo calculado pelo código e o texto não manda segui-lo. Vão a série anual bruta, o total de 12 meses, o payout anual da CVM, o flag de reserva e os eventos rotulados. A natureza do código fica no CSV e no relatório, para confronto. A regra de decisão e as faixas do score não mudaram. `cache/jev_*.json` fica de fora do git. `python comparacoes/comparar_ranking.py --limpar-cache-jev` renomeia o cache dessa comparação antes de chamar o Jev.
+
+`sem_base_de_lucro` zerava a nota de payout. O componente agora sai da média e os pesos restantes se renormalizam; a penalidade de prejuízo não entra. O número exibido é `n/d (sem base de lucro)`. Lucro não encontrado e divergência contra valor de mercado ÷ P/L continuam no DY bruto × P/L, também sem penalidade.
+
+Nesta execução (`--sem-jev`, Jev não chamado; a distribuição de P(extra) não foi medida): 35 extraordinários, 32 só por `pico_proventos`, 2 só por `reserva`, 1 pelos dois. 43 recorrentes. 2 com histórico insuficiente (MDNE3, PASS3). Nenhum misto. Decisão diferente com o Jev antigo: nenhuma.
+
+| Papel | Natureza | Gatilho | Score antigo | Score novo |
+|---|---|---|---:|---:|
+| VIVT3 | recorrente | — | 50,8 | 59,9 |
+| UGPA3 | extraordinário | pico_proventos | 77,5 | 77,5 |
+| TGMA3 | extraordinário | pico_proventos | 89,1 | 90,9 |
+| LEVE3 | recorrente | — | 82,7 | 82,7 |
+| EZTC3 | recorrente | — | 79,8 | 79,8 |
+| MOTV3 | extraordinário | pico_proventos | 66,0 | 66,0 |
+| RANI3 | recorrente | — | 66,3 | 66,3 |
+| MOVI3 | recorrente | — | 68,6 | 62,3 |
+| CXSE3 | recorrente | — | 55,3 | 55,3 |
+| TIMS3 | recorrente | — | 43,3 | 55,7 |
+| CURY3 | extraordinário | pico_proventos | 82,8 | 96,7 |
+| POMO4 | extraordinário | pico_proventos | 94,5 | 97,1 |
+| PLPL3 | extraordinário | pico_proventos | 93,3 | 93,3 |
+| LREN3 | recorrente | — | 87,6 | 87,6 |
+| BRSR6 | recorrente | — | 66,8 | 66,8 |
+| ABEV3 | recorrente | — | 77,1 | 77,1 |
+| COGN3 | extraordinário | pico_proventos | 68,9 | 61,8 |
+| TEND3 | extraordinário | pico_proventos | 82,3 | 82,3 |
+| SEER3 | extraordinário | pico_proventos | 69,6 | 69,6 |
+
+COGN3, TEND3 e SEER3 não perdem mais nota por payout zerado. TEND3 e SEER3 ficam no score publicado: a alavancagem já saturava a nota e tirar o payout (que também estava no topo) não move a média. COGN3 vai de 68,9 a 61,8 porque a nota de payout cheia sai da média e a de dívida/EBIT, abaixo do topo, fica sozinha. Não é penalidade de prejuízo.
+
 

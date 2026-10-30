@@ -145,13 +145,44 @@ def test_sem_base_de_lucro_zera_a_nota_e_nao_soma_penalidade():
     }
     m = dividendos.metricas(r)
     assert m["payout_fonte"] == "sem_base_de_lucro"
-    assert m["payout"] == pytest.approx(3.0)
+    assert m["payout"] is None
     assert m["sem_cobertura"] is True
     assert m["anos_prejuizo_com_provento"] == 0
     r["m"] = m
-    _, pilares = dividendos.score(r)
-    # nota de payout 0; alavancagem ausente; liquidez corrente no topo → pilar 50
-    assert pilares["sustentabilidade"] == 50
+    total, pilares = dividendos.score(r)
+    # payout de fora; alavancagem ausente; liquidez corrente no topo → pilar 100
+    assert pilares["sustentabilidade"] == 100
+    sem_payout = dict(r)
+    sem_payout["m"] = dict(m)
+    sem_payout["m"]["sem_cobertura"] = False
+    sem_payout["m"]["payout"] = None
+    sem_payout["m"]["anos_prejuizo_com_provento"] = 0
+    assert dividendos.score(sem_payout)[0] == total
+
+
+def test_prompt_do_jev_nao_traz_o_rotulo_de_natureza():
+    import json
+    import dividendos
+    dividendos.HOJE = dt.date(2026, 10, 26)
+    r = {
+        "ticker": "TIMS3", "empresa": "TIM", "setor": "Telecomunicações", "subsetor": None,
+        "dy": 0.08, "dy_bruto": 0.08, "pl": 20, "pvp": 1, "ev_ebitda": 4,
+        "roe": 0.1, "roic": 0.1, "mrg_liq": 0.1, "cresc_rec_5a": 0.0, "liq_corr": 1,
+        "div_liq_patrim": 0.2, "oscil_12m": 0.0, "lucro_12m": 1, "ebit_12m": 1, "div_liquida": 1,
+        "proventos_ano": {}, "natureza_proventos": "extraordinario", "gatilho_natureza": "pico_proventos",
+        "proventos_anuais_bruto": {2024: 1.0, 2025: 1.0}, "proventos_12m_bruto": 1.0,
+        "eventos_rotulados_12m": [], "pago_de_reserva": False,
+        "m": {
+            "anos_completos": [2020, 2021, 2022, 2023, 2024, 2025], "serie_div": [1, 1, 1, 1, 1, 1],
+            "payout": 0.5, "payout_fonte": "cvm", "payout_dy_pl": 1.6, "dividendo_acima_fcf": None,
+            "anos_pagos": 6, "cortes": 0, "cagr_div": 0.0, "div_ultimo_vs_media": 1.0, "div_liq_ebit": 1.0,
+        },
+    }
+    texto = json.dumps({"state": dividendos.estado_jev(r), "questions": dividendos.PERGUNTAS})
+    assert "dividend_nature" not in texto
+    estado = dividendos.estado_jev(r)
+    assert "dividend_nature" not in estado["context"]
+    assert "dividend_nature" not in estado["company"]
 
 
 def test_payout_de_fallback_usa_dy_bruto():
