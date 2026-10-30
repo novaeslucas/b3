@@ -4,7 +4,8 @@ from pathlib import Path
 import pytest
 
 from b3lib.cvm import (
-    fator_escala, fluxo, norm_cd, proventos_declarados, resumo_textos, resumir, selecionar_versao, setor_financeiro,
+    fator_escala, fluxo, ler_csv, norm_cd, proventos_declarados, resumo_empresa, resumo_textos,
+    resumir, selecionar_versao, setor_financeiro,
 )
 
 FIX = Path(__file__).resolve().parent / "fixtures"
@@ -146,3 +147,49 @@ def test_capex_de_concessao_e_arrendamento_sem_misturar_divida():
     assert caixa["arrendamento"] == 50
     assert caixa["fcf"] == 450
     assert caixa["dividendos_pagos"] == 80
+
+
+def _por_ano(txt, cd):
+    linhas = [d for d in ler_csv(txt) if norm_cd(d.get("CD_CVM")) == norm_cd(cd)]
+    return selecionar_versao(linhas)
+
+
+def test_abc_2022_nao_trata_lucro_como_zero():
+    """3.11.01 veio 0 no consolidado; o lucro está em 3.11 (789.718 mil)."""
+    r = resumo_textos(*_textos(), "20958", [2022])
+    assert r["por_ano"][0]["lucro"] == pytest.approx(789_718 * 1000)
+    assert r["anos_prejuizo_com_provento"] == 0
+
+
+def test_lavvi_e_yduq_2025_nao_ficam_com_payout_zero():
+    """A DVA lista dividendos 0, mas a DMPL tem distribuição de verdade."""
+    textos = _textos()
+    dva = (FIX / "dva_con.csv").read_text(encoding="utf-8")
+    lavvi = resumo_textos(*textos, "25062", [2025], dva_txt=dva)
+    ano = lavvi["por_ano"][0]
+    assert ano["fonte_proventos"] == "dmpl"
+    assert ano["proventos"] == pytest.approx(403_531 * 1000)
+    assert ano["payout"] == pytest.approx(403_531 / 414_072)
+    yduq = resumo_textos(*textos, "21016", [2025], dva_txt=dva)
+    y = yduq["por_ano"][0]
+    assert y["fonte_proventos"] == "dmpl"
+    assert y["proventos"] == pytest.approx((68_923 + 106_896) * 1000)
+    assert y["payout"] == pytest.approx((68_923 + 106_896) / 181_491)
+
+
+def test_bb_2025_payout_sai_da_controladora():
+    """O RI fala em 30% sobre o lucro de R$ 17,8 bi. O consolidado atribuído (R$ 13,7 bi) dava 38%."""
+    dre = (FIX / "dre_con.csv").read_text(encoding="utf-8")
+    dva = (FIX / "dva_con.csv").read_text(encoding="utf-8")
+    ind_dre = (FIX / "bb_2025_ind_dre.csv").read_text(encoding="utf-8")
+    ind_dva = (FIX / "bb_2025_ind_dva.csv").read_text(encoding="utf-8")
+    con = (_por_ano(dre, "1023"), {}, {}, _por_ano(dva, "1023"))
+    ind = (_por_ano(ind_dre, "1023"), {}, {}, _por_ano(ind_dva, "1023"))
+    r = resumo_empresa(con, ind, [2025], financeiro=True)
+    ano = r["por_ano"][0]
+    assert ano["lucro"] == pytest.approx(18_151_787 * 1000)
+    assert ano["proventos"] == pytest.approx(5_183_839 * 1000)
+    assert ano["fonte_proventos"] == "dva"
+    assert ano["payout"] == pytest.approx(5_183_839 / 18_151_787)
+    consolidado = resumo_empresa(con, ({}, {}, {}, {}), [2025], financeiro=False)
+    assert consolidado["por_ano"][0]["payout"] == pytest.approx(5_219_106 / 13_698_124)

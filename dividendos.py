@@ -41,7 +41,7 @@ import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 from b3lib.cvm import (
-    MIN_ANOS_SCORE, anos_exercicio, norm_cd, payout_por_cd, resumir, setor_financeiro,
+    MIN_ANOS_SCORE, anos_exercicio, norm_cd, pacotes_por_cd, resumo_empresa, setor_financeiro,
 )
 from b3lib.fundamentus import parse_campos_detalhe, parse_resultado_acoes
 from b3lib.http import B3, CACHE_DIR, fetch as _fetch, load_env
@@ -367,7 +367,7 @@ PERGUNTAS = {
         "instructions": "How sustainable is the dividend policy of the company in `company` over the next few "
                         "years? Weigh together earnings coverage (payout and its source), leverage, profitability, "
                         "regularity and trend of past dividends, company.dividend_nature, and "
-                        "company.pays_dividends_above_fcf when it is not null. Also weigh what is normal for its "
+                        "company.dividends_above_fcf when it is not null. Also weigh what is normal for its "
                         "sector (for example, regulated utilities and insurers usually sustain high payouts; "
                         "commodity producers swing with prices).",
         "criteria": CLASSES,
@@ -555,19 +555,24 @@ def anexar_cvm(candidatas):
         print("CVM: nenhum código CVM obtido; payout segue como DY × P/L.")
         return
     try:
-        por_cd = payout_por_cd(cds, HOJE, os.path.join(CACHE_DIR, "cvm"))
+        pacote = pacotes_por_cd(cds, HOJE, os.path.join(CACHE_DIR, "cvm"))
     except Exception as e:
         registrar_falha("-", "download DFP da CVM", e)
         print("CVM: download ou leitura do DFP falhou; payout segue como DY × P/L.")
         return
+    anos, consolidado, individual = pacote
     sem = []
     for r, cd in zip(candidatas, codigos):
-        base = por_cd.get(cd) if cd else None
-        if not base:
+        if not cd or (cd not in consolidado and cd not in individual):
+            sem.append(r["ticker"])
+            continue
+        resumo = resumo_empresa(consolidado.get(cd), individual.get(cd), anos,
+                                financeiro=setor_financeiro(r.get("setor"), r.get("subsetor")))
+        if not resumo or not resumo.get("anos"):
             sem.append(r["ticker"])
             continue
         r["cd_cvm"] = cd
-        r["cvm"] = resumir(base["por_ano"], financeiro=setor_financeiro(r.get("setor"), r.get("subsetor")))
+        r["cvm"] = resumo
     janela = anos_exercicio(HOJE)
     print(f"CVM: payout de {len(candidatas) - len(sem)} empresas (DFP {janela[0]}–{janela[-1]}, "
           f"média usada no score com pelo menos {MIN_ANOS_SCORE} anos)"

@@ -218,7 +218,7 @@ sem somar pai e filha, e sem a coluna de não controladores. O caixa da DFC cont
 |---|---:|---:|---:|---:|---|
 | PETR4 | 110,129 | 41,236 (30,682 + 10,554) | 37,44% | 42,309 na coluna Patrimônio Líquido (38,4%) | R$ 41,23 bi, 37,44% do lucro, aprovados na AGO e noticiados pelo Valor em 16/04/2026 |
 | TAEE11 | 1,580 | 1,124 (0,553 + 0,571) | 71,1% | só o JCP fixo, 0,553 (35%); intercalares, mínimo e adicional ficavam de fora | a DVA é a que fecha com a soma dessas linhas da DMPL quando elas entram |
-| BBAS3 | 13,698 | 5,219 de JCP e 0 de dividendos | 38,1% | a conta fixa não caía em Patrimônio Líquido; o mesmo 5,219 está espalhado em reserva e outros resultados | a DVA do banco está em 7.09.04, não em 7.08.04 |
+| BBAS3 | 13,698 | 5,219 de JCP e 0 de dividendos | 38,1% | a conta fixa não caía em Patrimônio Líquido | este 38,1% usa o lucro consolidado atribuído à controladora; o banco divulga outro número — ver a terceira passagem |
 
 A DVA de 2025 da Petrobras é o número que a companhia aprovou. A DMPL pela coluna de patrimônio
 fica R$ 1,073 bi acima, o movimento de reserva que não é remuneração atribuída ao lucro do ano.
@@ -311,4 +311,36 @@ que não é o crédito individualizado — limitação registrada.
 - Os painéis e o `setores_b3.py` da raiz não foram esvaziados. O parse de data do Yahoo e a
   classificação setorial já estão em `b3lib`. O resto é montagem de HTML e lista BESST, específica
   de cada script; mexer nisso não mudava a metodologia.
+
+## Terceira passagem
+
+### Banco do Brasil: o 38,1% não é o payout divulgado
+
+O relatório da administração de 2025 diz que o payout foi de **30%**, com **R$ 5,2 bilhões** distribuídos em JCP, e que o lucro líquido do ano foi de **R$ 17,8 bilhões**. O fato relevante de 13/08/2025 já tinha fixado o payout do exercício em 30%. Fontes: [fato relevante no RI do BB](https://api.mziq.com/mzfilemanager/v2/d/5760dff3-15e1-4962-9e81-322a0b3d0bbd/419c2232-0ab3-644a-6143-9d5afc54035d?origin=1) e o relatório da administração / apresentação de resultados de 2025 (lucro líquido R$ 17,8 bi; JCP R$ 5,2 bi; payout 30%).
+
+5,2 ÷ 17,8 = 29,2%, que o banco arredonda no rótulo da política (30%). O numerador casa com a DVA: JCP consolidado R$ 5,219 bi e, na controladora, R$ 5,184 bi.
+
+O 38,1% dividia esses R$ 5,219 bi pelo lucro **consolidado atribuído à controladora** do DFP (conta 3.11.01, R$ 13,698 bi). Esse não é o lucro do release. No DFP, o lucro da **controladora individual** (banco múltiplo, demonstração individual) é R$ 18,152 bi. Instituição financeira passa a usar essa demonstração — é a pessoa jurídica que declara o JCP — quando ela existe. O payout de 2025 fica **28,6%** (5,184 ÷ 18,152). A folga até os 30% é a diferença entre o IFRS individual (R$ 18,15 bi) e o lucro líquido de R$ 17,8 bi do relatório, que não está numa linha do DFP aberto.
+
+### LAVV3, YDUQ3 e ABCB4
+
+Não era unidade nem ano trocado.
+
+- **LAVV3 e YDUQ3.** A folha 7.08.04.02 (Dividendos) e a 7.08.04.01 (JCP) estão explicitamente zeradas em todos os exercícios de 2021 a 2025. A conta-pai só repete o lucro retido. A DMPL, porém, tem distribuição: Lavvi, conta fixa 5.04.06, R$ 403,5 milhões em 2025 contra lucro de R$ 414,1 milhões; Yduqs, «dividendos intercalares» (R$ 106,9 milhões) e «adicionais distribuídos» (R$ 68,9 milhões) em 2025. Tratar DVA zero como payout zero deixava o score mais folgado do que o caixa. Se a DVA vem zerada e a DMPL tem provento, a fonte passa a ser a DMPL. No ranking de 26/10 o payout de cinco anos ficou **81,4%** (LAVV3) e **68,4%** (YDUQ3), não mais 0%.
+- **ABCB4.** Em 2022 e 2023 o consolidado grava 3.11.01 = 0 e o lucro na conta 3.11 (R$ 790 milhões e R$ 801 milhões). O código lia o zero, marcava dois «anos de prejuízo» e jogava 2024 e 2025 fora porque esses exercícios só têm demonstração individual. A soma virava 154%. Agora 3.11.01 zerada com 3.11 preenchida usa a 3.11, e banco sem consolidado no ano usa a controladora. O payout de cinco anos ficou **45,1%**, sem ano de prejuízo com provento. O score de 26/10 não se mexeu (65,9 nos dois lados).
+
+Os três casos estão em `tests/test_cvm.py`, com recorte real do DFP em `tests/fixtures/`.
+
+### Jev, sem chamada daqui
+
+Não há chave neste ambiente. Nenhuma classe foi inventada. A comparação determinística foi regravada em `comparacoes/ranking_2026_10_26.md`, com a lista de quem mudou de estado (payout, natureza, dividendo acima do FCF, provento em ano de prejuízo).
+
+Quem tem o `.env` roda, na raiz do repositório:
+
+```bash
+python comparacoes/comparar_ranking.py
+```
+
+O script reaproveita o cache do dia, chama o Jev no estado novo do pregão de 26/10 e reescreve `comparacoes/ranking_2026_10_26.md` com a diferença real de decisão.
+
 

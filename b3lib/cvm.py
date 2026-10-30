@@ -174,10 +174,15 @@ def selecionar_versao(linhas):
 
 
 def lucro_controladora(linhas_dre):
+    """3.11.01 quando está preenchida. Alguns bancos gravam 3.11.01 = 0 e o lucro de verdade em 3.11."""
     por_codigo = {d.get("CD_CONTA"): _reais(d) for d in linhas_dre}
-    if "3.11.01" in por_codigo:
-        return por_codigo["3.11.01"]
-    return por_codigo.get("3.11")
+    atrib = por_codigo.get("3.11.01")
+    total = por_codigo.get("3.11")
+    if atrib not in (None, 0.0):
+        return atrib
+    if total not in (None, 0.0):
+        return total
+    return atrib if atrib is not None else total
 
 
 def _linha_capex(row):
@@ -266,14 +271,17 @@ def montar_anos(dre_por_ano, dmpl_por_ano, dfc_por_ano, anos, dva_por_ano=None):
         da_dva = proventos_dva(dva) if dva else None
         declarados = proventos_declarados(dmpl) if dmpl else None
         caixa = fluxo(dfc)
-        if da_dva is not None:
+        # DVA positiva vence (é a remuneração atribuída ao lucro do ano; na Petrobras a DMPL
+        # infla com o adicional do ano anterior). DVA zerada com DMPL positiva é omissão
+        # da folha (Lavvi, Yduqs): vale a DMPL.
+        if da_dva:
             proventos, fonte = da_dva, "dva"
         elif declarados:
             proventos, fonte = declarados, "dmpl"
         elif caixa["dividendos_pagos"]:
             proventos, fonte = caixa["dividendos_pagos"], "dfc"
-        elif declarados is not None or caixa["dividendos_pagos"] is not None or da_dva == 0:
-            proventos, fonte = 0.0, "dva" if da_dva == 0 else ("dmpl" if declarados is not None else "dfc")
+        elif da_dva == 0 or declarados == 0 or caixa["dividendos_pagos"] == 0:
+            proventos, fonte = 0.0, "dva" if da_dva == 0 else ("dmpl" if declarados == 0 else "dfc")
         else:
             proventos, fonte = None, None
         payout = proventos / lucro if proventos is not None and lucro and lucro > 0 else None
@@ -344,15 +352,19 @@ def _filtrar_membro(zf, nome, cds):
     return [d for d in ler_csv(texto) if norm_cd(d.get("CD_CVM")) in cds]
 
 
-def ler_zips(caminhos, cds):
-    """Junta DRE, DMPL, DFC e DVA consolidados, já na versão escolhida por ano."""
+def ler_zips(caminhos, cds, individual=False):
+    """Junta DRE, DMPL, DFC e DVA já na versão escolhida por ano.
+
+    ``individual=False`` lê o consolidado (``_con_``). ``True`` lê a controladora (``_ind_``).
+    """
     cds = {norm_cd(c) for c in cds}
+    tag = "ind" if individual else "con"
     baldes = {"dre": [], "dmpl": [], "dfc": [], "dva": []}
     prefixos = (
-        ("dfp_cia_aberta_DRE_con_", "dre"),
-        ("dfp_cia_aberta_DMPL_con_", "dmpl"),
-        ("dfp_cia_aberta_DFC_MI_con_", "dfc"),
-        ("dfp_cia_aberta_DVA_con_", "dva"),
+        (f"dfp_cia_aberta_DRE_{tag}_", "dre"),
+        (f"dfp_cia_aberta_DMPL_{tag}_", "dmpl"),
+        (f"dfp_cia_aberta_DFC_MI_{tag}_", "dfc"),
+        (f"dfp_cia_aberta_DVA_{tag}_", "dva"),
     )
     for caminho in caminhos:
         with zipfile.ZipFile(caminho) as zf:
@@ -368,6 +380,33 @@ def ler_zips(caminhos, cds):
             for chave in ("dre", "dmpl", "dfc", "dva")
         )
     return por_cd
+
+
+def fundir_anos(consolidado, individual, preferir_individual):
+    """Por ano, a demonstração a usar. Banco prefere a controladora; os demais, o consolidado."""
+    consolidado = consolidado or {}
+    individual = individual or {}
+    saida = {}
+    for ano in set(consolidado) | set(individual):
+        cons = consolidado.get(ano) or []
+        ind = individual.get(ano) or []
+        if preferir_individual and ind:
+            saida[ano] = ind
+        elif cons:
+            saida[ano] = cons
+        else:
+            saida[ano] = ind
+    return saida
+
+
+def resumo_empresa(con, ind, anos, financeiro=False):
+    """Payout da janela. Instituição financeira usa a controladora, que é quem declara o JCP."""
+    con = con or ({}, {}, {}, {})
+    ind = ind or ({}, {}, {}, {})
+    partes = [fundir_anos(con[i], ind[i], financeiro) for i in range(4)]
+    if not any(partes):
+        return None
+    return resumir(montar_anos(partes[0], partes[1], partes[2], anos, partes[3]), financeiro=financeiro)
 
 
 IDADE_CACHE_DFP_S = 7 * 24 * 3600
@@ -443,14 +482,19 @@ def baixar_dfp(ano, cache_dir, idade_max_s=IDADE_CACHE_DFP_S):
     return destino
 
 
-def payout_por_cd(cds, hoje, cache_dir, anos=None):
-    """{cd_cvm normalizado: resumo} para os códigos encontrados no DFP. Não marca setor financeiro."""
+def pacotes_por_cd(cds, hoje, cache_dir, anos=None):
+    """(anos, consolidado, individual) para o chamador escolher a demonstração por setor."""
     anos = list(anos or anos_exercicio(hoje))
     caminhos = [baixar_dfp(ano, cache_dir) for ano in anos_arquivo_dfp(hoje, janela=len(anos))]
-    bruto = ler_zips(caminhos, cds)
+    return anos, ler_zips(caminhos, cds, False), ler_zips(caminhos, cds, True)
+
+
+def payout_por_cd(cds, hoje, cache_dir, anos=None):
+    """Resumo consolidado. Preferir ``pacotes_por_cd`` + ``resumo_empresa`` quando houver setor."""
+    anos, con, ind = pacotes_por_cd(cds, hoje, cache_dir, anos)
     saida = {}
-    for cd, (dre, dmpl, dfc, dva) in bruto.items():
-        if not dre and not dmpl and not dfc and not dva:
-            continue
-        saida[cd] = resumir(montar_anos(dre, dmpl, dfc, anos, dva), financeiro=False)
+    for cd in con:
+        resumo = resumo_empresa(con.get(cd), ind.get(cd), anos, financeiro=False)
+        if resumo:
+            saida[cd] = resumo
     return saida
