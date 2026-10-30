@@ -71,7 +71,7 @@ def test_metricas_sem_cvm_continua_dy_vezes_pl():
     assert m["anos_completos"] == [2020, 2021, 2022, 2023, 2024, 2025]
     assert m["serie_div"] == [1, 1, 1, 1, 1, 1]
     assert m["div_liq_ebit"] == pytest.approx(2)
-    assert m["paga_com_divida"] is None
+    assert m["dividendo_acima_fcf"] is None
 
 
 def test_metricas_usa_serie_liquida_e_payout_cvm_quando_ha_tres_anos():
@@ -82,17 +82,42 @@ def test_metricas_usa_serie_liquida_e_payout_cvm_quando_ha_tres_anos():
         "proventos_ano": {ano: 1.0 for ano in range(2020, 2026)},
         "proventos_ano_liquido": {ano: 0.5 for ano in range(2020, 2026)},
         "div_liquida": None, "ebit_12m": None,
-        "cvm": {"util_no_score": True, "payout_medio": 0.42, "anos": 4, "paga_com_divida": True},
+        "cvm": {"util_no_score": True, "payout_agregado": 0.42, "anos": 4, "dividendo_acima_fcf": True},
     }
     m = dividendos.metricas(r)
     assert m["serie_div"] == [0.5] * 6
     assert m["payout"] == pytest.approx(0.42)
     assert m["payout_fonte"] == "cvm"
     assert m["payout_dy_pl"] == pytest.approx(0.8)
-    assert m["paga_com_divida"] is True
+    assert m["dividendo_acima_fcf"] is True
 
 
-def test_scripts_atuais_nao_desligam_ssl():
+def test_payout_de_fallback_usa_dy_bruto():
+    import dividendos
+    dividendos.HOJE = dt.date(2026, 10, 30)
+    r = {
+        "dy": 0.085, "dy_bruto": 0.10, "pl": 8,
+        "proventos_ano": {ano: 1.0 for ano in range(2020, 2026)},
+        "div_liquida": None, "ebit_12m": None,
+    }
+    m = dividendos.metricas(r)
+    assert m["payout"] == pytest.approx(0.8)
+    assert m["payout_fonte"] == "dy_x_pl"
+
+
+def test_cache_do_fetch_usa_o_dia_explicito(tmp_path, monkeypatch):
+    import b3lib.http as http
+    monkeypatch.setattr(http, "CACHE_DIR", str(tmp_path))
+
+    class Resp:
+        def read(self):
+            return "ok".encode("latin-1")
+
+    monkeypatch.setattr(http.urllib.request, "urlopen", lambda *a, **k: Resp())
+    http.fetch("/resultado.php", dia=dt.date(2026, 10, 26), nome="teste_dia")
+    nomes = [p.name for p in tmp_path.iterdir()]
+    assert any("20261026" in n for n in nomes)
+    assert not hasattr(http, "_HOJE")
     for nome in ("dividendos.py", "fiis.py", "leitura_pos_eleicao.py", "painel_pos_eleicao.py",
                  "painel_besst.py", "b3lib/http.py"):
         texto = (RAIZ / nome).read_text(encoding="utf-8")

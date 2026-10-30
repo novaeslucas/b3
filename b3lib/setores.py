@@ -10,21 +10,21 @@ import unicodedata
 from b3lib.http import B3, fetch
 
 
-def _b3(metodo, params, nome):
+def _b3(metodo, params, nome, dia=None):
     p = base64.b64encode(json.dumps(params, separators=(",", ":")).encode()).decode()
-    texto = fetch(None, f"{B3}/{metodo}/{p}", "utf-8", nome)
+    texto = fetch(None, f"{B3}/{metodo}/{p}", "utf-8", nome, dia=dia)
     return json.loads(texto) if texto.lstrip().startswith("{") else None
 
 
-def classificacao_b3(ticker):
+def classificacao_b3(ticker, dia=None):
     """{'setor_economico', 'subsetor', 'segmento', 'atividade'} segundo a B3, ou None."""
     raiz = ticker[:4]
     lista = _b3("GetInitialCompanies", {"language": "pt-br", "pageNumber": 1, "pageSize": 20, "company": raiz},
-                f"b3_GetInitialCompanies_1_20_{raiz}") or {}
+                f"b3_GetInitialCompanies_1_20_{raiz}", dia) or {}
     cvm = next((e["codeCVM"] for e in lista.get("results", []) if e["issuingCompany"] == raiz), None)
     if not cvm:
         return None
-    det = _b3("GetDetail", {"codeCVM": cvm, "language": "pt-br"}, f"b3_GetDetail_{cvm}")
+    det = _b3("GetDetail", {"codeCVM": cvm, "language": "pt-br"}, f"b3_GetDetail_{cvm}", dia)
     if not det or not det.get("industryClassification"):
         return None
     partes = [p.strip() for p in det["industryClassification"].split("/")]
@@ -49,9 +49,9 @@ def iguais(a, b):
     return len(wa) == len(wb) and all(x.startswith(y) or y.startswith(x) for x, y in zip(wa, wb))
 
 
-def classificacao(ticker, setor_fundamentus, subsetor_fundamentus):
+def classificacao(ticker, setor_fundamentus, subsetor_fundamentus, dia=None):
     """B3 quando disponível (prevalece em divergência), senão Fundamentus."""
-    b3 = classificacao_b3(ticker)
+    b3 = classificacao_b3(ticker, dia=dia)
     if not b3:
         return {"fonte": "Fundamentus", "setor_economico": None, "subsetor": setor_fundamentus,
                 "segmento": subsetor_fundamentus, "atividade": None, "diverge_subsetor": None,

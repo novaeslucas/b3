@@ -55,30 +55,35 @@ def test_dy_bruto_so_perde_o_ir_do_jcp():
     assert dy == pytest.approx(0.12 * 0.825)
 
 
-def test_natureza_recorrente_misto_e_extraordinario():
-    def ev(ano, bruto, tipo="DIVIDENDO", liquido=None):
+def test_natureza_recorrente_misto_e_extraordinario_na_janela_do_dy():
+    def ev(ano, bruto, tipo="DIVIDENDO", mes=6, dia=1):
         return {
-            "data_com": dt.date(ano, 6, 1), "classe": "dividendo", "tipo": tipo,
-            "valor_bruto": bruto, "valor_liquido": bruto if liquido is None else liquido,
+            "data_com": dt.date(ano, mes, dia), "classe": "dividendo", "tipo": tipo,
+            "valor_bruto": bruto, "valor_liquido": bruto,
             "extraordinario": "EXTRA" in tipo,
         }
     anos = [2020, 2021, 2022, 2023, 2024, 2025]
-    recorrente = classificar_natureza([ev(a, 1) for a in anos], anos)
+    hoje = dt.date(2025, 12, 31)
+    recorrente = classificar_natureza([ev(a, 1) for a in anos], hoje, anos)
     assert recorrente["natureza_proventos"] == "recorrente"
     assert recorrente["parcela_extraordinaria"] == 0
 
     misto = [ev(a, 1) for a in anos if a != 2025] + [ev(2025, 0.8), ev(2025, 0.2, "DIVIDENDO EXTRAORDINARIO")]
-    nat = classificar_natureza(misto, anos)
+    nat = classificar_natureza(misto, hoje, anos)
     assert nat["natureza_proventos"] == "misto"
     assert nat["parcela_extraordinaria"] == pytest.approx(0.2)
 
-    page = (FIX / "proventos_amostra.html").read_text(encoding="utf-8")
-    pico = classificar_natureza(parse_proventos_html(page), anos)
+    # 2025 foi normal; o extraordinário cai em 2026, dentro dos 12 meses do DY.
+    base = [ev(a, 1) for a in anos]
+    base.append(ev(2026, 5, "DIVIDENDO EXTRAORDINARIO", mes=3))
+    pico = classificar_natureza(base, dt.date(2026, 10, 30), anos + [2026])
     assert pico["natureza_proventos"] == "extraordinario"
     assert pico["parcela_extraordinaria"] > 0.5
+    assert pico["proventos_janela_liquido"] == pytest.approx(5)
 
 
 def test_aliquota_historica_e_a_partir_de_2026():
-    assert aliquota_jcp(dt.date(2025, 12, 31)) == 0.15
-    assert aliquota_jcp(dt.date(2026, 1, 1)) == 0.175
+    from b3lib.proventos import ALIQUOTA_JCP_ATE_2025, ALIQUOTA_JCP_DESDE_2026, DATA_NOVA_ALIQUOTA_JCP
+    assert aliquota_jcp(dt.date(2025, 12, 31)) == ALIQUOTA_JCP_ATE_2025 == 0.15
+    assert aliquota_jcp(DATA_NOVA_ALIQUOTA_JCP) == ALIQUOTA_JCP_DESDE_2026 == 0.175
     assert aliquota_jcp(None) == 0.15

@@ -16,18 +16,6 @@ from b3lib.log import logger
 
 B3 = "https://sistemaswebb3-listados.b3.com.br/listedCompaniesProxy/CompanyCall"
 CACHE_DIR = "cache"
-_HOJE = None  # preenchido por definir_hoje; o padrão é a data do processo
-
-
-def definir_hoje(data):
-    """Permite aos scripts fixar o dia do cache (snapshots)."""
-    global _HOJE
-    _HOJE = data
-
-
-def hoje():
-    import datetime as dt
-    return _HOJE or dt.date.today()
 
 
 def load_env(path=".env"):
@@ -38,10 +26,14 @@ def load_env(path=".env"):
                 os.environ.setdefault(k.strip(), v.strip().strip('"'))
 
 
-def fetch(path, url=None, encoding="latin-1", nome=None):
-    """GET (Fundamentus por padrão) com cache diário em disco. SSL sempre verificado."""
+def fetch(path, url=None, encoding="latin-1", nome=None, dia=None):
+    """GET (Fundamentus por padrão) com cache diário em disco. SSL sempre verificado.
+
+    ``dia`` entra no nome do arquivo. Quem reaproveita um snapshot passa a data;
+    omitido, vale o dia do processo. Não há estado global.
+    """
     import datetime as dt
-    dia = hoje() if isinstance(hoje(), dt.date) else dt.date.today()
+    dia = dia or dt.date.today()
     os.makedirs(CACHE_DIR, exist_ok=True)
     fn = os.path.join(CACHE_DIR, re.sub(r"[^\w]+", "_", nome or path or "url") + f"_{dia:%Y%m%d}.html")
     if os.path.exists(fn):

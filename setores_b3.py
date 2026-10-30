@@ -23,7 +23,7 @@ def main():
     linhas = list(csv.DictReader(open(acoes.csv_da_analise(acoes.HOJE), encoding="utf-8-sig"), delimiter=";"))
     fund = {r["ticker"]: acoes.detalhes(r["ticker"]) for r in linhas}
     with ThreadPoolExecutor(max_workers=4) as pool:
-        res = dict(zip(fund, pool.map(lambda t: classificacao(t, fund[t]["setor"], fund[t]["subsetor"]), fund)))
+        res = dict(zip(fund, pool.map(lambda t: classificacao(t, fund[t]["setor"], fund[t]["subsetor"], acoes.HOJE), fund)))
 
     sem_b3 = [t for t, c in res.items() if c["fonte"] != "B3"]
     div_sub = [t for t, c in res.items() if c["diverge_subsetor"]]

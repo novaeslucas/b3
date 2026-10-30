@@ -45,7 +45,6 @@ from b3lib.cvm import (
 )
 from b3lib.fundamentus import parse_campos_detalhe, parse_resultado_acoes
 from b3lib.http import B3, CACHE_DIR, fetch as _fetch, load_env
-from b3lib.http import definir_hoje
 from b3lib.log import configurar, registrar_falha, resumo_falhas
 from b3lib.numeros import lin, media, num
 from b3lib.proventos import (
@@ -86,10 +85,13 @@ CLASSES = {
 
 # ---------------------------------------------------------------- utilidades
 
-def fetch(path, url=None, encoding="latin-1", nome=None):
-    """Mesma assinatura de antes. O dia do cache é ``HOJE`` deste módulo (scripts antigos o reatribuem)."""
-    definir_hoje(HOJE)
-    return _fetch(path, url, encoding, nome)
+def fetch(path, url=None, encoding="latin-1", nome=None, dia=None):
+    """Mesma assinatura de antes, com ``dia`` opcional. O padrão é ``HOJE`` deste módulo.
+
+    As leituras em ``leituras/`` fazem ``acoes.HOJE = data`` e chamam ``fetch`` sem o
+    argumento: o dia é lido aqui na hora da chamada, não num global de ``b3lib``.
+    """
+    return _fetch(path, url, encoding, nome, dia=dia or HOJE)
 
 
 # ---------------------------------------------------------------- coleta
@@ -243,6 +245,10 @@ def conferir(r):
 
 # ---------------------------------------------------------------- métricas e score
 
+# Cada exercício com prejuízo e provento declarado tira isto da nota de payout (0 a 1), até zerar.
+PENALIDADE_PREJUIZO_COM_PROVENTO = 0.5
+
+
 def metricas(r):
     # Série líquida quando o enriquecimento novo a calculou; senão a série bruta (leituras antigas).
     anos = r.get("proventos_ano_liquido") or r["proventos_ano"]
@@ -252,10 +258,14 @@ def metricas(r):
     cortes = sum(1 for a, b in zip(serie, serie[1:]) if a > 0 and b < a * 0.8)  # queda > 20% a/a
     ini, fim = serie[0], serie[-1]
     cagr = (fim / ini) ** (1 / (len(serie) - 1)) - 1 if ini > 0 and fim > 0 else None
-    payout_aprox = r["dy"] * r["pl"] if r["dy"] is not None and r["pl"] else None
+    # Payout é métrica da companhia, sempre bruta. O DY líquido fica só no rendimento do acionista.
+    dy_bruto = r["dy_bruto"] if r.get("dy_bruto") is not None else r["dy"]
+    payout_aprox = dy_bruto * r["pl"] if dy_bruto is not None and r["pl"] else None
     cvm = r.get("cvm") or {}
-    if cvm.get("util_no_score"):
-        payout, fonte = cvm["payout_medio"], "cvm"
+    if cvm.get("sem_cobertura"):
+        payout, fonte = None, "cvm_sem_lucro"
+    elif cvm.get("util_no_score"):
+        payout, fonte = cvm["payout_agregado"], "cvm"
     else:
         payout, fonte = payout_aprox, "dy_x_pl"
     ebit = r.get("ebit_12m")
@@ -263,16 +273,29 @@ def metricas(r):
     return {
         "anos_completos": completos, "serie_div": serie, "anos_pagos": pagos, "cortes": cortes,
         "cagr_div": cagr, "payout": payout, "payout_dy_pl": payout_aprox, "payout_fonte": fonte,
-        "paga_com_divida": cvm.get("paga_com_divida"), "cvm_anos": cvm.get("anos"),
+        "sem_cobertura": bool(cvm.get("sem_cobertura")),
+        "anos_prejuizo_com_provento": cvm.get("anos_prejuizo_com_provento") or 0,
+        "dividendo_acima_fcf": cvm.get("dividendo_acima_fcf"), "cvm_anos": cvm.get("anos"),
         "div_liq_ebit": alav,
         "div_ultimo_vs_media": fim / (sum(serie[:-1]) / (len(serie) - 1)) if sum(serie[:-1]) > 0 else None,
     }
 
 
+def _nota_payout(payout):
+    if payout is None:
+        return None
+    if payout > 1.2:
+        return 0.0
+    if payout > 0.9:
+        return lin(payout, 1.2, 0.9)
+    return 1.0
+
+
 def score(r):
     m = r["m"]
-    payout = m["payout"]
-    s_payout = None if payout is None else (0.0 if payout > 1.2 else lin(payout, 1.2, 0.9) if payout > 0.9 else 1.0)
+    s_payout = 0.0 if m.get("sem_cobertura") else _nota_payout(m["payout"])
+    if s_payout is not None and m.get("anos_prejuizo_com_provento"):
+        s_payout = max(0.0, s_payout - PENALIDADE_PREJUIZO_COM_PROVENTO * m["anos_prejuizo_com_provento"])
     pilares = {
         "sustentabilidade": media([s_payout, lin(m["div_liq_ebit"], 4.0, 1.0), lin(r["liq_corr"], 0.8, 1.5)]),
         "historico": media([lin(m["anos_pagos"], ANOS_HIST - 3, ANOS_HIST), lin(m["cortes"], 3, 0)]),
@@ -299,13 +322,14 @@ def estado_jev(r):
     return {
         "context": "Fundamental indicators of a company listed on the Brazilian stock exchange (B3), computed from "
                    "public data. dividend_yield_12m and the per-share history below are net of withholding tax on JCP "
-                   "(interest on capital): 15% before 2026-01-01 and 17.5% on payments from that date. "
-                   "Payout is the 5-year average of declared distributions over controlling shareholders' net "
-                   "income from CVM DFP filings when company.payout_source is 'cvm'; otherwise it is net dividend "
-                   "yield times P/E. company.dividend_nature (recorrente, misto, extraordinario) was computed in "
-                   "code from labeled one-off dividends and from a spike versus the prior median. "
-                   "company.pays_dividends_above_fcf flags non-financial companies whose cash dividends exceeded "
-                   "free cash flow in most of the last five years. Banks and insurers do not report EBIT, so "
+                   "(interest on capital): 15% before 2026-01-01 and 17.5% on payment or credit from that date. "
+                   "Payout is gross: sum of declared distributions over sum of controlling shareholders' net income "
+                   "across five CVM DFP years when company.payout_source is 'cvm' (loss years stay in both sums); "
+                   "otherwise gross dividend yield times P/E. company.dividend_nature (recorrente, misto, "
+                   "extraordinario) was computed on the same trailing 12 months as the yield, against the median of "
+                   "prior full years. company.dividends_above_fcf means cash dividends exceeded free cash flow "
+                   "(CFO minus capex and IFRS 16 lease principal) in most of the last five years; the gap can be "
+                   "covered by cash already on the balance sheet. Banks and insurers do not report EBIT, so "
                    "EBIT-based leverage is missing for them, and the FCF flag is not applied to financials.",
         "company": {
             "ticker": r["ticker"], "name": r.get("empresa"), "sector": r.get("setor"), "subsector": r.get("subsetor"),
@@ -315,8 +339,8 @@ def estado_jev(r):
             "payout_source": m.get("payout_fonte") or "dy_x_pl",
             "payout_yield_times_pe": pct(m.get("payout_dy_pl")),
             "dividend_nature": natureza,
-            "extraordinary_share_last_complete_year": pct(r.get("parcela_extraordinaria")),
-            "pays_dividends_above_fcf": m.get("paga_com_divida"),
+            "extraordinary_share_of_ttm_yield": pct(r.get("parcela_extraordinaria")),
+            "dividends_above_fcf": m.get("dividendo_acima_fcf"),
             "dividends_per_share_by_year_BRL": {str(a): round(v, 4) for a, v in zip(m["anos_completos"], m["serie_div"])},
             "dividends_per_share_current_year_so_far_BRL": round(serie_ano.get(HOJE.year, 0.0), 4),
             "years_with_dividends": f"{m['anos_pagos']} of {ANOS_HIST}",
@@ -353,7 +377,8 @@ PERGUNTAS = {
         "instructions": "Is the trailing 12-month dividend yield of the company in `company` inflated by a "
                         "one-off or extraordinary distribution, or by a sharp share-price drop, rather than "
                         "reflecting its recurring dividend capacity? Use company.dividend_nature and "
-                        "company.extraordinary_share_last_complete_year, which the code already computed. "
+                        "company.extraordinary_share_of_ttm_yield, which the code already computed on the same "
+                        "trailing 12 months as the yield. "
                         "A large share of JCP is not, by itself, an extraordinary distribution.",
         "criteria": {
             "true": "The current yield looks inflated: dividend_nature is extraordinario or misto with a large "
@@ -416,6 +441,8 @@ def classificar(candidatas):
 
 def decisao(r):
     """Política explícita, no código, combinando score e julgamentos do Jev."""
+    if r.get("coleta") == "incompleta":
+        return "coleta incompleta"
     j = r.get("jev")
     if not j:
         return "-"
@@ -427,18 +454,21 @@ def decisao(r):
 
 
 def relatorio(candidatas):
-    ordem = {"estudar": 0, "monitorar": 1, "descartar": 2, "-": 3}
-    candidatas.sort(key=lambda r: (ordem[r["decisao"]], -r["score"]))
+    ordem = {"estudar": 0, "monitorar": 1, "descartar": 2, "coleta incompleta": 3, "-": 4}
+    candidatas.sort(key=lambda r: (ordem.get(r["decisao"], 9), -(r["score"] or 0)))
     curto = {"DIVIDENDO_SUSTENTAVEL": "SUSTENTÁVEL", "DIVIDENDO_ATENCAO": "ATENÇÃO", "DIVIDENDO_FRAGIL": "FRÁGIL"}
     f = lambda v, d=1: "   -" if v is None else f"{100 * v:5.{d}f}%"
     nat = {"recorrente": "recorr.", "misto": "misto", "extraordinario": "extraord."}
-    print(f"\n{'Ticker':<7}{'Setor':<22}{'DY':>7}{'Payout':>8}{'ROE':>7}{'Pagos':>6}{'Cortes':>7}"
+    print(f"\n{'Ticker':<7}{'Setor':<22}{'DYliq':>7}{'DYbr':>7}{'Payout':>8}{'ROE':>7}{'Pagos':>6}{'Cortes':>7}"
           f"{'CAGR div':>9}{'Score':>7}  {'Jev':<12}{'conf':>5}{'P(extra)':>9}  {'Proventos':<10}Decisão")
+    print("DY líquido = o que o acionista recebe (IR do JCP descontado). DY bruto = filtro --dy-min e payout DY×P/L.")
     for r in candidatas:
         m, j = r["m"], r.get("jev") or {}
         fonte = " CVM" if m.get("payout_fonte") == "cvm" else ""
-        print(f"{r['ticker']:<7}{(r.get('setor') or '')[:21]:<22}{f(r['dy'])}{f(m['payout'], 0):>8}{f(r['roe'], 0):>7}"
-              f"{m['anos_pagos']:>4}/{ANOS_HIST}{m['cortes']:>7}{f(m['cagr_div']):>9}{r['score']:>7.1f}  "
+        score_txt = "   -" if r.get("score") is None else f"{r['score']:>7.1f}"
+        print(f"{r['ticker']:<7}{(r.get('setor') or '')[:21]:<22}{f(r['dy'])}{f(r.get('dy_bruto')):>7}"
+              f"{f(m.get('payout'), 0):>8}{f(r['roe'], 0):>7}"
+              f"{(m.get('anos_pagos') or 0):>4}/{ANOS_HIST}{(m.get('cortes') or 0):>7}{f(m.get('cagr_div')):>9}{score_txt}  "
               f"{curto.get(j.get('classe'), '-'):<12}{j.get('confianca', 0):>5.2f}{j.get('p_extraordinario', 0):>9.2f}"
               f"  {nat.get(r.get('natureza_proventos'), '  -'):<10}{r['decisao']}{fonte}")
 
@@ -447,16 +477,17 @@ def relatorio(candidatas):
         w.writerow(["ticker", "empresa", "setor", "dy", "payout", "roe", "roic", "pl", "pvp", "div_liq_ebit",
                     "anos_pagos", "cortes", "cagr_div", "score", *PESOS, "jev_classe", "jev_confianca",
                     "jev_p_extraordinario", "decisao", "conferencia_b3", "dy_bruto", "natureza_proventos",
-                    "parcela_extraordinaria", "payout_fonte", "payout_dy_pl", "paga_com_divida", "cvm_anos"])
+                    "parcela_extraordinaria", "payout_fonte", "payout_dy_pl", "dividendo_acima_fcf", "cvm_anos",
+                    "coleta"])
         for r in candidatas:
             m, j = r["m"], r.get("jev") or {}
-            divida = {True: "sim", False: "nao"}.get(m.get("paga_com_divida"), "")
-            w.writerow([r["ticker"], r.get("empresa"), r.get("setor"), r["dy"], m["payout"], r["roe"], r["roic"],
-                        r["pl"], r["pvp"], m["div_liq_ebit"], m["anos_pagos"], m["cortes"], m["cagr_div"],
-                        r["score"], *(r["pilares"][k] for k in PESOS), j.get("classe"), j.get("confianca"),
+            acima = {True: "sim", False: "nao"}.get(m.get("dividendo_acima_fcf"), "")
+            w.writerow([r["ticker"], r.get("empresa"), r.get("setor"), r["dy"], m.get("payout"), r["roe"], r["roic"],
+                        r["pl"], r["pvp"], m.get("div_liq_ebit"), m.get("anos_pagos"), m.get("cortes"), m.get("cagr_div"),
+                        r.get("score"), *(r["pilares"][k] for k in PESOS), j.get("classe"), j.get("confianca"),
                         j.get("p_extraordinario"), r["decisao"], r.get("conferencia_b3"), r.get("dy_bruto"),
                         r.get("natureza_proventos"), r.get("parcela_extraordinaria"), m.get("payout_fonte"),
-                        m.get("payout_dy_pl"), divida, m.get("cvm_anos")])
+                        m.get("payout_dy_pl"), acima, m.get("cvm_anos"), r.get("coleta") or "ok"])
 
     divergentes = [f"{r['ticker']} ({r['conferencia_b3']})" for r in candidatas
                    if (r.get("conferencia_b3") or "").startswith(("diverge", "erro"))]
@@ -477,17 +508,17 @@ def gerar_dashboard(candidatas):
             "ticker": r["ticker"], "empresa": r.get("empresa"), "setor": r.get("setor"),
             "subsetor": r.get("subsetor"), "cotacao": r["cotacao"], "dy": r["dy"], "dy_bruto": r.get("dy_bruto"),
             "payout": r["m"]["payout"], "payout_fonte": r["m"].get("payout_fonte"),
-            "payout_dy_pl": r["m"].get("payout_dy_pl"), "paga_com_divida": r["m"].get("paga_com_divida"),
-            "cvm_anos": r["m"].get("cvm_anos"),
+            "payout_dy_pl": r["m"].get("payout_dy_pl"), "dividendo_acima_fcf": r["m"].get("dividendo_acima_fcf"),
+            "cvm_anos": r["m"].get("cvm_anos"), "coleta": r.get("coleta") or "ok",
             "natureza_proventos": r.get("natureza_proventos"),
             "parcela_extraordinaria": r.get("parcela_extraordinaria"),
             "roe": r["roe"], "roic": r["roic"], "mrg_liq": r["mrg_liq"], "pl": r["pl"], "pvp": r["pvp"],
             "ev_ebitda": r["ev_ebitda"], "div_liq_ebit": r["m"]["div_liq_ebit"], "liq_2m": r["liq_2m"],
             "oscil_12m": r.get("oscil_12m"), "cresc_rec_5a": r["cresc_rec_5a"],
             "anos_pagos": r["m"]["anos_pagos"], "cortes": r["m"]["cortes"], "cagr_div": r["m"]["cagr_div"],
-            "div_fundamentus": [round(r["proventos_ano"].get(a, 0.0), 4) for a in anos],
+            "div_fundamentus": [round((r.get("proventos_ano") or {}).get(a, 0.0), 4) for a in anos],
             "div_b3": [round(r.get("proventos_b3", {}).get(a, 0.0), 4) for a in anos] if r.get("proventos_b3") else None,
-            "div_ano_corrente": round(r["proventos_ano"].get(HOJE.year, 0.0), 4),
+            "div_ano_corrente": round((r.get("proventos_ano") or {}).get(HOJE.year, 0.0), 4),
             "score": r["score"], "pilares": r["pilares"], "jev": r.get("jev"),
             "decisao": r["decisao"], "conferencia_b3": r.get("conferencia_b3"),
         } for r in candidatas],
@@ -545,7 +576,8 @@ def anexar_cvm(candidatas):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--dy-min", type=float, default=5.0, help="DY mínimo em %% (padrão 5)")
+    ap.add_argument("--dy-min", type=float, default=5.0,
+                    help="DY bruto mínimo em %% (Fundamentus, antes do IR do JCP; padrão 5). O score mostra o líquido.")
     ap.add_argument("--liq-min", type=float, default=2_000_000, help="liquidez média diária mínima em R$")
     ap.add_argument("--limite", type=int, default=80, help="máximo de empresas analisadas (mais líquidas)")
     ap.add_argument("--sem-jev", action="store_true", help="só o score determinístico")
@@ -565,7 +597,8 @@ def main():
         PRECOS_EM = f"fechamento de {data:%d/%m/%Y} (Yahoo Finance) sobre indicadores do Fundamentus baixados em {HOJE:%d/%m/%Y}"
     candidatas = filtrar(mercado, args.dy_min / 100, args.liq_min, args.limite)
     print(f"{len(mercado)} tickers no Fundamentus; {len(candidatas)} empresas passaram nos filtros "
-          f"(DY >= {args.dy_min:g}%, liquidez >= R$ {args.liq_min:,.0f}, P/L > 0).")
+          f"(DY bruto >= {args.dy_min:g}%, liquidez >= R$ {args.liq_min:,.0f}, P/L > 0). "
+          f"O DY do score e do painel é o líquido de IR sobre JCP; --dy-min não muda de base.")
 
     def enriquecer(r):
         try:
@@ -577,30 +610,41 @@ def main():
             r["proventos_ano"] = tabela_anual(page) or agregar_por_ano(eventos, liquido=False)
             r["proventos_ano_liquido"] = agregar_por_ano(eventos, liquido=True, incluir_outros=False)
             completos = [HOJE.year - i for i in range(ANOS_HIST, 0, -1)]
-            r.update(classificar_natureza(eventos, completos))
+            r.update(classificar_natureza(eventos, HOJE, completos))
             r["dy_bruto"] = r["dy"]
             r["dy"], r["fator_jcp"] = aplicar_dy_liquido(r["dy"], eventos, HOJE)
+            r["coleta"] = "ok"
             return r
         except Exception as e:
             registrar_falha(r["ticker"], "coleta", e)
-            return None
+            r["coleta"] = "incompleta"
+            r["coleta_erro"] = f"{type(e).__name__}: {e}"
+            r["dy_bruto"] = r.get("dy")
+            return r
     with ThreadPoolExecutor(max_workers=4) as pool:
-        candidatas = [r for r in pool.map(enriquecer, candidatas) if r]
-    if not candidatas:
+        candidatas = list(pool.map(enriquecer, candidatas))
+    incompletas = [r for r in candidatas if r.get("coleta") == "incompleta"]
+    completas = [r for r in candidatas if r.get("coleta") != "incompleta"]
+    if not completas and not incompletas:
         resumo_falhas()
         sys.exit("Nenhuma empresa com coleta completa.")
-    if not args.sem_cvm:
-        anexar_cvm(candidatas)
-    for r in candidatas:
+    if not args.sem_cvm and completas:
+        anexar_cvm(completas)
+    for r in incompletas:
+        r["m"] = {"payout": None, "payout_fonte": None, "payout_dy_pl": None, "div_liq_ebit": None,
+                  "anos_pagos": None, "cortes": None, "cagr_div": None, "dividendo_acima_fcf": None, "cvm_anos": None}
+        r["score"] = None
+        r["pilares"] = {k: None for k in PESOS}
+    for r in completas:
         r["m"] = metricas(r)
         r["score"], r["pilares"] = score(r)
-    if not args.sem_b3:
+    if not args.sem_b3 and completas:
         with ThreadPoolExecutor(max_workers=4) as pool:
-            for r, situacao in zip(candidatas, pool.map(conferir, candidatas)):
+            for r, situacao in zip(completas, pool.map(conferir, completas)):
                 r["conferencia_b3"] = situacao
 
-    if not args.sem_jev:
-        classificar(candidatas)
+    if not args.sem_jev and completas:
+        classificar(completas)
     for r in candidatas:
         r["decisao"] = decisao(r)
     relatorio(candidatas)

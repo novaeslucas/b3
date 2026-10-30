@@ -131,7 +131,7 @@ Os endpoints da B3 não são documentados; o levantamento de por que foram escol
    por ano (dividendos + JCP; o DY e o histórico do score descontam o IR do JCP).
 4. **Métricas** sobre os 6 últimos anos completos: anos com pagamento, cortes (queda > 20% a/a), CAGR dos
    dividendos e último ano vs. média anterior, na série **líquida de IR sobre JCP**. O payout do score é a média
-   de até 5 exercícios do DFP da CVM (proventos declarados ÷ lucro da controladora), quando há pelo menos 3 anos;
+   de até 5 exercícios do DFP da CVM (soma dos proventos ÷ soma do lucro da controladora, prejuízo incluído), quando há pelo menos 3 anos;
    sem isso, cai para DY líquido × P/L. Há também a natureza do provento (recorrente, misto, extraordinário) e,
    fora de banco e seguradora, a marca de dividendo pago acima do fluxo de caixa livre. O detalhe e o que ainda
    não entrou estão em [AJUSTES.md](AJUSTES.md).
@@ -344,8 +344,9 @@ python -m pytest
 - **JCP líquido no DY:** o rendimento e a série por ação do score descontam 15% de IRRF até 2025 e 17,5%
   no JCP pago a partir de 2026 (LC 224/2025). O payout contábil da CVM continua no valor bruto declarado.
   A retenção de 10% sobre dividendos acima de R$ 50 mil/mês depende do investidor e não entra na conta.
-- **Payout:** média do DFP quando há pelo menos três exercícios com lucro positivo; senão DY líquido × P/L,
-  que ainda mistura lucro contábil de 12 meses com o preço. O ITR do ano corrente não entra.
+- **Payout:** soma dos proventos ÷ soma do lucro na janela de 5 anos do DFP, com os anos de prejuízo dentro
+  das duas somas, quando há pelo menos três exercícios; senão DY **bruto** × P/L. O filtro `--dy-min` continua
+  no DY bruto do Fundamentus. O DY mostrado no score é o líquido de IR sobre JCP.
 - **FCF:** caixa operacional menos aquisições de imobilizado e intangível. É uma aproximação, e não se aplica
   a banco e seguradora.
 - **Bancos e seguradoras** não têm EBIT; o indicador de alavancagem fica ausente e o pilar é renormalizado.

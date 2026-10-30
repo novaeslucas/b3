@@ -1,10 +1,12 @@
 """Proventos do Fundamentus: parse do HTML, JCP líquido e natureza recorrente/extraordinária.
 
-O IR retido na fonte sobre JCP era 15% até 2025. A Lei Complementar 224/2025 elevou a
-alíquota para 17,5% sobre JCP pago ou creditado a partir de 01/01/2026. Sem data de
-pagamento, a data-com decide a alíquota. Dividendos entram pelo valor cheio: a
-retenção de 10% sobre dividendos acima de R$ 50 mil/mês (Lei 15.270/2025) depende
-do investidor, não do papel, e fica de fora desta conta.
+O IRRF do JCP era 15% (Lei 9.249/1995, art. 9º, § 2º). A Lei Complementar 224/2025,
+art. 8º, fixou 17,5% «na data do pagamento ou do crédito ao beneficiário». O art. 14,
+III, produz efeito em 1º/1/2026. Não é a data da deliberação. Sem data de pagamento
+no Fundamentus, a data-com é o substituto (limitação: não é o crédito individualizado).
+
+Dividendos entram pelo valor cheio. A retenção de 10% sobre dividendos acima de
+R$ 50 mil/mês (Lei 15.270/2025) depende do investidor, não do papel.
 """
 import datetime as dt
 import re
@@ -13,15 +15,22 @@ import statistics
 from b3lib.numeros import num
 from b3lib.texto import sem_acento
 
+# Lei 9.249/1995, art. 9º, § 2º, na redação anterior à LC 224/2025.
+ALIQUOTA_JCP_ATE_2025 = 0.15
+# LC 224/2025, art. 8º, c/c art. 14, III. Não há, nesse artigo, alta posterior para 20%
+# (os 17,5% até 2027 e 20% em 2028 do art. 7º são de CSLL de capitalização, não de JCP).
+ALIQUOTA_JCP_DESDE_2026 = 0.175
+DATA_NOVA_ALIQUOTA_JCP = dt.date(2026, 1, 1)
+
 _DATA = re.compile(r"\d{2}/\d{2}/\d{4}")
 _EXTRA = ("extraordin", "especial", "nao recorrente")
 
 
 def aliquota_jcp(data_ref):
-    """Alíquota de IRRF do JCP conforme a data de pagamento (ou data-com, se faltar)."""
-    if data_ref and data_ref >= dt.date(2026, 1, 1):
-        return 0.175
-    return 0.15
+    """IRRF do JCP. ``data_ref`` é o pagamento ou, na falta dele, a data-com."""
+    if data_ref and data_ref >= DATA_NOVA_ALIQUOTA_JCP:
+        return ALIQUOTA_JCP_DESDE_2026
+    return ALIQUOTA_JCP_ATE_2025
 
 
 def classe_tipo(tipo):
@@ -116,23 +125,21 @@ def fator_liquido_12m(eventos, hoje):
     return liquido / bruto
 
 
-def classificar_natureza(eventos, anos_completos):
-    """Recorrente, misto ou extraordinário no último ano completo.
+def classificar_natureza(eventos, hoje, anos_completos):
+    """Recorrente, misto ou extraordinário na mesma janela de 12 meses do DY.
 
-    Um evento de dividendo entra como extraordinário se o tipo traz extraordinário,
-    especial ou não recorrente. JCP não é extraordinário só por ser JCP.
-
-    Além do rótulo, o excesso do último ano completo sobre a mediana dos anos
-    anteriores com pagamento (quando há pelo menos três e o ano passa de 1,8× a
-    mediana) conta como parcela extraordinária. A parcela usada é o maior entre o
-    valor rotulado e esse excesso, para não contar o mesmo pico duas vezes.
+    A base é a mediana dos anos civis inteiros anteriores ao início da janela
+    (pelo menos três com pagamento). Um dividendo extraordinário de 2026 entra
+    mesmo que 2025 tenha sido um ano normal. JCP não é extraordinário só por ser JCP.
+    A parcela é o maior entre o valor rotulado e o excesso sobre a mediana, para
+    não contar o mesmo pico duas vezes.
     """
-    if not anos_completos:
-        return {"natureza_proventos": "recorrente", "parcela_extraordinaria": 0.0,
-                "proventos_ultimo_ano_liquido": 0.0, "mediana_anterior_liquida": None}
-    ultimo = anos_completos[-1]
+    inicio = hoje - dt.timedelta(days=365)
 
-    def total(ano, so_extra=False):
+    def da_janela(e):
+        return e["classe"] != "outro" and inicio < e["data_com"] <= hoje
+
+    def total_ano(ano, so_extra=False):
         s = 0.0
         for e in eventos:
             if e["classe"] == "outro" or e["data_com"].year != ano:
@@ -142,9 +149,11 @@ def classificar_natureza(eventos, anos_completos):
             s += e["valor_liquido"]
         return s
 
-    tot = total(ultimo)
-    rotulado = total(ultimo, so_extra=True)
-    anteriores = [total(a) for a in anos_completos[:-1] if total(a) > 0]
+    janela = [e for e in eventos if da_janela(e)]
+    tot = sum(e["valor_liquido"] for e in janela)
+    rotulado = sum(e["valor_liquido"] for e in janela if e["extraordinario"])
+    anteriores = [total_ano(a) for a in anos_completos
+                  if dt.date(a, 12, 31) < inicio and total_ano(a) > 0]
     mediana = statistics.median(anteriores) if len(anteriores) >= 3 else None
     excesso = tot - mediana if mediana is not None and tot > 1.8 * mediana else 0.0
     parcela = max(rotulado, excesso)
@@ -158,7 +167,7 @@ def classificar_natureza(eventos, anos_completos):
     return {
         "natureza_proventos": natureza,
         "parcela_extraordinaria": share,
-        "proventos_ultimo_ano_liquido": tot,
+        "proventos_janela_liquido": tot,
         "mediana_anterior_liquida": mediana,
     }
 
