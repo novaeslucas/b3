@@ -40,6 +40,10 @@ Os dashboards são HTML estáticos; os links abaixo abrem cada um renderizado pe
 **Leituras diárias:** [06/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard_eleicao.html) · [07/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_07/dashboard_eleicao.html) · [08/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_08/dashboard_eleicao.html) · [09/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_09/dashboard_eleicao.html) · [13/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_13/dashboard_eleicao.html) · [14/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_14/dashboard_eleicao.html) · [15/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_15/dashboard_eleicao.html) · [16/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_16/dashboard_eleicao.html) · [19/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_19/dashboard_eleicao.html) · [20/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_20/dashboard_eleicao.html) · [21/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_21/dashboard_eleicao.html) · [22/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_22/dashboard_eleicao.html) · [23/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_23/dashboard_eleicao.html) · [26/10 — pós-2º turno](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_26/dashboard_eleicao.html) · [27/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_27/dashboard_eleicao.html) · [28/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_28/dashboard_eleicao.html) · [29/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_29/dashboard_eleicao.html)
 
 
+**Painel ao vivo:** cotações do pregão (atraso de até 15 min), altas/baixas, mapa setorial navegável e ficha de cada
+ação. É gerado e atualizado na sua máquina, não no htmlpreview: rode `python painel_ao_vivo.py` e abra
+`resultados_ao_vivo/painel_ao_vivo.html` (detalhes em [6. Painel ao vivo](#6-painel-ao-vivo)).
+
 **Pregão em andamento (não finalizado):** [26/10 — 1º pregão após o 2º turno, preços parciais](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_26_pregao_em_andamento/dashboard_eleicao.html).
 Painel consolidado com o pregão em andamento: [02/10 a 26/10 (parcial)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados_pregao_em_andamento/dashboard_pos_eleicao_2026_10_26.html)
 (`python painel_pos_eleicao.py --em-andamento 2026-10-26`).
@@ -261,8 +265,9 @@ O painel tem:
 - **10 maiores altas e 10 maiores baixas** do dia;
 - **tabela** com ticker, empresa, setor, último preço, variação % e em R$, fechamento anterior, abertura,
   mínima/máxima, quantidade negociada, volume financeiro (aproximado pelas barras de 5 min), linha intradiária e
-  horário da cotação; ordenável, com filtro por setor, por classe (ações/FIIs) e busca. O filtro de setor vale
-  também para as altas/baixas e abre o setor no mapa.
+  horário da cotação; ordenável, com filtro por setor, por classe (ações/FIIs/só pela liquidez), por índice (ao
+  clicar num índice na ficha) e busca. Os filtros valem também para as altas/baixas, e escolher um setor leva o
+  mapa até ele.
 
 **Como a atualização funciona.** O script roda em loop. Antes de cada coleta regrava
 `resultados_ao_vivo/painel_ao_vivo_dados.js` com o status “coletando”; ao fim, regrava o `.js` com as cotações e o
@@ -273,6 +278,27 @@ do fechamento a coleta é a cada `--intervalo` segundos (padrão 120); fora diss
 próximo dia útil (feriados não são conhecidos: no feriado ele coleta, vê que nada mudou e volta a dormir). Se o
 script parar, a página passa a mostrar “coletor parado” quando a próxima coleta prevista não chega. Um ticker que
 falha mantém a cotação anterior marcada com `*`.
+
+**Como ligar.** Na raiz do repositório, deixe rodando num terminal:
+
+```bash
+python painel_ao_vivo.py        # [--intervalo 120] [--liq-min 1000000] [--uma-vez]
+```
+
+e abra `resultados_ao_vivo/painel_ao_vivo.html` no navegador. Ctrl+C para o coletor; a página passa a mostrar
+“coletor parado”. Se o navegador não recarregar o `.js` ao abrir o arquivo do disco (o topo da página avisa “Sem
+painel_ao_vivo_dados.js ao lado da página”), sirva a pasta e abra http://localhost:8765/painel_ao_vivo.html:
+
+```bash
+python -m http.server 8765 --directory resultados_ao_vivo
+```
+
+**Fonte das cotações.** O endpoint `chart` do Yahoo, um pedido por ticker (cerca de 15 s por rodada para 282
+símbolos). Em 30/10/2026 foram comparadas alternativas gratuitas: o `spark` do Yahoo traz até 20 tickers por chamada,
+mas sem máxima/mínima, abertura, volume e 52 semanas, e com o mesmo atraso; o endpoint de cotação do site da B3
+(`cotacao.b3.com.br/mds/api/v1/instrumentQuotation/{ticker}`) veio com cerca de 15 min de atraso contra 17–35 min do
+Yahoo, mas sem fechamento anterior, volume financeiro e 52 semanas; a brapi chega perto do tempo real, mas pede token
+para a maioria dos papéis. Nenhuma foi adotada ainda.
 
 ## Onde o Jev foi aplicado
 
