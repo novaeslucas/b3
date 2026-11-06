@@ -405,7 +405,7 @@ def ask_jev(state, url, model, key, perguntas=PERGUNTAS, temperature=None):
             if e.code == 400 and temp is not None:
                 temp = None
                 continue
-            if e.code in (429, 529, 502, 503) and tentativa < 4:
+            if e.code in (429, 529, 502, 503, 504) and tentativa < 4:  # 504: gateway do provedor, transitório
                 time.sleep(2 ** tentativa)
                 continue
             raise RuntimeError(f"Erro da API ({url}) {e.code}: {e.read().decode(errors='replace')}")
@@ -424,11 +424,20 @@ def classificar(candidatas):
         if not env:
             sys.exit("Nenhuma chave encontrada no .env. Adicione OPENROUTER_API_KEY=... ou TYPESAFE_API_KEY=...")
         url, model = PROVIDERS[env]
+        def perguntar(p):
+            try:
+                return ask_jev(p[1], url, model, os.environ[env])
+            except RuntimeError as e:  # uma falha não descarta as respostas que já chegaram
+                return e
+
         with ThreadPoolExecutor(max_workers=8) as pool:
-            resps = list(pool.map(lambda p: ask_jev(p[1], url, model, os.environ[env]), pendentes))
-        tokens = sum(x["usage"]["input_tokens"] for x in resps)
-        print(f"Jev ({resps[0]['model']}) classificou {len(pendentes)} empresas; tokens de entrada: {tokens}")
-        for (r, _), resp in zip(pendentes, resps):
+            resps = list(pool.map(perguntar, pendentes))
+        ok = [(p, x) for p, x in zip(pendentes, resps) if not isinstance(x, Exception)]
+        falhas = [(p[0]["ticker"], x) for p, x in zip(pendentes, resps) if isinstance(x, Exception)]
+        if ok:
+            tokens = sum(x["usage"]["input_tokens"] for _, x in ok)
+            print(f"Jev ({ok[0][1]['model']}) classificou {len(ok)} empresas; tokens de entrada: {tokens}")
+        for (r, _), resp in ok:
             a = resp["answers"]
             cache[r["jev_key"]] = {
                 "ticker": r["ticker"],
@@ -439,6 +448,9 @@ def classificar(candidatas):
             }
         with open(JEV_CACHE, "w", encoding="utf-8") as f:
             json.dump(cache, f, ensure_ascii=False, indent=2)
+        if falhas:
+            sys.exit(f"Jev falhou em {len(falhas)} de {len(pendentes)} empresas ({', '.join(t for t, _ in falhas)}): "
+                     f"{falhas[0][1]}\nAs respostas que chegaram ficaram em {JEV_CACHE}; rode de novo para completar.")
     for r in candidatas:
         r["jev"] = cache[r["jev_key"]]
 

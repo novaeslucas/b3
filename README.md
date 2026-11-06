@@ -40,15 +40,16 @@ Os dashboards são HTML estáticos; os links abaixo abrem cada um renderizado pe
 
 | Dashboard | Conteúdo |
 |---|---|
-| [Painel pós-eleição](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html) | Acumulado de 02/10 a 29/10 por ativo, setor e fator eleitoral |
+| [Painel pós-eleição](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html) | Acumulado de 02/10 a 05/11 por ativo, setor e fator eleitoral |
 | [BESST no fechamento de 26/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/painel_besst_2026_10_26.html) | Bancos, energia, saneamento, seguros e telecom no 1º pregão após o 2º turno (`python painel_besst.py --finalizado`) |
-| [Ações — dividendos](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html) | Nova análise com o fechamento de 26/10 (pós-2º turno): score + classificação do Jev |
+| [Ações — dividendos](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html) | Nova análise com o fechamento de 04/11: score (payout pela CVM) + classificação do Jev |
+| [Ações — dividendos (26/10)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/snapshot_2026_10_26/dashboard.html) | Snapshot de 26/10, 1º pregão após o 2º turno |
 | [Ações — dividendos (05/10)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/snapshot_2026_10_05/dashboard.html) | Snapshot de 05/10, base das leituras diárias |
 | [FIIs — rendimentos](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_fiis.html) | Snapshot de 05/10: score, tipo do fundo e classificação do Jev |
 | [Leitura pós-1º turno (05/10)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_eleicao.html) | Primeiro pregão após o 1º turno × fatores eleitorais |
 | [Ações com setores da B3 (06/10)](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard.html) | Reexecução com a classificação setorial oficial da B3 |
 
-**Leituras diárias:** [06/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard_eleicao.html) · [07/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_07/dashboard_eleicao.html) · [08/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_08/dashboard_eleicao.html) · [09/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_09/dashboard_eleicao.html) · [13/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_13/dashboard_eleicao.html) · [14/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_14/dashboard_eleicao.html) · [15/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_15/dashboard_eleicao.html) · [16/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_16/dashboard_eleicao.html) · [19/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_19/dashboard_eleicao.html) · [20/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_20/dashboard_eleicao.html) · [21/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_21/dashboard_eleicao.html) · [22/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_22/dashboard_eleicao.html) · [23/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_23/dashboard_eleicao.html) · [26/10 — pós-2º turno](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_26/dashboard_eleicao.html) · [27/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_27/dashboard_eleicao.html) · [28/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_28/dashboard_eleicao.html) · [29/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_29/dashboard_eleicao.html)
+**Leituras diárias:** [06/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_06/dashboard_eleicao.html) · [07/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_07/dashboard_eleicao.html) · [08/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_08/dashboard_eleicao.html) · [09/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_09/dashboard_eleicao.html) · [13/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_13/dashboard_eleicao.html) · [14/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_14/dashboard_eleicao.html) · [15/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_15/dashboard_eleicao.html) · [16/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_16/dashboard_eleicao.html) · [19/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_19/dashboard_eleicao.html) · [20/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_20/dashboard_eleicao.html) · [21/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_21/dashboard_eleicao.html) · [22/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_22/dashboard_eleicao.html) · [23/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_23/dashboard_eleicao.html) · [26/10 — pós-2º turno](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_26/dashboard_eleicao.html) · [27/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_27/dashboard_eleicao.html) · [28/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_28/dashboard_eleicao.html) · [29/10](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_10_29/dashboard_eleicao.html) · [03/11](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_11_03/dashboard_eleicao.html) · [04/11](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_11_04/dashboard_eleicao.html) · [05/11](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/leituras/2026_11_05/dashboard_eleicao.html)
 
 
 **Painel ao vivo:** cotações do pregão (atraso de até 15 min), altas/baixas, mapa setorial navegável e ficha de cada
@@ -108,7 +109,7 @@ nenhuma das duas entra no painel consolidado de `resultados/`, que só usa preg�
 │   ├── resultado_fiis.csv       / dashboard_fiis.html
 │   ├── leitura_pos_eleicao.csv  / dashboard_eleicao.html
 │   └── dashboard_pos_eleicao.html          ← painel geral, bom ponto de partida
-├── leituras/AAAA_MM_DD/       # uma pasta por pregão (06/10 a 29/10): scripts do dia + CSV + dashboard
+├── leituras/AAAA_MM_DD/       # uma pasta por pregão (06/10 a 05/11): scripts do dia + CSV + dashboard
 ├── leituras/AAAA_MM_DD_pregao_em_andamento/   # leitura com preços parciais, fora do painel consolidado
 ├── resultados_pregao_em_andamento/            # painéis gerados durante um pregão não finalizado
 ├── resultados_ao_vivo/        # painel ao vivo e o .js que ele recarrega (gerados localmente, fora do git)
@@ -385,7 +386,7 @@ Conferência com a B3: 69 conferem, 4 divergem em algum ano, 4 são units (não 
 **Ações, nova análise de 26/10** (após a reeleição de Lula) — `python dividendos.py --precos-yahoo 2026-10-26`: o
 Fundamentus ainda trazia as cotações de 23/10, então a cotação de cada ação foi trocada pelo fechamento de 26/10 no
 Yahoo e DY, P/L, P/VP, EV/EBITDA e oscilação de 12 meses foram reajustados antes dos filtros. 80 empresas
-([CSV](resultados/resultado_dividendos.csv) · [dashboard](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html)):
+([CSV](resultados/snapshot_2026_10_26/resultado_dividendos.csv) · [dashboard](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/snapshot_2026_10_26/dashboard.html)):
 
 | Jev | Qtde |  | Decisão | Qtde |
 |---|---:|---|---|---:|
@@ -398,6 +399,23 @@ Yahoo e DY, P/L, P/VP, EV/EBITDA e oscilação de 12 meses foram reajustados ant
 LREN3, PGMN3, BBSE3, BRSR6, BRBI11, SEER3, VLID3). Entraram B3SA3, COGN3, ECOR3, FLRY3, HYPE3 e POSI3 (o DY passou de
 5% com a queda); saíram BLAU3, MTRE3 e SHUL4. Conferência com a B3: 72 conferem, 4 divergem, 4 são units.
 
+**Ações, nova análise de 04/11** — `python dividendos.py --precos-yahoo 2026-11-04`: fechamento de 04/11 no Yahoo
+no lugar da cotação do Fundamentus, como em 26/10. É a primeira análise com o payout da CVM (proventos declarados ÷
+lucro, média do DFP de 2021–2025; 76 empresas pela CVM e 4 sem base de lucro, que levam nota de payout 0), por isso
+parte das mudanças vem do método e não só do preço. 80 empresas
+([CSV](resultados/resultado_dividendos.csv) · [dashboard](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html)):
+
+| Jev | Qtde |  | Decisão | Qtde |
+|---|---:|---|---|---:|
+| SUSTENTÁVEL | 12 | | estudar | 6 |
+| ATENÇÃO | 61 | | monitorar | 34 |
+| FRÁGIL | 7 | | descartar | 40 |
+
+`estudar`: **JHSF3** (95,2), **TGMA3** (91,1, nova), **VBBR3** (79,6), **ABEV3** (76,7, nova), **CPFE3** (75,0),
+**BMGB4** (66,3). Os `descartar` caem de 52 para 40: 17 ações passam de `descartar` a `monitorar` (entre elas ITUB4,
+VALE3, BBSE3, KLBN11 e CPLE3) e EZTC3, WIZC3 e MOVI3 fazem o caminho inverso. Entraram BLAU3 e MTRE3; saíram HYPE3 e
+RANI3. Conferência com a B3: 72 conferem, 4 divergem, 4 são units.
+
 **FIIs** — 70 fundos após os filtros
 ([CSV](resultados/resultado_fiis.csv) · [dashboard](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_fiis.html)):
 
@@ -409,14 +427,15 @@ LREN3, PGMN3, BBSE3, BRSR6, BRBI11, SEER3, VLID3). Entraram B3SA3, COGN3, ECOR3,
 
 `estudar`: **LVBI11** (96,2), **HSLG11** (95,0), **KNHF11** (91,3), **JSRE11** (88,9).
 
-**Pós-eleição** — 146 ativos acompanhados em 18 pregões (05/10 na raiz, 06/10 a 29/10 em `leituras/`). Até 23/10, a
+**Pós-eleição** — 146 ativos acompanhados em 22 pregões (05/10 na raiz, 06/10 a 05/11 em `leituras/`). Até 23/10, a
 mediana do acumulado era **+14,0% nas ações** e **+5,4% nos FIIs** (Ibovespa +6,75%). Lula foi reeleito em 25/10
 (51,79% dos válidos) e o pregão de 26/10 apagou o rali: Ibovespa **−13,88%** com circuit breaker, mediana do dia
-**−21,2% nas ações** e **−5,5% nos FIIs**. A queda continuou nos três pregões seguintes (27/10 −0,51%, 28/10 −2,68%,
-29/10 −1,06%), com o fiscal do novo mandato no centro e DIs longos acima de 15%: até 29/10, acumulado desde 02/10 de
-**−16,4% nas ações**, **−4,3% nos FIIs** (medianas) e **−11,94% no Ibovespa**. O fator direcional do Jev (“efeito de
-vitória da oposição”) não separou os ativos (correlação com o dia +0,18 em 26/10, −0,09, +0,26 e +0,20 nos pregões
-seguintes, sem sinal estável); o que explicou a queda foram os fatores macro — juros domésticos e
+**−21,2% nas ações** e **−5,5% nos FIIs**. A queda seguiu por mais cinco pregões, com o fiscal do novo mandato no
+centro e DIs longos acima de 15%, até o repique de 04/11 (+1,23%); em 05/11 o Ibovespa voltou a cair (−0,82%) com o
+Copom sinalizando pausa nos cortes e o tombo do Nasdaq. Até 05/11, acumulado desde 02/10 de **−16,5% nas ações**,
+**−5,8% nos FIIs** (medianas) e **−13,49% no Ibovespa**. O fator direcional do Jev (“efeito de vitória da oposição”)
+não separou os ativos: a correlação com o dia foi +0,18 em 26/10 e oscilou entre −0,14 e +0,26 nos pregões
+seguintes, sem sinal estável; o que explicou a queda foram os fatores macro — juros domésticos e
 receita em dólar. Leitura dia a dia em
 [`leituras/`](leituras/) e visão consolidada em
 [`resultados/dashboard_pos_eleicao.html`](https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html).
@@ -438,7 +457,7 @@ python fiis.py                  # [--dy-min 8] [--liq-min 1000000] [--limite 80]
 ```
 
 ```bash
-python leituras/2026_10_29/leitura_pos_eleicao.py    # leitura de um pregão (usa o snapshot de 05/10)
+python leituras/2026_11_05/leitura_pos_eleicao.py    # leitura de um pregão (usa o snapshot de 05/10)
 ```
 
 ```bash
