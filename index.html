@@ -6,55 +6,91 @@
 <title>Dashboards B3 + Jev</title>
 <style>
   :root {
-    --bg: #f7f7f5; --card: #ffffff; --text: #1d1d1b; --muted: #6b6b66; --line: #e3e2dd;
-    --accent: #1f5fbf; --pos: #1a7f45; --neg: #b3261e; --chip: #eef2fa;
+    --bg: #f3f2ee; --card: #ffffff; --card-2: #f1f0ec; --text: #141413; --text-2: #4a4945; --muted: #6b6963;
+    --line: rgba(20, 20, 18, .12); --grid: #e6e5df;
+    --accent: #1f5fbf; --pos: #1a7f45; --neg: #b3261e;
+    --sombra: 0 1px 2px rgba(20, 20, 18, .05), 0 6px 18px -10px rgba(20, 20, 18, .14);
+    --sombra-alta: 0 2px 4px rgba(20, 20, 18, .06), 0 14px 28px -12px rgba(20, 20, 18, .22);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #161615; --card: #1f1f1d; --text: #ecebe6; --muted: #a09f99; --line: #33332f;
-      --accent: #7aa7ee; --pos: #5cc28a; --neg: #ef7b72; --chip: #232a38;
+      --bg: #0e0e0d; --card: #191918; --card-2: #232321; --text: #f1f0ec; --text-2: #c6c5bc; --muted: #9c9a92;
+      --line: rgba(255, 255, 255, .11); --grid: #2c2c2a;
+      --accent: #7aa7ee; --pos: #5cc28a; --neg: #ef7b72;
+      --sombra: 0 0 0 1px rgba(255, 255, 255, .02), 0 8px 22px -14px rgba(0, 0, 0, .8);
+      --sombra-alta: 0 0 0 1px rgba(255, 255, 255, .04), 0 16px 32px -14px rgba(0, 0, 0, .9);
     }
   }
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0; background: var(--bg); color: var(--text);
-    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font: 15px/1.55 "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  main { max-width: 980px; margin: 0 auto; padding: 32px 16px 48px; }
-  h1 { font-size: 1.6rem; margin: 0 0 6px; }
-  h2 { font-size: 1.1rem; margin: 36px 0 12px; }
-  p { margin: 0 0 10px; }
+  body::before {
+    content: ""; display: block; height: 3px;
+    background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 25%, transparent) 70%, transparent);
+  }
+  main { max-width: 1040px; margin: 0 auto; padding: 36px 16px 56px; }
+  h1 { font-size: clamp(24px, 2vw + 14px, 34px); font-weight: 720; letter-spacing: -.025em; line-height: 1.12; margin: 0 0 10px; text-wrap: balance; }
+  h2 { font-size: 12px; font-weight: 640; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 40px 0 12px; }
+  p { margin: 0 0 10px; max-width: 78ch; }
   .muted { color: var(--muted); }
   a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
   .aviso {
-    font-size: .85rem; color: var(--muted); border-left: 3px solid var(--line);
-    padding: 2px 0 2px 10px; margin-top: 12px;
+    display: inline-block; font-size: .8rem; color: var(--muted); background: var(--card-2);
+    border-radius: 999px; padding: 3px 12px; margin-top: 6px;
   }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
   .card {
-    display: block; background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-    padding: 14px 16px; color: inherit;
+    position: relative; display: block; background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 40px 16px 18px; color: inherit; box-shadow: var(--sombra);
+    transition: border-color .15s, box-shadow .15s, transform .15s;
   }
-  a.card:hover { border-color: var(--accent); text-decoration: none; }
-  .card strong { display: block; color: var(--accent); margin-bottom: 4px; }
-  .card span { font-size: .9rem; color: var(--muted); }
-  .destaque { border-color: var(--accent); }
-  table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line);
-          border-radius: 10px; overflow: hidden; }
-  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); font-weight: 600; }
-  tr:last-child td { border-bottom: 0; }
-  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  a.card::after {
+    content: "→"; position: absolute; top: 14px; right: 16px; color: var(--muted);
+    transition: transform .15s, color .15s;
+  }
+  a.card:hover { border-color: var(--accent); text-decoration: none; transform: translateY(-1px); box-shadow: var(--sombra-alta); }
+  a.card:hover::after { color: var(--accent); transform: translateX(3px); }
+  .card strong { display: block; color: var(--text); font-weight: 660; letter-spacing: -.01em; margin-bottom: 4px; }
+  .card span { display: block; font-size: .88rem; line-height: 1.5; color: var(--text-2); }
+  .destaque { border-color: color-mix(in srgb, var(--accent) 55%, transparent); background: color-mix(in srgb, var(--accent) 6%, var(--card)); }
+  .destaque strong { color: var(--accent); }
+
+  /* Ibovespa acumulado: desenhado a partir da tabela de leituras */
+  .ibov { background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--sombra); padding: 16px 18px 10px; margin-bottom: 12px; }
+  .ibov:empty { display: none; }
+  .ibov-topo { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 20px; }
+  .ibov-topo .rot { font-size: 11px; font-weight: 640; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  .ibov-topo .val { font-size: 30px; font-weight: 720; letter-spacing: -.025em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .ibov-topo .extra { font-size: .85rem; color: var(--text-2); font-variant-numeric: tabular-nums; }
+  .ibov svg { display: block; width: 100%; height: auto; margin-top: 8px; overflow: visible; }
+  .ibov svg text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+
+  .tabela { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--sombra); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 640;
+       border-bottom-color: var(--line); white-space: nowrap; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover td { background: var(--card-2); }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.num { font-weight: 620; }
   .pos { color: var(--pos); } .neg { color: var(--neg); }
-  td.data { white-space: nowrap; }
-  td.resumo { font-size: .9rem; }
+  td.data { white-space: nowrap; font-weight: 620; font-variant-numeric: tabular-nums; }
+  td.resumo { font-size: .88rem; line-height: 1.5; color: var(--text-2); }
   .links a { white-space: nowrap; }
-  .tabela { overflow-x: auto; }
   @media (max-width: 640px) {
+    main { padding: 24px 12px 40px; }
     td.resumo, th.resumo { display: none; }
+    th, td { padding: 9px 12px; }
   }
-  footer { margin-top: 40px; font-size: .85rem; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  footer { margin-top: 40px; padding-top: 14px; border-top: 1px solid var(--line); font-size: .85rem; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -98,8 +134,9 @@
 
   <h2>Leituras diárias</h2>
   <p class="muted">Variação do Ibovespa no dia e acumulada desde 02/10, último pregão antes do 1º turno.</p>
+  <div class="ibov" id="ibov"></div>
   <div class="tabela">
-  <table>
+  <table id="leituras">
     <thead>
       <tr><th>Pregão</th><th class="num">Ibov dia</th><th class="num">Acum.</th><th class="resumo">Destaques</th></tr>
     </thead>
@@ -188,5 +225,47 @@
     Código e dados em <a href="https://github.com/novaeslucas/b3">github.com/novaeslucas/b3</a>.
   </footer>
 </main>
+<script>
+// Gráfico do Ibovespa acumulado, lido das próprias linhas da tabela (coluna "Acum."): entra pregão novo, o gráfico acompanha.
+(() => {
+  const num = s => parseFloat(s.replace("−", "-").replace("%", "").replace(",", "."));
+  const pts = [...document.querySelectorAll("#leituras tbody tr")].map(tr => ({
+    d: tr.cells[0].textContent.trim(), dia: num(tr.cells[1].textContent), ac: num(tr.cells[2].textContent),
+  })).filter(p => !isNaN(p.ac));
+  if (pts.length < 2) return;
+  const serie = [{ d: "02/10", ac: 0 }, ...pts], ult = pts.at(-1);
+  const fmt = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(2).replace(".", ",") + "%";
+  const W = 1000, H = 190, m = { l: 44, r: 12, t: 10, b: 22 };
+  const min = Math.min(0, ...serie.map(p => p.ac)), max = Math.max(0, ...serie.map(p => p.ac)), folga = (max - min) * .08;
+  const x = i => m.l + i / (serie.length - 1) * (W - m.l - m.r);
+  const y = v => m.t + (max + folga - v) / (max - min + 2 * folga) * (H - m.t - m.b);
+  const cor = ult.ac >= 0 ? "var(--pos)" : "var(--neg)";
+  const linha = serie.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.ac).toFixed(1)}`).join("");
+  const passo = Math.ceil((max - min) / 4 / 5) * 5 || 5;
+  let g = "";
+  for (let v = Math.ceil(min / passo) * passo; v <= max; v += passo)
+    g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"${v === 0 ? "" : ' stroke-dasharray="3 4"'}/>` +
+         `<text x="${m.l - 8}" y="${y(v) + 4}" text-anchor="end">${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(v)}%</text>`;
+  const cada = Math.ceil(serie.length / 9);
+  serie.forEach((p, i) => {
+    const fim = i === serie.length - 1;
+    if (fim || (i % cada === 0 && serie.length - 1 - i >= cada / 2))
+      g += `<text x="${x(i)}" y="${H - 4}" text-anchor="${fim ? "end" : i ? "middle" : "start"}">${p.d}</text>`;
+  });
+  document.getElementById("ibov").innerHTML = `
+    <div class="ibov-topo">
+      <div><div class="rot">Ibovespa desde 02/10, véspera do 1º turno</div>
+        <div class="val ${ult.ac >= 0 ? "pos" : "neg"}">${fmt(ult.ac)}</div></div>
+      <div class="extra">último pregão ${ult.d}: <b class="${ult.dia >= 0 ? "pos" : "neg"}">${fmt(ult.dia)}</b> no dia · ${pts.length} pregões</div>
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Ibovespa acumulado desde 02/10 por pregão">
+      ${g}
+      <path d="${linha}L${x(serie.length - 1)},${y(0)}L${x(0)},${y(0)}Z" fill="${cor}" fill-opacity=".10"/>
+      <path d="${linha}" fill="none" stroke="${cor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      ${serie.map((p, i) => `<circle cx="${x(i)}" cy="${y(p.ac)}" r="9" fill="transparent"><title>${p.d}: ${fmt(p.ac)} acumulado</title></circle>`).join("")}
+      <circle cx="${x(serie.length - 1)}" cy="${y(ult.ac)}" r="4" fill="${cor}" stroke="var(--card)" stroke-width="2"/>
+    </svg>`;
+})();
+</script>
 </body>
 </html>
