@@ -133,148 +133,181 @@ table.t td.nm { max-width: 200px; overflow: hidden; text-overflow: ellipsis; col
 .badge { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 11px; background: var(--surface-2); color: var(--text-2); }
 footer { margin-top: 18px; font-size: 12px; color: var(--muted); }
 /* ===== Camada visual v2 — início (fonte: templates/_camada_visual.css; aplicar com tools/aplicar_camada_visual.py) ===== */
-/* Uma só linguagem visual para todos os dashboards: neutros, tipografia, cartões, controles, tabelas e foco.
-   Só CSS: não muda dados, cálculos nem o comportamento dos scripts. As cores semânticas de cada painel
-   (estudar/monitorar/descartar, alta/baixa, séries) continuam as do próprio template. */
+/* Estilo "terminal de mesa": fundo azul-noite, painéis planos de canto reto com borda de 1px, rótulos pequenos em
+   caixa alta, selos preenchidos, alta em verde e baixa em vermelho, botão principal invertido (claro sobre escuro).
+   Só CSS: não muda dados, cálculos nem o comportamento dos scripts. --pos, --neg e --mid ficam em hexadecimal
+   porque o mapa de calor do painel pós-eleição interpola essas cores no JavaScript. */
 :root {
-  --bg: #f3f2ee; --surface: #ffffff; --surface-2: #f1f0ec; --border: rgba(20, 20, 18, .12);
-  --text: #141413; --text-2: #4a4945; --muted: #6b6963; --faint: #86847d; --grid: #e6e5df;
-  --v2-sombra: 0 1px 2px rgba(20, 20, 18, .05), 0 6px 18px -10px rgba(20, 20, 18, .14);
-  --v2-sombra-alta: 0 2px 4px rgba(20, 20, 18, .06), 0 14px 28px -12px rgba(20, 20, 18, .22);
-  --v2-raio: 14px;
+  --bg: #f3f4f7; --surface: #ffffff; --surface-2: #eceef3; --border: #d5d9e2;
+  --text: #0a0c12; --text-2: #3b4150; --muted: #626a7a; --faint: #7f8696; --grid: #e4e7ee; --axis: #b7bdca; --mid: #eceef3; --map-bg: #e9ebf1;
+  --accent: #1d5fd6;
+  --pos: #16a34a; --neg: #dc2626; --pos-txt: #12813b; --neg-txt: #c2261f;
+  --estudar: #12813b; --monitorar: #a85d05; --descartar: #c2261f; --neutro: #7f8696;
+  --ok: #16a34a; --warn: #b7791f; --bad: #dc2626;
+  --v2-raio: 2px;
+  --v2-sel: #e7e3ff;            /* linha selecionada */
+  --v2-sobre-cor: #ffffff;      /* texto sobre selo preenchido */
+  --v2-dica: #ffffff;           /* fundo de dica flutuante */
+  --v2-sombra-dica: 0 8px 24px -8px rgba(10, 12, 18, .28);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0e0e0d; --surface: #191918; --surface-2: #232321; --border: rgba(255, 255, 255, .11);
-    --text: #f1f0ec; --text-2: #c6c5bc; --muted: #9c9a92; --faint: #7d7b74; --grid: #2c2c2a;
-    --v2-sombra: 0 0 0 1px rgba(255, 255, 255, .02), 0 8px 22px -14px rgba(0, 0, 0, .8);
-    --v2-sombra-alta: 0 0 0 1px rgba(255, 255, 255, .04), 0 16px 32px -14px rgba(0, 0, 0, .9);
+    --bg: #04060c; --surface: #090c15; --surface-2: #121622; --border: #1d2230;
+    --text: #f3f5f9; --text-2: #b6bcc9; --muted: #7c8495; --faint: #5d6474; --grid: #161a26; --axis: #2b3141; --mid: #121622; --map-bg: #060911;
+    --accent: #4b8cf7;
+    --pos: #1fa855; --neg: #e5484d; --pos-txt: #3ddc84; --neg-txt: #ff6b6e;
+    --estudar: #2fc46b; --monitorar: #e6a93a; --descartar: #f05656; --neutro: #5d6474;
+    --ok: #2fc46b; --warn: #e6a93a; --bad: #f05656;
+    --v2-sel: #221d47; --v2-sobre-cor: #04130a; --v2-dica: #1a1e2b;
+    --v2-sombra-dica: 0 10px 28px -8px rgba(0, 0, 0, .9);
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e0e0d; --surface: #191918; --surface-2: #232321; --border: rgba(255, 255, 255, .11);
-  --text: #f1f0ec; --text-2: #c6c5bc; --muted: #9c9a92; --faint: #7d7b74; --grid: #2c2c2a;
-  --v2-sombra: 0 0 0 1px rgba(255, 255, 255, .02), 0 8px 22px -14px rgba(0, 0, 0, .8);
-  --v2-sombra-alta: 0 0 0 1px rgba(255, 255, 255, .04), 0 16px 32px -14px rgba(0, 0, 0, .9);
+  --bg: #04060c; --surface: #090c15; --surface-2: #121622; --border: #1d2230;
+  --text: #f3f5f9; --text-2: #b6bcc9; --muted: #7c8495; --faint: #5d6474; --grid: #161a26; --axis: #2b3141; --mid: #121622; --map-bg: #060911;
+  --accent: #4b8cf7;
+  --pos: #1fa855; --neg: #e5484d; --pos-txt: #3ddc84; --neg-txt: #ff6b6e;
+  --estudar: #2fc46b; --monitorar: #e6a93a; --descartar: #f05656; --neutro: #5d6474;
+  --ok: #2fc46b; --warn: #e6a93a; --bad: #f05656;
+  --v2-sel: #221d47; --v2-sobre-cor: #04130a; --v2-dica: #1a1e2b;
+  --v2-sombra-dica: 0 10px 28px -8px rgba(0, 0, 0, .9);
 }
 
 /* Base */
-html { -webkit-text-size-adjust: 100%; scrollbar-color: color-mix(in srgb, var(--muted) 55%, transparent) transparent; }
+html { -webkit-text-size-adjust: 100%; scrollbar-color: var(--axis) transparent; }
 body {
-  font-family: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
-  line-height: 1.5; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  font-family: "Roboto", "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 13.5px; line-height: 1.5; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased;
 }
-body::before {
-  content: ""; display: block; height: 3px;
-  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 25%, transparent) 70%, transparent);
-}
-::selection { background: color-mix(in srgb, var(--accent) 28%, transparent); }
-:where(a, button, input, select, th, [tabindex], .chip, .kpi):focus-visible {
-  outline: 2px solid var(--accent); outline-offset: 2px;
-}
+::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+:where(a, button, input, select, th, [tabindex], .chip, .kpi):focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-/* Cabeçalho e títulos */
-h1 { font-size: clamp(21px, 1.2vw + 14px, 28px); font-weight: 720; letter-spacing: -.022em; line-height: 1.15; text-wrap: balance; }
-h2 { font-size: 14.5px; font-weight: 660; letter-spacing: -.008em; }
-.sub { font-size: 13px; line-height: 1.5; max-width: 110ch; margin-top: 4px; text-wrap: pretty; }
-header { align-items: flex-start; }
+/* Títulos */
+h1 { font-size: clamp(20px, .9vw + 14px, 26px); font-weight: 600; letter-spacing: -.012em; line-height: 1.2; text-wrap: balance; }
+h2 { font-size: 15px; font-weight: 600; letter-spacing: 0; color: var(--text); }
+.sub { font-size: 12.5px; line-height: 1.5; max-width: 120ch; margin-top: 4px; color: var(--muted); }
+header { align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 
-/* Cartões */
-.card { border-radius: var(--v2-raio); box-shadow: var(--v2-sombra); }
+/* Painéis: planos, canto reto, sem sombra */
+.card, .tablebox, .tabwrap, .ctxbox, .mapa, .fx-caixa, .andamento { border-radius: var(--v2-raio); box-shadow: none; }
+.card { border-color: var(--border); }
 
-/* KPIs: rótulo discreto, número forte */
-.kpis { gap: 12px; }
-.kpi { position: relative; padding: 14px 16px 13px; transition: border-color .15s, box-shadow .15s, transform .15s, background-color .15s; }
-.kpi .l { font-size: 11px; font-weight: 620; letter-spacing: .065em; line-height: 1.3; }
-.kpi .v { font-size: clamp(22px, .9vw + 14px, 28px); font-weight: 720; letter-spacing: -.022em; line-height: 1.15; margin-top: 5px; }
-.kpi .d { font-size: 12px; line-height: 1.4; margin-top: 3px; }
-.kpi[data-k]:hover { transform: translateY(-1px); box-shadow: var(--v2-sombra-alta); }
-.kpi.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, var(--surface)); box-shadow: 0 0 0 1px var(--accent), var(--v2-sombra); }
+/* KPIs */
+.kpis { gap: 8px; }
+.kpi { position: relative; padding: 12px 14px 11px; transition: border-color .12s, background-color .12s; }
+.kpi .l { font-size: 10.5px; font-weight: 500; letter-spacing: .07em; line-height: 1.3; color: var(--muted); }
+.kpi .v { font-size: clamp(20px, .7vw + 14px, 25px); font-weight: 600; letter-spacing: -.01em; line-height: 1.2; margin-top: 4px; }
+.kpi .d { font-size: 12px; line-height: 1.4; margin-top: 2px; }
+.kpi[data-k]:hover { border-color: var(--axis); background: var(--surface-2); }
+.kpi.on { border-color: var(--text); background: var(--surface-2); box-shadow: inset 0 2px 0 var(--text); }
 
-/* Botões, abas, chips e campos */
+/* Botões: secundário com contorno, principal invertido */
 .btn, .theme, .ms-fechar, .ms-nav .voltar, .context .fontes-btn {
-  min-height: 32px; border-radius: 9px; padding: 5px 12px; font-size: 13px; font-weight: 560;
-  transition: background-color .15s, border-color .15s, color .15s;
+  min-height: 32px; border-radius: var(--v2-raio); padding: 5px 13px; font-size: 13px; font-weight: 500;
+  background: transparent; border: 1px solid var(--axis); color: var(--text);
+  transition: background-color .12s, border-color .12s, color .12s;
 }
-.theme:hover { background: var(--surface-2); }
-#theme::before, #tema::before { content: "◐"; margin-right: 6px; opacity: .75; }
-.tabs { border-radius: 10px; padding: 3px; gap: 2px; background: var(--surface-2); overflow: visible; }
-.tabs button { border-radius: 7px; padding: 5px 14px; font-weight: 560; transition: background-color .15s, color .15s; }
+.btn:hover, .theme:hover, .ms-nav .voltar:hover, .context .fontes-btn:hover { background: var(--surface-2); border-color: var(--text); }
+.theme.mapa-btn, .context .fontes-btn { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
+.theme.mapa-btn:hover, .context .fontes-btn:hover { background: var(--text-2); border-color: var(--text-2); color: var(--bg); }
+#theme::before, #tema::before { content: "◐"; margin-right: 6px; opacity: .7; }
+
+/* Abas segmentadas e chips retangulares */
+.tabs { border-radius: var(--v2-raio); padding: 0; gap: 0; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+.tabs button { border-radius: 0; padding: 6px 15px; font-weight: 500; color: var(--muted); transition: background-color .12s, color .12s; }
 .tabs button:hover:not(.on) { color: var(--text); }
-.tabs button.on { box-shadow: 0 1px 2px rgba(0, 0, 0, .18); }
-.chip { padding: 4px 11px; font-weight: 520; transition: background-color .15s, border-color .15s, color .15s; }
-.chip:hover:not(.on) { background: var(--surface-2); color: var(--text); }
+.tabs button.on { background: var(--bg); color: var(--text); box-shadow: inset 0 0 0 1px var(--axis); }
+.chip, .tag {
+  border-radius: var(--v2-raio); padding: 3px 10px; font-weight: 500; background: var(--surface-2); border-color: var(--border); color: var(--text-2);
+  transition: background-color .12s, border-color .12s, color .12s;
+}
+.chip:hover:not(.on) { border-color: var(--axis); color: var(--text); }
+.chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+.chip i, .dot { border-radius: 0; }
+
+/* Campos */
 select, input[type="search"], input[type="text"] {
-  min-height: 34px; border-radius: 9px; background-color: var(--surface); border: 1px solid var(--border); color: var(--text);
-  transition: border-color .15s, box-shadow .15s;
+  min-height: 32px; border-radius: var(--v2-raio); background-color: var(--surface); border: 1px solid var(--border); color: var(--text);
+  transition: border-color .12s;
 }
-select:hover, input[type="search"]:hover, input[type="text"]:hover { border-color: color-mix(in srgb, var(--text) 30%, transparent); }
-select:focus, input[type="search"]:focus, input[type="text"]:focus {
-  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
-}
+select:hover, input[type="search"]:hover, input[type="text"]:hover { border-color: var(--axis); }
+select:focus, input[type="search"]:focus, input[type="text"]:focus { outline: none; border-color: var(--text); }
+input::placeholder { color: var(--faint); }
 input[type="checkbox"], input[type="range"] { accent-color: var(--accent); }
 
-/* Barras fixas no topo (seletor de pregão, status da coleta) */
-.dayctl, .status {
-  background: color-mix(in srgb, var(--bg) 84%, transparent);
-  -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3);
-}
+/* Barras fixas no topo */
+.dayctl, .status { background: color-mix(in srgb, var(--bg) 88%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
 
-/* Tabelas de dados: cabeçalho de rótulo, 1ª coluna fixa na rolagem horizontal */
+/* Tabelas densas: faixa de cabeçalho, 1ª coluna fixa, linha selecionada em violeta */
 .tablebox, .tabwrap { scrollbar-width: thin; }
-.wrap > .tablebox { border-radius: var(--v2-raio); box-shadow: var(--v2-sombra); }
 :is(.tablebox, .tabwrap) th {
-  font-size: 11px; font-weight: 640; letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
-  padding-top: 9px; padding-bottom: 9px; border-bottom-color: color-mix(in srgb, var(--text) 16%, transparent);
+  font-size: 10.5px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--muted);
+  background: var(--surface-2); padding-top: 9px; padding-bottom: 9px; border-bottom-color: var(--border);
 }
-:is(.tablebox, .tabwrap) th:hover { color: var(--text); }
+:is(.tablebox, .tabwrap) th:hover, :is(.tablebox, .tabwrap) th.on { color: var(--text); }
 :is(.tablebox, .tabwrap) td { padding-top: 7px; padding-bottom: 7px; border-bottom-color: var(--grid); }
 :is(.tablebox, .tabwrap) tbody tr:last-child td { border-bottom-color: transparent; }
 :is(.tablebox, .tabwrap) :is(th, td):first-child { position: sticky; left: 0; z-index: 1; }
 :is(.tablebox, .tabwrap) td:first-child { background: var(--surface); box-shadow: inset -1px 0 0 var(--grid); }
 :is(.tablebox, .tabwrap) th:first-child { z-index: 2; }
 :is(.tablebox, .tabwrap) tbody tr:hover td:first-child { background: var(--surface-2); }
-:is(.tablebox, .tabwrap) tbody tr.sel td:first-child { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent), inset -1px 0 0 var(--grid); }
-.badge { font-size: 11.5px; font-weight: 620; padding: 2px 9px; letter-spacing: .005em; }
+:is(.tablebox, .tabwrap) tbody tr.sel, :is(.tablebox, .tabwrap) tbody tr.sel td:first-child { background: var(--v2-sel); }
+:is(.tablebox, .tabwrap) tbody tr.sel td:first-child { box-shadow: inset 2px 0 0 var(--accent), inset -1px 0 0 var(--grid); }
+.tk { font-weight: 600; }
 
-/* Blocos de contexto do pregão: texto corrido legível */
+/* Selos preenchidos (decisão, classe do Jev) */
+.badge { border-radius: var(--v2-raio); font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; }
+.b-estudar { background: var(--estudar); color: var(--v2-sobre-cor); }
+.b-monitorar { background: var(--monitorar); color: var(--v2-sobre-cor); }
+.b-descartar { background: var(--descartar); color: var(--v2-sobre-cor); }
+.b-neutro { background: var(--surface-2); color: var(--text-2); box-shadow: inset 0 0 0 1px var(--border); }
+.pill, .top .vb { border-radius: var(--v2-raio); }
+
+/* Contexto do pregão */
 .ctxbox, .context { line-height: 1.6; }
-.ctxbox { border-radius: 10px; padding: 12px 14px; border-left: 3px solid color-mix(in srgb, var(--accent) 60%, transparent); }
+.ctxbox { padding: 11px 14px; background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--text); }
 .context { color: var(--text-2); max-width: 150ch; }
-.andamento { border-radius: 10px; background: color-mix(in srgb, currentColor 8%, transparent); }
+.andamento { background: color-mix(in srgb, currentColor 8%, transparent); }
 
-/* Detalhe do ativo, barras e rótulos de seção */
-.dhead .t { font-size: 22px; letter-spacing: -.02em; }
+/* Detalhe do ativo, barras, rótulos de seção e legendas */
+.dhead .t { font-size: 21px; font-weight: 600; letter-spacing: -.01em; }
 .facts { gap: 10px 14px; padding: 12px 0; border-block: 1px solid var(--grid); }
-.facts div { font-size: 11.5px; }
-.facts b { font-size: 14.5px; font-weight: 640; margin-top: 1px; }
-.sec, .hb .grp, .rank .sep { font-size: 11px; font-weight: 620; letter-spacing: .065em; }
-.row .track, .bar { background: color-mix(in srgb, var(--text) 9%, transparent); }
-.legend { gap: 6px 14px; }
+.facts div { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; }
+.facts b { font-size: 14px; font-weight: 600; margin-top: 2px; letter-spacing: 0; text-transform: none; }
+.sec, .hb .grp, .rank .sep { font-size: 10.5px; font-weight: 500; letter-spacing: .07em; }
+.row .track, .bar { background: var(--surface-2); border-radius: 0; }
+.row .track { height: 10px; }
+.row .track i, .bar > i, .hb .trk i, .rank .trk i, .amp, .scale .bar, .legenda .esc, .ms-leg i { border-radius: 0; }
+.legend, .legenda { gap: 5px 14px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.legend .muted { text-transform: none; letter-spacing: 0; font-size: 12px; }
+.legend span::before { border-radius: 0; width: 7px; height: 7px; margin-right: 6px; }
+.legend i, .tag i { border-radius: 0; }
+svg text { font-size: 10.5px; }
+.heat td.c { border-radius: 0; }
 
 /* Dicas flutuantes e modais */
-.tip, .ms-tip { border-radius: 10px; box-shadow: var(--v2-sombra-alta); }
-.fx-fundo { -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
-.fx-caixa { border-radius: var(--v2-raio); box-shadow: var(--v2-sombra-alta); }
+.tip, .ms-tip { border-radius: var(--v2-raio); background: var(--v2-dica); border-color: var(--axis); box-shadow: var(--v2-sombra-dica); }
+.fx-caixa { box-shadow: var(--v2-sombra-dica); }
+.ms-topo { background: var(--surface); }
 
 /* Rodapé e notas */
 .note { line-height: 1.55; }
-footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--border); line-height: 1.6; max-width: 130ch; color: var(--muted); }
+footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border); line-height: 1.6; max-width: 130ch; color: var(--muted); }
 
 /* Telas pequenas */
 @media (max-width: 560px) {
   .wrap { padding-left: 12px; padding-right: 12px; }
-  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  .kpi { padding: 12px 12px 11px; }
-  .card { padding: 13px 12px; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .kpi { padding: 10px 11px; }
+  .card { padding: 12px 11px; }
   .row { grid-template-columns: 104px 1fr 40px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
 @media print {
-  body::before, .btn, .theme, .filters, .filtros, .tabs { display: none !important; }
-  .card, .wrap > .tablebox { box-shadow: none; break-inside: avoid; }
+  .btn, .theme, .filters, .filtros, .tabs { display: none !important; }
+  .card, .tablebox { break-inside: avoid; }
   .dayctl, .status { position: static; }
 }
 /* ===== Camada visual v2 — fim ===== */
