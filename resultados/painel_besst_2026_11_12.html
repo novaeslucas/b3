@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel BESST B3</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f9f9f7; --surface: #fcfcfb; --surface-2: #f0efec; --border: rgba(11, 11, 11, .10);
+  --text: #0b0b0b; --text-2: #52514e; --muted: #898781; --grid: #e1e0d9; --axis: #c3c2b7;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
+  --pos: #256abf; --neg: #d03b3b; --pos-txt: #1c5cab; --neg-txt: #b8312f;
+  --accent: #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
+    --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+    --pos: #3987e5; --neg: #e66767; --pos-txt: #86b6ef; --neg-txt: #f08c8b;
+    --accent: #3987e5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #232321; --border: rgba(255, 255, 255, .10);
+  --text: #f0efec; --text-2: #c3c2b7; --muted: #898781; --grid: #2c2c2a; --axis: #383835;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+  --pos: #3987e5; --neg: #e66767; --pos-txt: #86b6ef; --neg-txt: #f08c8b;
+  --accent: #3987e5;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 20px 16px 40px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: 24px; margin: 0 0 4px; letter-spacing: -.01em; }
+h2 { font-size: 15px; margin: 0; font-weight: 650; }
+.sub, .muted { color: var(--muted); }
+.sub { font-size: 13px; }
+button { font: inherit; color: var(--text); }
+.btn { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { background: var(--surface-2); }
+.andamento { margin-top: 12px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--neg); color: var(--neg-txt); font-weight: 600; }
+.ctxbox { font-size: 13px; color: var(--text-2); margin-top: 10px; padding: 10px 12px; background: var(--surface-2); border-radius: 8px; display: grid; gap: 6px; }
+.ctxbox a { color: var(--accent); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+.cardhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+.full { margin-top: 12px; }
+.note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
+.kpi .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.kpi .v { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; margin-top: 2px; }
+.kpi .d { font-size: 12px; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.pos { color: var(--pos-txt); } .neg { color: var(--neg-txt); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+.chip { border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 3px 11px; font-size: 13px; cursor: pointer; color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
+.chip i { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.chip.on { background: var(--text); color: var(--surface); border-color: var(--text); }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart text.lab { fill: var(--text); font-size: 12px; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+  font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); min-width: 170px; max-width: 280px; display: none; z-index: 3; }
+.tip .h { font-weight: 650; margin-bottom: 4px; }
+.tip .r { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--text-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); }
+.rank { display: grid; gap: 3px; font-size: 12px; }
+.rank .r { display: grid; grid-template-columns: 62px 1fr 62px; gap: 8px; align-items: center; }
+.rank .trk { position: relative; height: 12px; }
+.rank .trk i { position: absolute; top: 0; height: 100%; border-radius: 3px; background: var(--c); }
+.rank .trk .z { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--axis); }
+.rank .trk .ref { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px dashed var(--text-2); opacity: .6; }
+.rank .n { text-align: right; font-variant-numeric: tabular-nums; }
+.rank .tk { font-weight: 650; }
+.tablebox { overflow-x: auto; }
+table.t { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+table.t th { position: sticky; top: 0; background: var(--surface); text-align: right; font-weight: 600; color: var(--text-2); padding: 7px 8px; border-bottom: 1px solid var(--border); cursor: pointer; white-space: nowrap; user-select: none; }
+table.t td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.t .l { text-align: left; }
+table.t tr:hover td { background: var(--surface-2); }
+table.t td.nm { max-width: 220px; overflow: hidden; text-overflow: ellipsis; color: var(--text-2); }
+.tk { font-weight: 650; }
+.badge { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 11px; background: var(--surface-2); color: var(--text-2); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--c); margin-right: 6px; }
+footer { margin-top: 18px; font-size: 12px; color: var(--muted); }
+/* ===== Camada visual v2 — início (fonte: templates/_camada_visual.css; aplicar com tools/aplicar_camada_visual.py) ===== */
+/* Estilo "terminal de mesa": fundo azul-noite, painéis planos de canto reto com borda de 1px, rótulos pequenos em
+   caixa alta, selos preenchidos, alta em verde e baixa em vermelho, botão principal invertido (claro sobre escuro).
+   Só CSS: não muda dados, cálculos nem o comportamento dos scripts. --pos, --neg e --mid ficam em hexadecimal
+   porque o mapa de calor do painel pós-eleição interpola essas cores no JavaScript. */
+:root {
+  --bg: #f3f4f7; --surface: #ffffff; --surface-2: #eceef3; --border: #d5d9e2;
+  --text: #0a0c12; --text-2: #3b4150; --muted: #626a7a; --faint: #7f8696; --grid: #e4e7ee; --axis: #b7bdca; --mid: #eceef3; --map-bg: #e9ebf1;
+  --accent: #1d5fd6;
+  --pos: #16a34a; --neg: #dc2626; --pos-txt: #12813b; --neg-txt: #c2261f;
+  --estudar: #12813b; --monitorar: #a85d05; --descartar: #c2261f; --neutro: #7f8696;
+  --ok: #16a34a; --warn: #b7791f; --bad: #dc2626;
+  --v2-raio: 2px;
+  --v2-sel: #e7e3ff;            /* linha selecionada */
+  --v2-sobre-cor: #ffffff;      /* texto sobre selo preenchido */
+  --v2-dica: #ffffff;           /* fundo de dica flutuante */
+  --v2-sombra-dica: 0 8px 24px -8px rgba(10, 12, 18, .28);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #04060c; --surface: #090c15; --surface-2: #121622; --border: #1d2230;
+    --text: #f3f5f9; --text-2: #b6bcc9; --muted: #7c8495; --faint: #5d6474; --grid: #161a26; --axis: #2b3141; --mid: #121622; --map-bg: #060911;
+    --accent: #4b8cf7;
+    --pos: #1fa855; --neg: #e5484d; --pos-txt: #3ddc84; --neg-txt: #ff6b6e;
+    --estudar: #2fc46b; --monitorar: #e6a93a; --descartar: #f05656; --neutro: #5d6474;
+    --ok: #2fc46b; --warn: #e6a93a; --bad: #f05656;
+    --v2-sel: #221d47; --v2-sobre-cor: #04130a; --v2-dica: #1a1e2b;
+    --v2-sombra-dica: 0 10px 28px -8px rgba(0, 0, 0, .9);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #04060c; --surface: #090c15; --surface-2: #121622; --border: #1d2230;
+  --text: #f3f5f9; --text-2: #b6bcc9; --muted: #7c8495; --faint: #5d6474; --grid: #161a26; --axis: #2b3141; --mid: #121622; --map-bg: #060911;
+  --accent: #4b8cf7;
+  --pos: #1fa855; --neg: #e5484d; --pos-txt: #3ddc84; --neg-txt: #ff6b6e;
+  --estudar: #2fc46b; --monitorar: #e6a93a; --descartar: #f05656; --neutro: #5d6474;
+  --ok: #2fc46b; --warn: #e6a93a; --bad: #f05656;
+  --v2-sel: #221d47; --v2-sobre-cor: #04130a; --v2-dica: #1a1e2b;
+  --v2-sombra-dica: 0 10px 28px -8px rgba(0, 0, 0, .9);
+}
+
+/* Base */
+html { -webkit-text-size-adjust: 100%; scrollbar-color: var(--axis) transparent; }
+body {
+  font-family: "Roboto", "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 13.5px; line-height: 1.5; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased;
+}
+::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+:where(a, button, input, select, th, [tabindex], .chip, .kpi):focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Títulos */
+h1 { font-size: clamp(20px, .9vw + 14px, 26px); font-weight: 600; letter-spacing: -.012em; line-height: 1.2; text-wrap: balance; }
+h2 { font-size: 15px; font-weight: 600; letter-spacing: 0; color: var(--text); }
+.sub { font-size: 12.5px; line-height: 1.5; max-width: 120ch; margin-top: 4px; color: var(--muted); }
+header { align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+
+/* Com o menu lateral, o conteúdo ocupa a largura da tela como num terminal */
+.wrap { max-width: 1640px; }
+
+/* Painéis: planos, canto reto, sem sombra */
+.card, .tablebox, .tabwrap, .ctxbox, .mapa, .fx-caixa, .andamento { border-radius: var(--v2-raio); box-shadow: none; }
+.card { border-color: var(--border); }
+
+/* KPIs */
+.kpis { gap: 8px; }
+.kpi { position: relative; padding: 12px 14px 11px; transition: border-color .12s, background-color .12s; }
+.kpi .l { font-size: 10.5px; font-weight: 500; letter-spacing: .07em; line-height: 1.3; color: var(--muted); }
+.kpi .v { font-size: clamp(20px, .7vw + 14px, 25px); font-weight: 600; letter-spacing: -.01em; line-height: 1.2; margin-top: 4px; }
+.kpi .d { font-size: 12px; line-height: 1.4; margin-top: 2px; }
+.kpi[data-k]:hover { border-color: var(--axis); background: var(--surface-2); }
+.kpi.on { border-color: var(--text); background: var(--surface-2); box-shadow: inset 0 2px 0 var(--text); }
+
+/* Botões: secundário com contorno, principal invertido */
+.btn, .theme, .ms-fechar, .ms-nav .voltar, .context .fontes-btn {
+  min-height: 32px; border-radius: var(--v2-raio); padding: 5px 13px; font-size: 13px; font-weight: 500;
+  background: transparent; border: 1px solid var(--axis); color: var(--text);
+  transition: background-color .12s, border-color .12s, color .12s;
+}
+.btn:hover, .theme:hover, .ms-nav .voltar:hover, .context .fontes-btn:hover { background: var(--surface-2); border-color: var(--text); }
+.theme.mapa-btn, .context .fontes-btn { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
+.theme.mapa-btn:hover, .context .fontes-btn:hover { background: var(--text-2); border-color: var(--text-2); color: var(--bg); }
+#theme::before, #tema::before { content: "◐"; margin-right: 6px; opacity: .7; }
+
+/* Abas segmentadas e chips retangulares */
+.tabs { border-radius: var(--v2-raio); padding: 0; gap: 0; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+.tabs button { border-radius: 0; padding: 6px 15px; font-weight: 500; color: var(--muted); transition: background-color .12s, color .12s; }
+.tabs button:hover:not(.on) { color: var(--text); }
+.tabs button.on { background: var(--bg); color: var(--text); box-shadow: inset 0 0 0 1px var(--axis); }
+.chip, .tag {
+  border-radius: var(--v2-raio); padding: 3px 10px; font-weight: 500; background: var(--surface-2); border-color: var(--border); color: var(--text-2);
+  transition: background-color .12s, border-color .12s, color .12s;
+}
+.chip:hover:not(.on) { border-color: var(--axis); color: var(--text); }
+.chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+.chip i, .dot { border-radius: 0; }
+
+/* Campos */
+select, input[type="search"], input[type="text"] {
+  min-height: 32px; border-radius: var(--v2-raio); background-color: var(--surface); border: 1px solid var(--border); color: var(--text);
+  transition: border-color .12s;
+}
+select:hover, input[type="search"]:hover, input[type="text"]:hover { border-color: var(--axis); }
+select:focus, input[type="search"]:focus, input[type="text"]:focus { outline: none; border-color: var(--text); }
+input::placeholder { color: var(--faint); }
+input[type="checkbox"], input[type="range"] { accent-color: var(--accent); }
+
+/* Barras fixas no topo */
+.dayctl, .status { background: color-mix(in srgb, var(--bg) 88%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+
+/* Tabelas densas: faixa de cabeçalho, 1ª coluna fixa, linha selecionada em violeta */
+.tablebox, .tabwrap { scrollbar-width: thin; }
+:is(.tablebox, .tabwrap) th {
+  font-size: 10.5px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--muted);
+  background: var(--surface-2); padding-top: 9px; padding-bottom: 9px; border-bottom-color: var(--border);
+}
+:is(.tablebox, .tabwrap) th:hover, :is(.tablebox, .tabwrap) th.on { color: var(--text); }
+:is(.tablebox, .tabwrap) td { padding-top: 7px; padding-bottom: 7px; border-bottom-color: var(--grid); }
+:is(.tablebox, .tabwrap) tbody tr:last-child td { border-bottom-color: transparent; }
+:is(.tablebox, .tabwrap) :is(th, td):first-child { position: sticky; left: 0; z-index: 1; }
+:is(.tablebox, .tabwrap) td:first-child { background: var(--surface); box-shadow: inset -1px 0 0 var(--grid); }
+:is(.tablebox, .tabwrap) th:first-child { z-index: 2; }
+:is(.tablebox, .tabwrap) tbody tr:hover td:first-child { background: var(--surface-2); }
+:is(.tablebox, .tabwrap) tbody tr.sel, :is(.tablebox, .tabwrap) tbody tr.sel td:first-child { background: var(--v2-sel); }
+:is(.tablebox, .tabwrap) tbody tr.sel td:first-child { box-shadow: inset 2px 0 0 var(--accent), inset -1px 0 0 var(--grid); }
+.tk { font-weight: 600; }
+/* Setas de alta e baixa ao lado da variação, como nas grades de cotação */
+:is(.tablebox, .tabwrap) td:is(.pos, .neg)::after { display: inline-block; width: 0; height: 0; margin-left: 6px; vertical-align: 2px; content: ""; border-inline: 3.5px solid transparent; }
+:is(.tablebox, .tabwrap) td.pos::after { border-bottom: 5px solid currentColor; }
+:is(.tablebox, .tabwrap) td.neg::after { border-top: 5px solid currentColor; }
+
+/* Selos preenchidos (decisão, classe do Jev) */
+.badge { border-radius: var(--v2-raio); font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; }
+.b-estudar { background: var(--estudar); color: var(--v2-sobre-cor); }
+.b-monitorar { background: var(--monitorar); color: var(--v2-sobre-cor); }
+.b-descartar { background: var(--descartar); color: var(--v2-sobre-cor); }
+.b-neutro { background: var(--surface-2); color: var(--text-2); box-shadow: inset 0 0 0 1px var(--border); }
+.pill, .top .vb { border-radius: var(--v2-raio); }
+
+/* Contexto do pregão */
+.ctxbox, .context { line-height: 1.6; }
+.ctxbox { padding: 11px 14px; background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--text); }
+.context { color: var(--text-2); max-width: 150ch; }
+.andamento { background: color-mix(in srgb, currentColor 8%, transparent); }
+
+/* Detalhe do ativo, barras, rótulos de seção e legendas */
+.dhead .t { font-size: 21px; font-weight: 600; letter-spacing: -.01em; }
+.facts { gap: 10px 14px; padding: 12px 0; border-block: 1px solid var(--grid); }
+.facts div { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; }
+.facts b { font-size: 14px; font-weight: 600; margin-top: 2px; letter-spacing: 0; text-transform: none; }
+.sec, .hb .grp, .rank .sep { font-size: 10.5px; font-weight: 500; letter-spacing: .07em; }
+.row .track, .bar { background: var(--surface-2); border-radius: 0; }
+.row .track { height: 10px; }
+.row .track i, .bar > i, .hb .trk i, .rank .trk i, .amp, .scale .bar, .legenda .esc, .ms-leg i { border-radius: 0; }
+.legend, .legenda { gap: 5px 14px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.legend .muted { text-transform: none; letter-spacing: 0; font-size: 12px; }
+.legend span::before { border-radius: 0; width: 7px; height: 7px; margin-right: 6px; }
+.legend i, .tag i { border-radius: 0; }
+svg text { font-size: 10.5px; }
+.heat td.c { border-radius: 0; }
+
+/* Dicas flutuantes e modais */
+.tip, .ms-tip { border-radius: var(--v2-raio); background: var(--v2-dica); border-color: var(--axis); box-shadow: var(--v2-sombra-dica); }
+.fx-caixa { box-shadow: var(--v2-sombra-dica); }
+.ms-topo { background: var(--surface); }
+
+/* Rodapé e notas */
+.note { line-height: 1.55; }
+footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border); line-height: 1.6; max-width: 130ch; color: var(--muted); }
+
+/* Telas pequenas */
+@media (max-width: 560px) {
+  .wrap { padding-left: 12px; padding-right: 12px; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .kpi { padding: 10px 11px; }
+  .card { padding: 12px 11px; }
+  .row { grid-template-columns: 104px 1fr 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+@media print {
+  .btn, .theme, .filters, .filtros, .tabs { display: none !important; }
+  .card, .tablebox { break-inside: avoid; }
+  .dayctl, .status { position: static; }
+}
+/* ===== Camada visual v2 — fim ===== */
+</style>
+</head>
+<body>
+<!-- ===== Menu lateral v1 — início (fonte: templates/_menu_lateral.html; aplicar com tools/aplicar_camada_visual.py) ===== -->
+<style>
+/* Moldura de navegação no estilo "terminal de mesa": menu lateral fixo à esquerda e faixa de leitura fixa no rodapé.
+   Serve aos dashboards (variáveis --surface/--border) e à página inicial (--card/--line). */
+.v2-lado, .v2-faixa {
+  --l-sup: var(--surface, var(--card)); --l-sup2: var(--surface-2, var(--card-2)); --l-borda: var(--border, var(--line));
+  font: 13.5px/1.3 "Roboto", "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+}
+.v2-lado *, .v2-faixa * { box-sizing: border-box; }
+body { padding-left: 212px; padding-bottom: 32px; }
+html.v2-rec body { padding-left: 56px; }
+.v2-lado {
+  position: fixed; inset: 0 auto 32px 0; width: 212px; z-index: 30; display: flex; flex-direction: column;
+  background: var(--bg); border-right: 1px solid var(--l-borda); padding: 16px 10px 12px 0; overflow: hidden auto; scrollbar-width: none;
+}
+.v2-marca { display: flex; align-items: center; gap: 9px; padding: 2px 10px 18px 16px; color: var(--text); font-size: 19px; font-weight: 700; letter-spacing: -.02em; text-decoration: none; white-space: nowrap; }
+.v2-marca:hover { text-decoration: none; }
+.v2-marca svg { flex: none; }
+.v2-marca small { font-size: 10.5px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); align-self: flex-end; padding-bottom: 3px; }
+.v2-nav { display: flex; flex-direction: column; }
+.v2-nav a, .v2-rec-btn {
+  display: flex; align-items: center; gap: 11px; min-height: 40px; padding: 8px 10px 8px 13px; border: 0; border-left: 3px solid transparent;
+  background: none; color: var(--muted); font: inherit; text-align: left; text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: color .12s, background-color .12s;
+}
+.v2-nav a svg, .v2-rec-btn svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.v2-nav a:hover, .v2-rec-btn:hover { color: var(--text); background: var(--l-sup); text-decoration: none; }
+.v2-nav a.on { color: var(--text); font-weight: 500; border-left-color: var(--text); }
+.v2-nav a:focus-visible, .v2-rec-btn:focus-visible, .v2-caixa a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.v2-sep { height: 1px; background: var(--l-borda); margin: 8px 0 8px 16px; }
+.v2-rec-btn { width: 100%; color: var(--text); font-weight: 500; }
+.v2-caixa { margin: 14px 0 0 16px; padding: 10px; background: var(--l-sup); border: 1px solid var(--l-borda); border-radius: 2px; color: var(--text); line-height: 1.4; white-space: normal; }
+.v2-caixa a { display: block; margin-top: 9px; padding: 7px 10px; background: var(--text); color: var(--bg); border-radius: 2px; font-weight: 600; text-align: center; text-decoration: none; }
+.v2-caixa a:hover { background: var(--text-2); text-decoration: none; }
+.v2-fim { margin-top: auto; }
+html.v2-rec .v2-lado { width: 56px; padding-right: 0; }
+html.v2-rec .v2-marca { padding-left: 17px; }
+html.v2-rec :is(.v2-marca span, .v2-marca small, .v2-nav a span, .v2-rec-btn span, .v2-caixa) { display: none; }
+html.v2-rec :is(.v2-nav a, .v2-rec-btn) { padding-left: 17px; }
+html.v2-rec .v2-rec-btn svg { transform: scaleX(-1); }
+html.v2-rec .v2-sep { margin-left: 0; }
+
+.v2-faixa {
+  position: fixed; inset: auto 0 0 0; height: 32px; z-index: 31; display: flex; align-items: center; gap: 8px; padding: 0 14px;
+  background: var(--l-sup2); border-top: 1px solid var(--l-borda); color: var(--text); white-space: nowrap; overflow: hidden;
+}
+.v2-faixa svg { flex: none; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.v2-faixa b { font-weight: 600; flex: none; }
+.v2-faixa span { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.v2-faixa i { font-style: normal; color: var(--muted); padding: 0 7px; }
+.v2-faixa .pos { color: var(--pos-txt, var(--pos)); } .v2-faixa .neg { color: var(--neg-txt, var(--neg)); }
+
+@media (max-width: 900px) {
+  body, html.v2-rec body { padding-left: 0; }
+  .v2-lado, html.v2-rec .v2-lado {
+    position: static; width: auto; flex-direction: row; align-items: stretch; padding: 0; border-right: 0; border-bottom: 1px solid var(--l-borda);
+    overflow: auto hidden;
+  }
+  .v2-marca, html.v2-rec .v2-marca { padding: 8px 6px 8px 12px; font-size: 16px; }
+  .v2-marca small, .v2-fim, .v2-sep { display: none; }
+  html.v2-rec :is(.v2-marca span, .v2-nav a span) { display: inline; }
+  .v2-nav { flex-direction: row; }
+  .v2-nav a, html.v2-rec .v2-nav a { padding: 8px 11px; border-left: 0; border-bottom: 2px solid transparent; gap: 7px; }
+  .v2-nav a.on { border-bottom-color: var(--text); }
+}
+@media print { .v2-lado, .v2-faixa { display: none; } body, html.v2-rec body { padding-left: 0; padding-bottom: 0; } }
+</style>
+<nav class="v2-lado" id="v2-lado" aria-label="Dashboards">
+  <a class="v2-marca" data-rel="index.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/index.html">
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 18V11h4v7zM8 18V6h4v12zM14 18V2h4v16z" fill="currentColor"/></svg>
+    <span>b3·jev</span><small>estudo</small></a>
+  <div class="v2-nav">
+    <a data-rel="index.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/index.html" title="Página inicial">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z"/></svg><span>Início</span></a>
+    <a data-rel="resultados/dashboard_pos_eleicao.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html" title="Painel pós-eleição">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 14V2M2 14h12M4.5 10.5l3-3.5 2.5 2 3.5-5"/></svg><span>Painel pós-eleição</span></a>
+    <a data-rel="index.html#leituras" data-grupo="leituras" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/index.html#leituras" title="Leituras diárias">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3.5h11v10h-11zM2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg><span>Leituras diárias</span></a>
+    <a data-rel="resultados/dashboard.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html" title="Ações — dividendos">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M10 6c-.4-.8-1.1-1.2-2-1.2-1.2 0-2 .6-2 1.5 0 2.2 4.1.9 4.1 3.2 0 1-.9 1.7-2.1 1.7-1 0-1.8-.5-2.2-1.3M8 3.6v8.8"/></svg><span>Ações — dividendos</span></a>
+    <a data-rel="resultados/dashboard_fiis.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_fiis.html" title="FIIs — rendimentos">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 14V2h7v12M10 6h3v8M1.5 14h13M5.5 5h2M5.5 8h2M5.5 11h2"/></svg><span>FIIs — rendimentos</span></a>
+    <a data-rel="resultados/painel_besst_2026_11_12.html" data-grupo="painel_besst" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/painel_besst_2026_11_12.html" title="Painel BESST">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l5 2v4c0 3-2 5.200-5 6.400-3-1.200-5-3.400-5-6.400v-4z"/></svg><span>Painel BESST</span></a>
+    <a data-rel="resultados/dashboard_eleicao.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_eleicao.html" title="Leitura pós-1º turno">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 14.500V2M3 2.500h9.500l-2 3 2 3H3"/></svg><span>Pós-1º turno</span></a>
+  </div>
+  <div class="v2-sep"></div>
+  <button class="v2-rec-btn" id="v2-recolher" type="button" title="Recolher ou abrir o menu" aria-expanded="true">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.500L3.500 8 8 12.500M13 3.500L8.500 8l4.500 4.500"/></svg><span>Recolher menu</span></button>
+  <div class="v2-fim">
+    <div class="v2-caixa">Estudo pessoal. Não é recomendação de investimento.
+      <a href="https://github.com/novaeslucas/b3#readme">Ver metodologia</a></div>
+  </div>
+</nav>
+<div class="v2-faixa" id="v2-faixa" role="note">
+  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.500h10v11H3zM5.500 5.500h5M5.500 8h5M5.500 10.500h3"/></svg>
+  <b id="v2-faixa-rot">Leitura:</b><span id="v2-faixa-txt">Estudo pessoal, não é recomendação de investimento.</span>
+</div>
+<script>
+// Menu lateral: marca a página atual, lembra se está recolhido e, fora do htmlpreview (servidor local), troca os links por relativos.
+(() => {
+  const d = document, raiz = d.documentElement, botao = d.getElementById("v2-recolher");
+  const marca = on => { raiz.classList.toggle("v2-rec", on); botao.setAttribute("aria-expanded", String(!on)); };
+  try { marca(localStorage.getItem("v2-menu") === "recolhido"); } catch (e) {}
+  botao.addEventListener("click", () => {
+    const on = !raiz.classList.contains("v2-rec"); marca(on);
+    try { localStorage.setItem("v2-menu", on ? "recolhido" : "aberto"); } catch (e) {}
+  });
+  const previa = location.hostname === "htmlpreview.github.io";
+  const onde = decodeURIComponent(previa ? location.search : location.pathname).replace(/\/$/, "/index.html");
+  const links = [...d.querySelectorAll("#v2-lado a[data-rel]")];
+  const base = (onde.match(/^(.*\/)(?:index\.html|(?:resultados|resultados_ao_vivo|leituras|carteira)\/.*)$/) || [])[1];
+  if (!previa && base != null) links.forEach(a => { a.href = base + a.dataset.rel; });
+  const itens = links.filter(a => !a.classList.contains("v2-marca"));
+  const atual = itens.find(a => !a.dataset.rel.includes("#") && onde.endsWith("/" + a.dataset.rel))
+    || itens.find(a => a.dataset.grupo && onde.includes("/" + a.dataset.grupo));
+  if (atual) { atual.classList.add("on"); atual.setAttribute("aria-current", "page"); }
+
+  // Faixa do rodapé: na página inicial, o Ibovespa dos últimos pregões; nos dashboards, o subtítulo (data e base da leitura).
+  const esc = s => s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  let feito = false;
+  const faixa = () => {
+    if (feito) return;
+    const txt = d.getElementById("v2-faixa-txt"), rot = d.getElementById("v2-faixa-rot");
+    const linhas = [...d.querySelectorAll("#leituras tbody tr")].filter(tr => tr.cells.length > 1);
+    if (linhas.length) {
+      rot.textContent = "Ibovespa por pregão:";
+      txt.innerHTML = linhas.slice(-12).reverse().map(tr => {
+        const v = tr.cells[1].textContent.trim();
+        return `${esc(tr.cells[0].textContent.trim())} <span class="${/^[−-]/.test(v) ? "neg" : "pos"}">${esc(v)}</span>`;
+      }).join("<i>•</i>");
+      feito = true; return;
+    }
+    const sub = d.querySelector("header .sub, .wrap .sub");
+    const t = sub && sub.textContent.replace(/\s+/g, " ").trim();
+    if (t) { txt.innerHTML = esc(t) + "<i>•</i>Estudo pessoal, não é recomendação de investimento."; feito = true; }
+  };
+  d.addEventListener("DOMContentLoaded", faixa); addEventListener("load", faixa); setTimeout(faixa, 1500);
+})();
+</script>
+<!-- ===== Menu lateral v1 — fim ===== -->
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Painel BESST — bancos, energia, saneamento, seguros e telecom</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <button class="btn" id="tema" type="button">Tema</button>
+  </header>
+  <div class="andamento" id="andamento"></div>
+  <div class="ctxbox" id="contexto"></div>
+
+  <div class="chips" id="chips"></div>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="cardhead"><h2>Variação do dia por subsetor</h2></div>
+      <div class="chart" id="barras"></div>
+      <div class="note" id="notaBarras">Média simples das empresas de cada subsetor: preço de agora ÷ fechamento do último pregão finalizado. Tracejado = Ibovespa.</div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2>Acumulado desde a véspera da eleição</h2><div class="legend" id="legenda"></div></div>
+      <div class="chart" id="linhas"></div>
+      <div class="note" id="notaLinhas">Média simples por subsetor; o último ponto é o preço de agora (pregão em andamento).</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="cardhead"><h2>Empresas — variação do dia</h2></div>
+      <div class="rank" id="rank"></div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2 id="tituloDisp">DY de agora × variação do dia</h2></div>
+      <div class="chart" id="disp"></div>
+      <div class="note" id="notaDisp">DY de agora = DY do snapshot do Fundamentus ajustado pelo preço de agora (proventos dos últimos 12 meses, sem projeção). Queda de preço eleva o DY sem mudar o provento.</div>
+    </div>
+  </div>
+
+  <div class="card full">
+    <div class="cardhead"><h2>Tabela</h2><span class="muted" id="ntab"></span></div>
+    <div class="tablebox"><table class="t"><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table></div>
+    <div class="note">Score, decisão e fatores do Jev só existem para as empresas que passaram nos filtros de dividendos.py (marcadas como “analisada”). Governo = P(decisões do governo federal determinam os resultados); Flávio = efeito de uma vitória da oposição no lucro e valuation (−2..+2), julgado antes do 2º turno.</div>
+  </div>
+
+  <footer id="rodape"></footer>
+</div>
+<script>
+const DADOS = {"gerado_em": "12/11/2026 20:35", "horario_precos": "18:19", "data_base": "02/10/2026", "data_anterior": "11/11/2026", "data_pregao": "12/11/2026", "dias": ["02/10", "05/10", "06/10", "07/10", "08/10", "09/10", "13/10", "14/10", "15/10", "16/10", "19/10", "20/10", "21/10", "22/10", "23/10", "26/10", "27/10", "28/10", "29/10", "30/10", "03/11", "04/11", "05/11", "06/11", "09/11", "10/11", "11/11", "12/11"], "referencias": [{"id": "ibov", "nome": "Ibovespa", "acum": [0.0, 0.07702157561876999, 0.0714155583895062, 0.0634359628347605, 0.07341956640553837, 0.08823881529292343, 0.07689665044374472, 0.07490825807459078, 0.0635504775785336, 0.06930744606095307, 0.06748041537620697, 0.08422559404523322, 0.07485100070270412, 0.06248861359081803, 0.06750123623871129, -0.08071727871327072, -0.08539156234547018, -0.10987689665044376, -0.11935038908986806, -0.1259297816412045, -0.1383858626343596, -0.12779324883533305, -0.13493480467428365, -0.12292637222496938, -0.10347448143039328, -0.10815397027821883, -0.10439059938057937, -0.10822001145147442], "nivel": [192115.0, 206912.0, 205835.0, 204302.0, 206220.0, 209067.0, 206888.0, 206506.0, 204324.0, 205430.0, 205079.0, 208296.0, 206495.0, 204120.0, 205083.0, 176608.0, 175710.0, 171006.0, 169186.0, 167922.0, 165529.0, 167564.0, 166192.0, 168499.0, 172236.0, 171337.0, 172060.0, 171324.3125], "dia": -0.0042757613623154445}, {"id": "dolar", "nome": "Dólar (R$/US$)", "acum": [0.0, -0.043345976016180954, -0.04627523192072769, -0.03903818230203948, -0.03932530160079284, -0.04541369143667828, -0.037774492211946065, -0.03515152732403448, -0.02421935731836966, -0.03063320988877205, -0.035630181213816225, -0.03836808511512391, -0.03881013015314094, -0.03316040748116944, -0.050334158477984725, 0.02862282703413066, 0.024353285461858, 0.02351091669569061, 0.03095858132939422, 0.04058890039699148, 0.05052551048122389, 0.045107309126148465, 0.05368455311866782, 0.05366538140078614, 0.054661032616113214, 0.06884792126084172, null, 0.08083316634158422], "nivel": [5.223100185394287, 4.996699810028076, 4.981400012969971, 5.019199848175049, 5.0177001953125, 4.985899925231934, 5.0258002281188965, 5.0395002365112305, 5.09660005569458, 5.0630998611450195, 5.0370001792907715, 5.02269983291626, 5.02039098739624, 5.049900054931641, 4.96019983291626, 5.372600078582764, 5.350299835205078, 5.345900058746338, 5.384799957275391, 5.435100078582764, 5.486999988555908, 5.458700180053711, 5.503499984741211, 5.503399848937988, 5.508600234985352, 5.582699775695801, null, 5.645299911499023], "dia": null}], "empresas": [{"ticker": "ITUB4", "nome": "Itaú Unibanco", "subsetor": "Bancos", "estatal": false, "preco": 41.68000030517578, "fech_anterior": 41.720001220703125, "fech_base": 44.83000183105469, "dia": -0.0009587946873667041, "acum": [0.0, 0.10372512873645445, 0.12536245153556247, 0.09547175115955553, 0.10082526117443313, 0.12580859155222002, 0.10818644381052422, 0.09257188359753421, 0.07851877089659243, 0.07271912086505727, 0.06848091834557013, 0.08855670854012221, 0.09078740862341084, 0.07071153333635127, 0.07740346340120197, -0.06981933839554333, -0.0811956960890462, -0.11264784397710126, -0.11800135399197886, -0.13696192178364786, -0.14142315176521003, -0.11420929148914949, -0.10840955636510674, -0.09591797626872078, -0.06937319837888567, -0.08097258353446368, -0.06937319837888567, -0.07026547841220099], "dy_snapshot": 0.0695, "dy_agora": 0.0747525186465293, "pl_agora": 9.8644836769555, "pvp_agora": 2.212768251758161, "roe": 0.2245, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 64.6, "score_hoje": 65.4, "p_governo": 0.14, "juros": 1.98, "oposicao": 0.79, "juros_dir": -1.52}, {"ticker": "BBDC4", "nome": "Bradesco", "subsetor": "Bancos", "estatal": false, "preco": 14.319999694824219, "fech_anterior": 14.329999923706055, "fech_base": 19.229999542236328, "dia": -0.0006978526821408426, "acum": [0.0, 0.13572546398761043, 0.18564741444653454, 0.14196565820192664, 0.11856478111909285, 0.12376500908842214, 0.11284452043422077, 0.08528348081314352, 0.07800312198164305, 0.058762407437052966, 0.04524185439123629, 0.07540305759002774, 0.07384295944339936, 0.0514820486055525, 0.05928244015259576, -0.17056681284713893, -0.18200728462383375, -0.23660943033654436, -0.2636505364281777, -0.2792511707431161, -0.29381173962696905, -0.26885071480445755, -0.2839313164038533, -0.26157045515905586, -0.23660943033654436, -0.2438897395749955, -0.2548101786361475, -0.2553302113516903], "dy_snapshot": 0.0654, "dy_agora": 0.08782416388280781, "pl_agora": 6.1286322146855605, "pvp_agora": 0.8638169342691675, "roe": 0.1413, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_SUSTENTAVEL", "score_antes": 59.0, "score_hoje": 60.5, "p_governo": 0.19, "juros": 1.99, "oposicao": 0.73, "juros_dir": -1.44}, {"ticker": "BBAS3", "nome": "Banco do Brasil", "subsetor": "Bancos", "estatal": true, "preco": 15.479999542236328, "fech_anterior": 16.889999389648438, "fech_base": 23.719999313354492, "dia": -0.08348134389372874, "acum": [0.0, 0.11003375572958451, 0.03878583907782751, 0.01939295974440891, 0.022765637907220304, 0.03878583907782751, 0.02234404308549509, 0.019814554566134124, 0.001686379286900852, -0.0037942729845367174, 0.0096965200776995, 0.020236149387859337, 0.016020281581597295, 0.00843173561252386, 0.042158517240638904, -0.2634907327539936, -0.2672850057385303, -0.2921584569323963, -0.3060708448163578, -0.3056492499946326, -0.3174535833589778, -0.3048060603511822, -0.3048060603511822, -0.27782463504869004, -0.282462017265687, -0.2790893391028755, -0.28794266953712455, -0.3473861724135463], "dy_snapshot": 0.0291, "dy_agora": 0.044589923799202014, "pl_agora": 6.128043663642459, "pvp_agora": 0.4894603565209632, "roe": 0.0799, "analisada": false}, {"ticker": "SANB11", "nome": "Santander Brasil", "subsetor": "Bancos", "estatal": false, "preco": 28.389999389648438, "fech_anterior": 27.399999618530273, "fech_base": 28.09000015258789, "dia": 0.03613137901099228, "acum": [0.0, 0.026343886333157984, 0.05945176458605639, 0.04877176662309668, 0.035243850684954836, 0.026343886333157984, 0.028123852042981623, 0.006763991919740642, 0.01281597039501614, 0.009967984518494566, -0.007476005364205784, 0.00427194486411242, 0.0014239589875910674, -0.012103956950550887, -0.019935901135649914, -0.06372377735150825, -0.07903165899947373, -0.13314345855471998, -0.12281953521533218, -0.14773939465955965, -0.128515506968375, -0.08116769933286938, -0.07653967984518495, -0.08650766436367963, -0.03880385000594133, -0.014239929382607097, -0.024563920623334345, 0.01067993006162049], "dy_snapshot": 0.0821, "dy_agora": 0.08123244274675409, "pl_agora": 6.872623561751847, "pvp_agora": 1.0814275310403643, "roe": 0.15689999999999998, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 50.6, "score_hoje": 50.5, "p_governo": 0.16, "juros": 1.98, "oposicao": 0.66, "juros_dir": -1.48}, {"ticker": "BPAC11", "nome": "BTG Pactual", "subsetor": "Bancos", "estatal": false, "preco": 54.13999938964844, "fech_anterior": 55.95000076293945, "fech_base": 66.0199966430664, "dia": -0.03235033688310396, "acum": [0.0, 0.22523483039503778, 0.19085135934854547, 0.16086039513147066, 0.17343237140014645, 0.2344744644660528, 0.2202363170985464, 0.18267200547116147, 0.16828235648688672, 0.16252656623030126, 0.18600434766882223, 0.2376553050469452, 0.2202363170985464, 0.20357472167211554, 0.20902762425703836, -0.09118444333787534, -0.08739771185178313, -0.14692513543562724, -0.18146010809888813, -0.2196303684124098, -0.2278097222897938, -0.18176305355148792, -0.18388361393874963, -0.15904266463493488, -0.12980909293982823, -0.15601326788987369, -0.15252948185638127, -0.1799454386168261], "dy_snapshot": 0.021400000000000002, "dy_agora": 0.026095825931430144, "pl_agora": 11.570969272764911, "pvp_agora": 2.648776098584739, "roe": 0.2288, "analisada": false}, {"ticker": "ITSA4", "nome": "Itaúsa (holding do Itaú)", "subsetor": "Bancos", "estatal": false, "preco": 13.569999694824219, "fech_anterior": 13.569999694824219, "fech_base": 14.670000076293945, "dia": 0.0, "acum": [0.0, 0.11520112646683489, 0.12747108585604128, 0.09066120768842212, 0.09406947195566939, 0.11179273218263996, 0.08997952883158322, 0.07225626860461265, 0.0606680530807191, 0.0518064229672337, 0.053169715672438, 0.07702795559401165, 0.07089297589940857, 0.042944792853748526, 0.04362647171058742, -0.08725287841270113, -0.09134288654526113, -0.11997274844776018, -0.12406269157184635, -0.15132926076914122, -0.1533742323311844, -0.12610772814236337, -0.12610772814236337, -0.11724609802887809, -0.08657126456433595, -0.08861623612637903, -0.07498298403196857, -0.07498298403196857], "dy_snapshot": 0.07690000000000001, "dy_agora": 0.08313360540680642, "pl_agora": 8.380654208255448, "pvp_agora": 1.6187797863628073, "roe": 0.1936, "analisada": true, "decisao": "descartar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 63.8, "score_hoje": 64.2, "p_governo": 0.16, "juros": 1.96, "oposicao": 0.73, "juros_dir": -1.27}, {"ticker": "ABCB4", "nome": "ABC Brasil", "subsetor": "Bancos", "estatal": false, "preco": 23.549999237060547, "fech_anterior": 23.579999923706055, "fech_base": 26.149999618530273, "dia": -0.0012722937549862756, "acum": [0.0, 0.07992352516544154, 0.10210325488501892, 0.07304014819406168, 0.09827914846327879, 0.13040152570387553, 0.11472275501962748, 0.09024859062251123, 0.10669219717885992, 0.09598471378573992, 0.10478010749860811, 0.14149142703304585, 0.12925434483448783, 0.09636713172179023, 0.12772467309028634, -0.08107070603482924, -0.07724667255185236, -0.11510517295567779, -0.1464627143241739, -0.1521988374874026, -0.15640536184519316, -0.12045887818285617, -0.13040152570387553, -0.09177818942794935, -0.08757166507015868, -0.09598471378573992, -0.09827914846327868, -0.09942640227142974], "dy_snapshot": 0.09970000000000001, "dy_agora": 0.11070722227018716, "pl_agora": 6.0158315450693856, "pvp_agora": 0.846539169515752, "roe": 0.1405, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_SUSTENTAVEL", "score_antes": 65.7, "score_hoje": 66.1, "p_governo": 0.25, "juros": 1.98, "oposicao": 0.72, "juros_dir": -1.48}, {"ticker": "BRSR6", "nome": "Banrisul", "subsetor": "Bancos", "estatal": true, "preco": 12.90999984741211, "fech_anterior": 13.289999961853027, "fech_base": 15.920000076293945, "dia": -0.028592935705918143, "acum": [0.0, 0.05967341447152852, 0.08040205279593704, 0.11557789847801492, 0.14007534745913497, 0.18530155457299413, 0.16520095151776193, 0.155150709894311, 0.07600496725338801, 0.09359294999859236, 0.10301503654453614, 0.14195981269165592, 0.13881903730412093, 0.11118093274379648, 0.14070350253664188, -0.08731157893601815, -0.1451005281750256, -0.18216077918545914, -0.21168340888246984, -0.2236181157384416, -0.22989948680101568, -0.19974876193066338, -0.20791459822575842, -0.1809045289346104, -0.16645726167277586, -0.17211053756200834, -0.16520101142192722, -0.18907036522970555], "dy_snapshot": 0.0966, "dy_agora": 0.11912254207410206, "pl_agora": 3.446450964290293, "pvp_agora": 0.4541205976476622, "roe": 0.1326, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_SUSTENTAVEL", "score_antes": 66.8, "score_hoje": 66.8, "p_governo": 0.6, "juros": 1.99, "oposicao": 0.68, "juros_dir": -1.43}, {"ticker": "BMGB4", "nome": "Banco BMG", "subsetor": "Bancos", "estatal": false, "preco": 5.199999809265137, "fech_anterior": 5.269999980926514, "fech_base": 6.590000152587891, "dia": -0.013282765069207891, "acum": [0.0, 0.047040961396306535, 0.04248857761577374, 0.02124428880788698, 0.03490136779179975, 0.0622154534019399, 0.0698027355835995, 0.057663069621407326, 0.07283763398472609, 0.05462817122028052, 0.0698027355835995, 0.08952953901208027, 0.09711682119373966, 0.08497722758923287, 0.09408192279261307, -0.06525042416075211, -0.1335356743649455, -0.18512901954178484, -0.2169954889324579, -0.2245826987564319, -0.19271622936575883, -0.16236724535449187, -0.16995452753615137, -0.18512901954178484, -0.2185129019541785, -0.2063733083496717, -0.20030351154741832, -0.2109256921302045], "dy_snapshot": 0.07769999999999999, "dy_agora": 0.09846981130415883, "pl_agora": 5.389377647538829, "pvp_agora": 0.781183582878981, "roe": 0.1447, "analisada": true, "decisao": "estudar", "jev_classe": "DIVIDENDO_SUSTENTAVEL", "score_antes": 65.8, "score_hoje": 66.5, "p_governo": 0.14, "juros": 1.99, "oposicao": 0.76, "juros_dir": -1.41}, {"ticker": "BRBI11", "nome": "BR Partners", "subsetor": "Bancos", "estatal": false, "preco": 10.239999771118164, "fech_anterior": 10.5, "fech_base": 15.140000343322754, "dia": -0.02476192656017484, "acum": [0.0, 0.14927339656265293, 0.12285334309768148, 0.18361952905749201, 0.22391018932954365, 0.2747687450068317, 0.22523109751722803, 0.2298547171067562, 0.2021136294733481, 0.19154560808735965, 0.18626147141361304, 0.264200723620843, 0.23117562529444058, 0.20409505474525091, 0.23315717654709567, -0.14134744351353767, -0.19947162412685104, -0.2608983271708799, -0.3249669725710297, -0.34214003881844923, -0.3718626147141362, -0.3381769993035154, -0.3328929886105211, -0.3401585505561704, -0.29392342549728223, -0.3091149404920468, -0.30647293514554963, -0.3236460013929692], "dy_snapshot": 0.0911, "dy_agora": 0.13469277644811817, "pl_agora": 6.736485978886191, "pvp_agora": 1.3256538673310172, "roe": 0.19699999999999998, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 52.5, "score_hoje": 54.6, "p_governo": 0.19, "juros": 1.84, "oposicao": 0.61, "juros_dir": -1.47}, {"ticker": "PINE4", "nome": "Banco Pine", "subsetor": "Bancos", "estatal": false, "preco": 11.069999694824219, "fech_anterior": 11.8100004196167, "fech_base": 12.630000114440918, "dia": -0.0626588229043008, "acum": [0.0, 0.08946952527331309, 0.11005544978051529, 0.09817892002236572, 0.1662707370362022, 0.2311955700582511, 0.23515441331096776, 0.20585901854605826, 0.2082343698028808, 0.2509897108131791, 0.2699921433244874, 0.32620743058017454, 0.4022168585907895, 0.29216148431892885, 0.30166273832891033, -0.03958828150985594, -0.05621536276434169, -0.1417260447849381, -0.18368960204296214, -0.20902615355515508, -0.21456848880376544, -0.18448138579523643, -0.17656377479845797, -0.12114012027773591, -0.087094249525145, -0.08313540627242844, -0.06492475751339433, -0.12351547153455866], "dy_snapshot": 0.0746, "dy_agora": 0.08511273947374406, "pl_agora": 4.662897733686845, "pvp_agora": 1.5601424748049968, "roe": 0.3343, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 62.1, "score_hoje": 62.8, "p_governo": 0.35, "juros": 1.94, "oposicao": 0.76, "juros_dir": -1.42}, {"ticker": "AXIA3", "nome": "Axia Energia (ex-Eletrobras)", "subsetor": "Energia", "estatal": false, "preco": 47.5, "fech_anterior": 48.790000915527344, "fech_base": 56.900001525878906, "dia": -0.026439862498891742, "acum": [0.0, 0.0787346119876422, 0.04534267042478035, 0.0521967895669575, 0.04358522804447351, 0.051669570261291264, 0.034270595710885976, 0.052899793335931866, 0.03936727247275651, 0.04551845488808848, 0.03198593402491312, 0.041300499316371475, 0.029525487875631917, 0.038312833861424256, 0.019332134351891073, -0.10720566125194209, -0.10579965371399314, -0.15237261425554338, -0.16203868143148892, -0.16643235442438498, -0.1847100501649438, -0.16379612381179554, -0.16186296401030997, -0.15131810860208172, -0.13813708962339355, -0.14727593749367285, -0.1425307626162896, -0.16520213134974449], "dy_snapshot": 0.0271, "dy_agora": 0.03246294736842105, "pl_agora": 11.144551845342706, "pvp_agora": 1.1019332161687172, "roe": 0.0986, "analisada": false}, {"ticker": "EGIE3", "nome": "Engie Brasil", "subsetor": "Energia", "estatal": false, "preco": 26.350000381469727, "fech_anterior": 26.649999618530273, "fech_base": 30.700000762939453, "dia": -0.01125700718029099, "acum": [0.0, 0.03061884701461426, 0.029315947757784455, 0.019218245535033596, 0.03550489008142699, 0.03355044800325446, 0.020195404445501497, 0.029641688104146358, 0.021498365830949773, 0.020195404445501497, -0.0016287017318104002, 0.017589543803223195, 0.013029303211391063, 0.012703562865028939, 0.002931600988640204, -0.1042345499483649, -0.0879479054019715, -0.10749189128336722, -0.13811080042659996, -0.14462542096798625, -0.1491856615598185, -0.13061889671750904, -0.13224759844931944, -0.11498373286383978, -0.09739418906061659, -0.10684041059064309, -0.1319218581029573, -0.14169381997934594], "dy_snapshot": 0.0294, "dy_agora": 0.03425350994054356, "pl_agora": 9.424202090831844, "pvp_agora": 2.489087983917336, "roe": 0.2637, "analisada": false}, {"ticker": "EQTL3", "nome": "Equatorial", "subsetor": "Energia", "estatal": false, "preco": 34.09000015258789, "fech_anterior": 34.5, "fech_base": 41.90999984741211, "dia": -0.01188405354817712, "acum": [0.0, 0.1371987597455231, 0.1500835346797489, 0.16917203957054383, 0.1849200674830962, 0.2109281838409205, 0.17394418854853555, 0.16917203957054383, 0.14889052019054372, 0.15509425014711287, 0.15867338463589942, 0.1830112625046023, 0.16034362312502082, 0.1493676531692889, 0.16630878659221748, -0.1686948155706276, -0.15771893663606684, -0.18730609646150642, -0.21498445130845212, -0.2221427202860249, -0.2326413752206694, -0.206156034862929, -0.20830349735196663, -0.18706752997213383, -0.16917203957054394, -0.19231690295004167, -0.1768074415268619, -0.1865903059722176], "dy_snapshot": 0.0377, "dy_agora": 0.04634810774208976, "pl_agora": 44.79447168702017, "pvp_agora": 1.6430875759538905, "roe": 0.036699999999999997, "analisada": false}, {"ticker": "CPFE3", "nome": "CPFL Energia", "subsetor": "Energia", "estatal": false, "preco": 44.5, "fech_anterior": 44.41999816894531, "fech_base": 48.09000015258789, "dia": 0.0018010318404428904, "acum": [0.0, 0.04054898641613991, 0.03867749229465267, 0.04158868774493807, 0.047203170109399784, 0.09482223661514433, 0.0521937682172815, 0.05697653711318096, 0.03285502206995505, 0.02640882623693086, 0.02724061902961994, 0.04117279134859353, 0.029527930223325116, 0.0291121131511074, 0.035350400448022734, -0.11208150078074774, -0.09149514476851439, -0.10688291481263046, -0.1160324768839579, -0.12871696001389754, -0.13453943023859505, -0.11332918996978147, -0.1224786727169822, -0.09315865102976595, -0.07049281303580968, -0.07693908819296069, -0.07631528326050718, -0.0746516976751288], "dy_snapshot": 0.0776, "dy_agora": 0.08386031460674158, "pl_agora": 8.540964857558743, "pvp_agora": 2.257849864836764, "roe": 0.2643, "analisada": true, "decisao": "estudar", "jev_classe": "DIVIDENDO_SUSTENTAVEL", "score_antes": 73.9, "score_hoje": 74.7, "p_governo": 0.7, "juros": 1.95, "oposicao": 0.91, "juros_dir": 1.44}, {"ticker": "CMIG4", "nome": "Cemig", "subsetor": "Energia", "estatal": true, "preco": 10.619999885559082, "fech_anterior": 10.720000267028809, "fech_base": 11.40999984741211, "dia": -0.009328393561453097, "acum": [0.0, 0.04995615271226317, 0.050832596973049426, 0.04031551659058996, 0.05784398389468892, 0.06310256587708118, 0.042944765790623673, 0.042944765790623673, 0.030674880468916976, 0.036809823129770214, 0.01752846730409896, 0.036809823129770214, 0.025416298486524713, 0.021910605025704966, 0.022787049286491223, -0.09377736276367299, -0.08413672664199989, -0.11130583006777184, -0.11744085631095036, -0.11744085631095036, -0.13584576787583547, -0.10604733166770475, -0.1095530251285245, -0.08939522504206698, -0.06310256587708118, -0.06485537081632853, -0.06047323309472252, -0.06923750853793453], "dy_snapshot": 0.0895, "dy_agora": 0.09615772231679642, "pl_agora": 6.6177212257953615, "pvp_agora": 1.0424539764965972, "roe": 0.1575, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 71.1, "score_hoje": 71.7, "p_governo": 0.87, "juros": 1.92, "oposicao": 1.22, "juros_dir": 1.31}, {"ticker": "CPLE3", "nome": "Copel", "subsetor": "Energia", "estatal": false, "preco": 15.149999618530273, "fech_anterior": 15.279999732971191, "fech_base": 16.610000610351562, "dia": -0.008507861041411102, "acum": [0.0, 0.03853096725653238, 0.043347338163598925, 0.05117389782582937, 0.06261282179186489, 0.06261282179186489, 0.05418420141233371, 0.05057195193986885, 0.045755581032802306, 0.06562312537836923, 0.06201076107456416, 0.06261282179186489, 0.04515352031550135, 0.052378019260431063, 0.04394939888089966, -0.09090910134830366, -0.08910297661207123, -0.11559307401660734, -0.12703194056697287, -0.13786880381570765, -0.15051179180067487, -0.12161350894260547, -0.130042186737807, -0.10716439622140583, -0.08850091589477038, -0.09632753297267105, -0.08007229551523909, -0.08789891259313976], "dy_snapshot": 0.064, "dy_agora": 0.07016765853246452, "pl_agora": 14.42031872179191, "pvp_agora": 1.8698072978920566, "roe": 0.12990000000000002, "analisada": true, "decisao": "descartar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 41.0, "score_hoje": 42.3, "p_governo": 0.9, "juros": 1.96, "oposicao": 1.15, "juros_dir": 1.54}, {"ticker": "TAEE11", "nome": "Taesa", "subsetor": "Energia", "estatal": false, "preco": 41.56999969482422, "fech_anterior": 41.279998779296875, "fech_base": 42.849998474121094, "dia": 0.007025216184666894, "acum": [0.0, 0.024270734015438666, 0.01983669356095108, 0.044107427576389746, 0.0648775424268242, 0.08401405874010837, 0.0700116711045351, 0.06627771887327105, 0.04200707388227576, 0.03990672018816199, 0.03780636649404823, 0.07047842626149858, 0.055776039427145596, 0.047841379807653794, 0.04434076064264958, -0.054842440088775146, -0.053208841551624864, -0.07327886817883589, -0.08518081309585168, -0.07607931009617308, -0.08634765647603859, -0.06884473869990482, -0.07584597702991314, -0.06161025632808004, -0.041306807610165475, -0.04970822238662065, -0.036639434089417944, -0.029871617850113052], "dy_snapshot": 0.0702, "dy_agora": 0.0723615593476785, "pl_agora": 8.808765396242798, "pvp_agora": 1.7753348761150134, "roe": 0.2014, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 71.3, "score_hoje": 71.7, "p_governo": 0.69, "juros": 1.97, "oposicao": 1.04, "juros_dir": 1.64}, {"ticker": "ISAE4", "nome": "ISA Energia", "subsetor": "Energia", "estatal": false, "preco": 26.290000915527344, "fech_anterior": 26.6200008392334, "fech_base": 28.190000534057617, "dia": -0.012396690958014212, "acum": [0.0, 0.039375618374390964, 0.044341964395843814, 0.039730362208813874, 0.06349765783140482, 0.040085106043236785, 0.036182991525052666, 0.03902094220043617, 0.018800949601138095, 0.010287300556392376, 0.007449417541476988, 0.032280944667336886, 0.028024086314729857, 0.0056757660298305534, 0.004611534526561822, -0.07768714056644943, -0.09152181180660279, -0.10074494852019455, -0.11670808276688549, -0.12167436112787022, -0.1202554534506467, -0.08939341646053345, -0.08797450878330981, -0.07946079207809587, -0.049308310417296664, -0.07059239919892712, -0.05569349645550492, -0.06739977234958894], "dy_snapshot": 0.061500000000000006, "dy_agora": 0.0659446534661798, "pl_agora": 6.5655057270419475, "pvp_agora": 0.830014218333428, "roe": 0.12710000000000002, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 73.4, "score_hoje": 73.9, "p_governo": 0.58, "juros": 1.93, "oposicao": 1, "juros_dir": 1.47}, {"ticker": "ALUP11", "nome": "Alupar", "subsetor": "Energia", "estatal": false, "preco": 33.09000015258789, "fech_anterior": 32.63999938964844, "fech_base": 33.5099983215332, "dia": 0.013786788338058908, "acum": [0.0, 0.07997613964228822, 0.11727843933225146, 0.13936145083724694, 0.1745748308515791, 0.18531791137630216, 0.18322899170067086, 0.16621915214905436, 0.14503135940859102, 0.14771712953977167, 0.14891083045087083, 0.14861246214188828, 0.15458073902221492, 0.15070138181751958, 0.15428237071323236, -0.0435690587168569, -0.014622437729418292, -0.05252158787493122, -0.06624880683981738, -0.06296624317187938, -0.08236342762690185, -0.026260737018673375, -0.04058480643910911, -0.03610859877886419, -0.024470299489609215, -0.03670544923441377, -0.02596236870969082, -0.012533518053787107], "dy_snapshot": 0.0322, "dy_agora": 0.03260870338544293, "pl_agora": 7.870107466909146, "pvp_agora": 1.1355863973582834, "roe": 0.1438, "analisada": false}, {"ticker": "ENGI11", "nome": "Energisa", "subsetor": "Energia", "estatal": false, "preco": 47.38999938964844, "fech_anterior": 47.290000915527344, "fech_base": 55.150001525878906, "dia": 0.0021145796613477597, "acum": [0.0, 0.13961916110970551, 0.16446055201953458, 0.17969167286540544, 0.2012692324026948, 0.24587483560142376, 0.21686307803383253, 0.21051677768138632, 0.17969167286540544, 0.18386217786213988, 0.19764281458386046, 0.22375332722520658, 0.19673614095966574, 0.1954668808891764, 0.205258375006796, -0.14252040603595073, -0.13617410568350452, -0.17116957715724757, -0.1931097231408314, -0.19691750335229918, -0.21305529782236476, -0.18875792492094967, -0.1878513204662411, -0.16409796557324008, -0.1412511459654615, -0.15902085612179695, -0.14252040603595073, -0.14070719712653357], "dy_snapshot": 0.0206, "dy_agora": 0.02397320140603674, "pl_agora": 15.73365165592861, "pvp_agora": 1.2201958138404494, "roe": 0.07780000000000001, "analisada": false}, {"ticker": "AURE3", "nome": "Auren", "subsetor": "Energia", "estatal": false, "preco": 11.800000190734863, "fech_anterior": 11.800000190734863, "fech_base": 13.819999694824219, "dia": 0.0, "acum": [0.0, 0.12445733031911521, 0.11432705923269926, 0.14182345017569142, 0.16208392334169686, 0.12807528920760847, 0.107091210462539, 0.1005788982646163, 0.07452971847975198, 0.07235890174256032, 0.07742407178918143, 0.09985529268555249, 0.1020260404159179, 0.07308250732162436, 0.10274964599498193, -0.22141820068841211, -0.19753976863391332, -0.20188133310147038, -0.20622282856220142, -0.21345874633918782, -0.23227207735389188, -0.20477568641089972, -0.19102745643599062, -0.1628075289207609, -0.13965263343849976, -0.1497829045249156, -0.14616494563642235, -0.14616494563642235], "dy_snapshot": 0.0, "dy_agora": 0.0, "pl_agora": -11.373082672980345, "pvp_agora": 1.075832144741384, "roe": -0.0947, "analisada": false}, {"ticker": "SBSP3", "nome": "Sabesp", "subsetor": "Saneamento", "estatal": false, "preco": 26.93000030517578, "fech_anterior": 27.40999984741211, "fech_base": 28.229999542236328, "dia": -0.017511840383379162, "acum": [0.0, 0.11583423700986106, 0.1346085475975718, 0.13531702999530415, 0.18172161357778216, 0.19022313209217168, 0.15267451091675022, 0.14665247810062398, 0.128940891109512, 0.14063058041369803, 0.1402762716502315, 0.15267451091675022, 0.1346085475975718, 0.12646120271744832, 0.1328374091678406, -0.10485296253880738, -0.09564289406208515, -0.1105206865914673, -0.10945803055946868, -0.12504423792198316, -0.1402762716502316, -0.10626992733427243, -0.11335454861779715, -0.05136375767280488, -0.01877431058771073, -0.0297555850587643, -0.02904710266103183, -0.04605027481901136], "dy_snapshot": 0.024, "dy_agora": 0.0251585589425257, "pl_agora": 11.809897406237202, "pvp_agora": 2.0986893613668696, "roe": 0.17800000000000002, "analisada": false}, {"ticker": "SAPR11", "nome": "Sanepar", "subsetor": "Saneamento", "estatal": true, "preco": 32.470001220703125, "fech_anterior": 33.20000076293945, "fech_base": 35.209999084472656, "dia": -0.021987937513881395, "acum": [0.0, 0.07384272526053381, 0.09400742571307541, 0.1919909773360824, 0.22266402602791513, 0.28003410584295496, 0.1729622354711602, 0.1616018912058279, 0.11956828156605193, 0.1360409270115459, 0.13746095650204926, 0.16103385774136547, 0.16756608007072527, 0.1664300131418004, 0.19057083950427356, -0.02953709010421346, -0.04373760169185781, -0.07923888066096862, -0.09542740103292602, -0.1238284242082146, -0.15506956053516274, -0.11417207199496426, -0.12865660031483983, -0.09400737154242267, -0.07185455396426255, -0.07753478026758132, -0.05708600891215576, -0.07781874282915979], "dy_snapshot": 0.015700000000000002, "dy_agora": 0.017024853071072026, "pl_agora": 21.56059723203746, "pvp_agora": 0.81151948520928, "roe": 0.037599999999999995, "analisada": false}, {"ticker": "CSMG3", "nome": "Copasa", "subsetor": "Saneamento", "estatal": true, "preco": 54.779998779296875, "fech_anterior": 55.20000076293945, "fech_base": 56.25, "dia": -0.007608731482564801, "acum": [0.0, 0.08497775607638891, 0.09760002983940974, 0.11751112196180546, 0.1322666422526042, 0.14773328993055546, 0.10879998101128474, 0.13066663953993052, 0.10222222222222221, 0.09528889973958332, 0.10719997829861105, 0.12977776421440979, 0.1200000000000001, 0.11928887261284715, 0.1480889214409722, -0.12444444444444447, -0.10311109754774306, -0.11111111111111116, -0.1269333224826389, -0.14471110026041667, -0.15982225206163192, -0.12195556640625005, -0.12977776421440967, -0.10151109483506948, -0.07893330891927086, -0.05724446614583334, -0.018666653103298625, -0.02613335503472225], "dy_snapshot": 0.0354, "dy_agora": 0.03634994604550005, "pl_agora": 16.107754307725692, "pvp_agora": 2.356757280815972, "roe": 0.146, "analisada": false}, {"ticker": "BBSE3", "nome": "BB Seguridade", "subsetor": "Seguros", "estatal": true, "preco": 37.68000030517578, "fech_anterior": 39.65999984741211, "fech_base": 40.45000076293945, "dia": -0.04992434568467419, "acum": [0.0, 0.013349836967669448, -0.00914706860089265, -0.004202768366776799, 0.008899891311779484, 0.009147068600892538, 0.018046959912672245, 0.030407899110925563, 0.027688477398272848, 0.04029668819212118, 0.019035857682088153, 0.04598270890653988, 0.04969093408212677, 0.0711990361877548, 0.0798516559039395, 0.06650181893627005, 0.05784919922008536, 0.022249633972966976, 0.03955496771181832, 0.02150800779914608, 0.008405442427071641, -0.06674909053186495, -0.06304077104979622, -0.05463532862272458, -0.04598270890653988, -0.016810884854143282, -0.019530306566796107, -0.06847961447510187], "dy_snapshot": 0.1151, "dy_agora": 0.12356143742813275, "pl_agora": 7.964499446458664, "pvp_agora": 6.716262106311925, "roe": 0.8438, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 43.7, "score_hoje": 44.0, "p_governo": 0.6, "juros": 1.62, "oposicao": 0.58, "juros_dir": -1.54}, {"ticker": "CXSE3", "nome": "Caixa Seguridade", "subsetor": "Seguros", "estatal": true, "preco": 21.579999923706055, "fech_anterior": 21.690000534057617, "fech_base": 20.40999984741211, "dia": -0.005071489517892824, "acum": [0.0, 0.010289122655134042, 0.01861837682293843, 0.03037730739189648, 0.04850562364132949, 0.022538020345924448, 0.021068118980427375, 0.021558086102259733, 0.03919643522986038, 0.06124448845395225, 0.029887340270064122, 0.043116172204519465, 0.04752568939766477, 0.043606045874678756, 0.048995590763161845, 0.03135714818388813, 0.05781481205279859, 0.04164627083902217, 0.05340520140798022, 0.04752568939766477, 0.017638442579273717, 0.01714847545744136, 0.026457663868910464, 0.004409610644818374, 0.03625672595053908, 0.07692306254589654, 0.06271438981944955, 0.057324844930966234], "dy_snapshot": 0.0662, "dy_agora": 0.06261084359484838, "pl_agora": 14.316178293335616, "pvp_agora": 4.694522276396614, "roe": 0.32789999999999997, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 55.5, "score_hoje": 55.2, "p_governo": 0.84, "juros": 1.77, "oposicao": 0.07, "juros_dir": -1.55}, {"ticker": "PSSA3", "nome": "Porto Seguro", "subsetor": "Seguros", "estatal": false, "preco": 45.939998626708984, "fech_anterior": 45.97999954223633, "fech_base": 49.470001220703125, "dia": -0.000869963373762106, "acum": [0.0, 0.041843534338906085, 0.06044062644005388, 0.06428138723887789, 0.082676370561241, 0.07459063140602318, 0.06650489225080558, 0.07236704928277216, 0.06610067469323577, 0.07277134395166529, 0.03921565754676193, 0.0636749066798763, 0.04568421802640654, 0.0450778145787285, 0.04265212367669258, -0.026076427808687463, -0.027693606484260336, -0.055993539304875384, -0.07297352984177374, -0.09541138274174554, -0.10390133945453306, -0.09258139717081637, -0.11643424285625281, -0.10349712189696325, -0.07721850819816745, -0.05660001986387697, -0.07054783893973782, -0.07135642827752431], "dy_snapshot": 0.060599999999999994, "dy_agora": 0.06525646690500914, "pl_agora": 8.06062640145207, "pvp_agora": 1.8387143173819243, "roe": 0.2284, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 79.5, "score_hoje": 79.9, "p_governo": 0.16, "juros": 1.71, "oposicao": 0.73, "juros_dir": -1.49}, {"ticker": "IRBR3", "nome": "IRB Re", "subsetor": "Seguros", "estatal": false, "preco": 57.529998779296875, "fech_anterior": 58.18000030517578, "fech_base": 63.31999969482422, "dia": -0.011172250300264808, "acum": [0.0, 0.011844598920004445, 0.04421988416381328, 0.0546430685588819, 0.11291853380194117, 0.10849656948345787, 0.12318387696384314, 0.11481359251586754, 0.10154769956041809, 0.1054958992004198, 0.090966553442692, 0.1024952289173815, 0.05732781539660503, 0.057169974163438386, 0.06869864963812788, -0.025426415320768947, -0.02984837963925202, -0.10075807168136697, -0.12349967991966726, -0.12065697135928655, -0.10518003599985015, -0.07643714744021879, -0.09807326459889831, -0.08385978204174016, -0.07627918571756132, -0.07691091211870049, -0.0811749749592715, -0.09144031812117359], "dy_snapshot": 0.024900000000000002, "dy_agora": 0.027406014834948863, "pl_agora": -32.00855743832326, "pvp_agora": 0.8813028871749521, "roe": -0.0276, "analisada": false}, {"ticker": "WIZC3", "nome": "Wiz Co", "subsetor": "Seguros", "estatal": false, "preco": 6.289999961853027, "fech_anterior": 6.400000095367432, "fech_base": 8.1899995803833, "dia": -0.017187520605511653, "acum": [0.0, 0.02564103161250042, 0.0488401212086349, 0.052503092455061795, 0.07570218205119628, 0.11355315663303811, 0.08058618252768412, 0.08302812454404984, 0.08302812454404984, 0.07692309483750104, 0.10989018538661122, -0.11233206918109884, -0.14774110174657484, -0.1489621309766359, -0.13675207156353808, -0.2527472284348201, -0.24420019849002728, -0.2735042595708326, -0.29059826123854005, -0.2832722605238083, -0.2991452911833329, -0.2722832303407715, -0.2735042595708326, -0.26495722962603974, -0.26129420015773475, -0.2368741977752955, -0.21855916687752686, -0.23199019729880765], "dy_snapshot": 0.0768, "dy_agora": 0.09999872874636703, "pl_agora": 5.0688644381233185, "pvp_agora": 1.3593772811330718, "roe": 0.26780000000000004, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 76.1, "score_hoje": 77.3, "p_governo": 0.16, "juros": 1.68, "oposicao": 0.63, "juros_dir": -1.29}, {"ticker": "VIVT3", "nome": "Telefônica Brasil (Vivo)", "subsetor": "Telecom", "estatal": false, "preco": 33.619998931884766, "fech_anterior": 34.25, "fech_base": 30.139999389648438, "dia": -0.01839419176978785, "acum": [0.0, 0.05607168441542987, 0.04147312625458488, 0.05773058415242582, 0.06270734664638233, 0.006967518117913851, 0.018248213521798506, 0.03351029360766078, 0.03583277855264266, 0.05441278467843391, 0.05640347701942283, 0.06801590174433181, 0.08294625250916976, 0.1008626734269753, 0.07597879767422433, 0.018248213521798506, 0.031187808662678895, 0.019907113258794462, 0.020238905862787426, 0.01858000612579125, -0.00199069234098892, 0.02853353111370427, 0.03251497907865053, 0.047777059164513025, 0.06668885789429724, 0.07830128261920621, 0.136363659375625, 0.11546116830485187], "dy_snapshot": 0.08449999999999999, "dy_agora": 0.07575342298969022, "pl_agora": 16.44189728785605, "pvp_agora": 1.650882495659902, "roe": 0.1005, "analisada": true, "decisao": "monitorar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 50.9, "score_hoje": 49.8, "p_governo": 0.5, "juros": 1.31, "oposicao": 0.92, "juros_dir": 0.98}, {"ticker": "TIMS3", "nome": "TIM", "subsetor": "Telecom", "estatal": false, "preco": 21.489999771118164, "fech_anterior": 21.65999984741211, "fech_base": 18.549999237060547, "dia": -0.007848572368030604, "acum": [0.0, 0.03881408357498217, 0.02425880223436394, 0.03234503537180755, 0.01832884994995654, -0.024258699412330942, -0.01886784304669087, -0.00862532905621094, 0.004851760446872744, 0.020485233625025634, 0.011859904568814805, 0.026415185909433037, 0.044204939940622356, 0.05121298124053131, 0.029110562681236685, -0.024258699412330942, 0.02479789815313116, 0.04797850854996044, 0.04743941263119322, 0.03342322720934221, 0.04851760446872788, 0.06738544751541875, 0.07601077657162958, 0.07169811204352405, 0.095956914277888, 0.12991913458396454, 0.16765502632141227, 0.158490601346434], "dy_snapshot": 0.08039999999999999, "dy_agora": 0.06940065220495804, "pl_agora": 3743.639054467543, "pvp_agora": 2.0389433745104024, "roe": 0.0005, "analisada": true, "decisao": "descartar", "jev_classe": "DIVIDENDO_FRAGIL", "score_antes": 43.2, "score_hoje": 42.8, "p_governo": 0.28, "juros": 1.23, "oposicao": 0.85, "juros_dir": -0.2}, {"ticker": "FIQE3", "nome": "Unifique", "subsetor": "Telecom", "estatal": false, "preco": 5.489999771118164, "fech_anterior": 5.53000020980835, "fech_base": 5.440000057220459, "dia": -0.007233352110771807, "acum": [0.0, 0.022058802260453536, 0.06433821708660048, 0.11764703304297397, 0.12132350008638282, 0.1397058353034275, 0.1268382444784406, 0.11764703304297397, 0.1397058353034275, 0.14705876939024543, 0.14338230234683635, 0.14889704673889415, 0.15808825817436056, 0.1397058353034275, 0.1397058353034275, -0.08272063995753343, -0.0790440852602361, -0.05514709330502232, -0.04411769217479555, -0.029411736347271344, -0.04411769217479555, -0.020220612565693297, -0.0018382773486487203, 0.007352934086817919, 0.011029401130226768, 0.014705868173635617, 0.016544145522284337, 0.009191123781578048], "dy_snapshot": 0.1157, "dy_agora": 0.11464627071775027, "pl_agora": 9.789154003648196, "pvp_agora": 1.8064521305701309, "roe": 0.184, "analisada": true, "decisao": "descartar", "jev_classe": "DIVIDENDO_ATENCAO", "score_antes": 85.4, "score_hoje": 85.3, "p_governo": 0.3, "juros": 1.37, "oposicao": 0.87, "juros_dir": 0.98}], "sem_preco": ["BPAN4", "ELET3"], "contexto": [{"texto": "25/10 (2º turno): Lula reeleito com 51,79% dos válidos × Flávio Bolsonaro 48,21%; Flávio diz que vai pedir a anulação da eleição — fontes do TSE e do STF veem chance remota", "url": "https://www.infomoney.com.br/mercados/ibovespa-hoje-bolsa-de-valores-ao-vivo-26102026/"}, {"texto": "12/11: Ibovespa −0,43% a 171.324 (semana +1,68%), small caps −1,48%, IFIX −0,88%; dólar +1,62% a R$ 5,652; DIs em alta em toda a curva, mais na parte longa (DI1F29 +0,195 p.p. a 14,76%, DI1F33 +0,235 p.p. a 15,245%); IPCA de outubro +0,14%, abaixo do esperado (12 meses 4,63%); Plano Moretti prevê ajuste de R$ 50 a 60 bi em 2027; Congresso aprova R$ 149 bi em créditos para Bolsa Família, BPC e Previdência; Jensen Huang deixa o comando da Nvidia; Brent +3,30% a US$ 95,82; Banco do Brasil decepciona no 3T26 (BBAS3 −8,35%); sobem HAPV3 +14,90% e AZZA3 +9,95% após balanços, BEEF3 +5,65%, UGPA3 +4,55%, SUZB3 +4,16%, SANB11 +3,61%, PETR4 +2,64%; caem MGLU3 −7,70%, TEND3 −6,95%, CSNA3 −6,42%, CSAN3 −5,94%, VALE3 −0,74%", "url": "https://www.infomoney.com.br/mercados/ibovespa-hoje-bolsa-de-valores-ao-vivo-12112026/"}], "snapshot": "05/10/2026", "finalizado": true, "fonte_cadastro": "2026_11_12"};
+// Mesmo painel para o pregão em andamento (padrão) e para o pregão fechado (painel_besst.py --finalizado).
+const FIN = DADOS.finalizado;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const sp = (v, d = 1) => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(100 * v).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }) + "%";
+const pct = (v, d = 1) => v == null ? "–" : (100 * v).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }) + "%";
+const num = (v, d = 2) => v == null ? "–" : v.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const cls = v => v == null || v === 0 ? "" : v > 0 ? "pos" : "neg";
+const media = a => { a = a.filter(x => x != null); return a.length ? a.reduce((s, x) => s + x, 0) / a.length : null; };
+const mediana = a => { a = a.filter(x => x != null).sort((x, y) => x - y); if (!a.length) return null; const m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; };
+
+// tema
+const root = document.documentElement;
+try { const t = localStorage.getItem("tema-painel"); if (t) root.dataset.theme = t; } catch (_) {}
+$("#tema").onclick = () => {
+  const escuro = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = escuro ? "light" : "dark";
+  try { localStorage.setItem("tema-painel", root.dataset.theme); } catch (_) {}
+  render();
+};
+
+const SUBS = ["Bancos", "Energia", "Saneamento", "Seguros", "Telecom"];
+const COR = { Bancos: "var(--s1)", Energia: "var(--s4)", Saneamento: "var(--s3)", Seguros: "var(--s2)", Telecom: "var(--s5)" };
+const EMP = DADOS.empresas;
+const IB = DADOS.referencias.find(r => r.id === "ibov");
+const DOL = DADOS.referencias.find(r => r.id === "dolar");
+const N = DADOS.dias.length;
+const estado = { sub: null, ord: "dia", asc: true };
+const visiveis = () => EMP.filter(e => !estado.sub || e.subsetor === estado.sub);
+const subsPresentes = SUBS.filter(s => EMP.some(e => e.subsetor === s));
+
+$("#sub").textContent = `${EMP.length} empresas · ${FIN ? "fechamento de" : "preços de"} ${DADOS.data_pregao}${FIN ? "" : ` às ${DADOS.horario_precos || "?"}`} · ` +
+  `dia vs ${DADOS.data_anterior} · acumulado vs ${DADOS.data_base} · gerado em ${DADOS.gerado_em}` +
+  (DADOS.sem_preco.length ? ` · sem cotação: ${DADOS.sem_preco.join(", ")}` : "");
+if (FIN) {
+  document.title = "Painel BESST Fechamento";
+  $("#andamento").hidden = true;
+  $("#notaBarras").textContent = "Média simples das empresas de cada subsetor: fechamento do pregão ÷ fechamento do pregão anterior. Tracejado = Ibovespa.";
+  $("#notaLinhas").textContent = "Média simples por subsetor, fechamentos diários.";
+  $("#tituloDisp").textContent = "DY no fechamento × variação do dia";
+  $("#notaDisp").textContent = "DY no fechamento = DY do snapshot do Fundamentus ajustado pelo preço de fechamento (proventos dos últimos 12 meses, sem projeção). Queda de preço eleva o DY sem mudar o provento.";
+}
+$("#andamento").textContent = `PREGÃO NÃO FINALIZADO — cotações de agora (${DADOS.horario_precos || DADOS.gerado_em}), não de fechamento. ` +
+  "Os números vão mudar até o fim do pregão; este painel fica separado dos painéis de pregões finalizados.";
+$("#contexto").innerHTML = DADOS.contexto.map(c => `<div>${esc(c.texto)} · <a href="${esc(c.url)}" target="_blank" rel="noopener">fonte</a></div>`).join("");
+$("#rodape").innerHTML = `BESST: bancos, energia, saneamento, seguros e telecomunicações. Preços: Yahoo Finance (último negócio no horário indicado; fechamentos diários desde ${esc(DADOS.data_base)}).
+  DY, P/L e P/VP: snapshot do Fundamentus de ${esc(DADOS.snapshot)} reajustado pelo preço ${FIN ? "de fechamento" : "de agora"}. Score, decisão e fatores do Jev (TypeSafe): leitura de ${esc(DADOS.fonte_cadastro)}.
+  Itaúsa entra em Bancos por ser holding do Itaú. Não é recomendação de investimento.`;
+
+function chips() {
+  $("#chips").innerHTML = `<button class="chip ${estado.sub ? "" : "on"}" data-s="">Todos</button>` +
+    subsPresentes.map(s => `<button class="chip ${estado.sub === s ? "on" : ""}" data-s="${s}" style="--c:${COR[s]}"><i></i>${s} <span class="muted">${EMP.filter(e => e.subsetor === s).length}</span></button>`).join("");
+  $("#chips").querySelectorAll("button").forEach(b => b.onclick = () => { estado.sub = b.dataset.s || null; render(); });
+}
+
+function kpis() {
+  const v = visiveis();
+  const porSub = subsPresentes.map(s => [s, media(EMP.filter(e => e.subsetor === s).map(e => e.dia))]).sort((a, b) => b[1] - a[1]);
+  const dyMed = mediana(v.map(e => e.dy_agora)), dyAntes = mediana(v.map(e => e.dy_snapshot));
+  const acima = v.filter(e => e.dia != null && e.dia > IB.dia).length;
+  const it = [
+    ["Ibovespa no dia", sp(IB.dia, 2), cls(IB.dia), `${num(IB.nivel[N - 1], 0)} pontos · acumulado ${sp(IB.acum[N - 1])}`],
+    [`${estado.sub || "BESST"} no dia`, sp(media(v.map(e => e.dia)), 2), cls(media(v.map(e => e.dia))), `mediana ${sp(mediana(v.map(e => e.dia)))} · ${v.length} empresas`],
+    [`${estado.sub || "BESST"} acumulado`, sp(media(v.map(e => e.acum[N - 1]))), cls(media(v.map(e => e.acum[N - 1]))), `desde ${DADOS.data_base.slice(0, 5)}`],
+    ["Acima do Ibovespa hoje", `${acima} de ${v.length}`, "", pct(acima / Math.max(1, v.length), 0) + " caíram menos que o índice"],
+    [FIN ? "DY mediano no fechamento" : "DY mediano agora", pct(dyMed), "", `era ${pct(dyAntes)} com o preço de ${DADOS.data_base.slice(0, 5)}`],
+    ["Dólar", DOL.nivel[N - 1] ? `R$ ${num(DOL.nivel[N - 1], 3)}` : "–", "", `dia ${sp(DOL.dia, 2)} · melhor subsetor: ${porSub[0][0]} ${sp(porSub[0][1])}`],
+  ];
+  $("#kpis").innerHTML = it.map(([l, v, c, d]) => `<div class="card kpi"><div class="l">${esc(l)}</div><div class="v ${c}">${v}</div><div class="d">${esc(d)}</div></div>`).join("");
+}
+
+function escala(vals, extra = []) {
+  const all = vals.concat(extra).filter(x => x != null);
+  let lo = Math.min(0, ...all), hi = Math.max(0, ...all);
+  const pad = (hi - lo) * .08 || .01; return [lo - pad, hi + pad];
+}
+
+function barras() {
+  const linhas = subsPresentes.map(s => ({ s, v: media(EMP.filter(e => e.subsetor === s).map(e => e.dia)), n: EMP.filter(e => e.subsetor === s).length }));
+  const W = 560, rowH = 34, m = { l: 96, r: 64, t: 8, b: 22 }, H = m.t + m.b + rowH * linhas.length;
+  const [lo, hi] = escala(linhas.map(x => x.v), [IB.dia]);
+  const x = v => m.l + (v - lo) / (hi - lo) * (W - m.l - m.r);
+  const ticks = []; for (let t = Math.ceil(lo * 20) / 20; t <= hi; t += .05) ticks.push(t);
+  $("#barras").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Variação do dia por subsetor">
+    ${ticks.map(t => `<line x1="${x(t)}" x2="${x(t)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--grid)"/><text x="${x(t)}" y="${H - 6}" text-anchor="middle">${sp(t, 0)}</text>`).join("")}
+    <line x1="${x(0)}" x2="${x(0)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--axis)"/>
+    ${linhas.map((r, i) => {
+      const y = m.t + i * rowH + 6, h = rowH - 12, x0 = Math.min(x(0), x(r.v)), w = Math.abs(x(r.v) - x(0));
+      const sel = !estado.sub || estado.sub === r.s;
+      return `<g style="cursor:pointer" data-s="${r.s}" opacity="${sel ? 1 : .35}">
+        <text class="lab" x="${m.l - 8}" y="${y + h / 2 + 4}" text-anchor="end">${r.s}</text>
+        <rect x="${x0}" y="${y}" width="${Math.max(1, w)}" height="${h}" rx="4" fill="${COR[r.s]}"><title>${r.s}: ${sp(r.v, 2)} (${r.n} empresas)</title></rect>
+        <text x="${r.v < 0 ? x0 - 6 : x0 + w + 6}" y="${y + h / 2 + 4}" text-anchor="${r.v < 0 ? "end" : "start"}" style="fill:var(--text)">${sp(r.v)}</text></g>`;
+    }).join("")}
+    <line x1="${x(IB.dia)}" x2="${x(IB.dia)}" y1="${m.t - 4}" y2="${H - m.b}" stroke="var(--text-2)" stroke-dasharray="4 3" stroke-width="2" opacity=".7"/>
+    <text x="${x(IB.dia)}" y="${m.t + 2}" text-anchor="middle" dy="-2">Ibov ${sp(IB.dia)}</text>
+  </svg>`;
+  $("#barras").querySelectorAll("g[data-s]").forEach(g => g.onclick = () => { estado.sub = estado.sub === g.dataset.s ? null : g.dataset.s; render(); });
+}
+
+function linhas() {
+  const series = subsPresentes.map(s => ({ nome: s, cor: COR[s], v: DADOS.dias.map((_, i) => media(EMP.filter(e => e.subsetor === s).map(e => e.acum[i]))) }));
+  series.push({ nome: "Ibovespa", cor: "var(--text-2)", v: IB.acum, tracejado: true });
+  $("#legenda").innerHTML = series.map(s => `<span style="--c:${s.cor}"><i></i>${s.nome}</span>`).join("");
+  const W = 560, H = 260, m = { l: 44, r: 12, t: 10, b: 26 };
+  const [lo, hi] = escala(series.flatMap(s => s.v));
+  const x = i => m.l + i / (N - 1) * (W - m.l - m.r), y = v => m.t + (hi - v) / (hi - lo) * (H - m.t - m.b);
+  const ticks = []; for (let t = Math.ceil(lo * 20) / 20; t <= hi; t += .05) ticks.push(t);
+  const path = v => v.map((p, i) => p == null ? "" : `${i && v[i - 1] != null ? "L" : "M"}${x(i).toFixed(1)},${y(p).toFixed(1)}`).join("");
+  const passo = Math.ceil(N / 7);
+  $("#linhas").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Acumulado por subsetor">
+    ${ticks.map(t => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${sp(t, 0)}</text>`).join("")}
+    <line x1="${m.l}" x2="${W - m.r}" y1="${y(0)}" y2="${y(0)}" stroke="var(--axis)"/>
+    <rect x="${x(N - 2)}" y="${m.t}" width="${x(N - 1) - x(N - 2)}" height="${H - m.t - m.b}" fill="var(--neg)" opacity=".06"/>
+    ${DADOS.dias.map((d, i) => i % passo === 0 || i === N - 1 ? `<text x="${x(i)}" y="${H - 8}" text-anchor="${i === N - 1 ? "end" : "middle"}">${esc(d)}</text>` : "").join("")}
+    ${series.map(s => {
+      const sel = s.tracejado || !estado.sub || estado.sub === s.nome;
+      return `<path d="${path(s.v)}" fill="none" stroke="${s.cor}" stroke-width="${s.tracejado ? 2 : 2.4}" ${s.tracejado ? 'stroke-dasharray="5 4"' : ""} opacity="${sel ? 1 : .25}" stroke-linejoin="round"/>`;
+    }).join("")}
+    <line id="cursor" y1="${m.t}" y2="${H - m.b}" stroke="var(--axis)" style="display:none"/>
+    <rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent" id="hover"/>
+  </svg><div class="tip" id="tipL"></div>`;
+  const svg = $("#linhas svg"), tip = $("#tipL"), cur = $("#cursor");
+  $("#hover").onmousemove = ev => {
+    const r = svg.getBoundingClientRect(), px = (ev.clientX - r.left) / r.width * W;
+    const i = Math.max(0, Math.min(N - 1, Math.round((px - m.l) / (W - m.l - m.r) * (N - 1))));
+    cur.setAttribute("x1", x(i)); cur.setAttribute("x2", x(i)); cur.style.display = "";
+    tip.innerHTML = `<div class="h">${esc(DADOS.dias[i])}</div>` + series.map(s => `<div class="r"><span><span class="dot" style="--c:${s.cor}"></span>${s.nome}</span><span>${sp(s.v[i])}</span></div>`).join("");
+    tip.style.display = "block";
+    const left = ev.clientX - r.left + 14;
+    tip.style.left = (left + 200 > r.width ? left - 220 : left) + "px"; tip.style.top = (ev.clientY - r.top - 20) + "px";
+  };
+  $("#hover").onmouseleave = () => { tip.style.display = "none"; cur.style.display = "none"; };
+}
+
+function rank() {
+  const v = visiveis().filter(e => e.dia != null).sort((a, b) => b.dia - a.dia);
+  const [lo, hi] = escala(v.map(e => e.dia), [IB.dia]);
+  const x = val => (val - lo) / (hi - lo) * 100;
+  $("#rank").innerHTML = v.map(e => {
+    const a = Math.min(x(0), x(e.dia)), w = Math.abs(x(e.dia) - x(0));
+    return `<div class="r" title="${esc(e.nome)} · ${e.subsetor}"><span class="tk">${esc(e.ticker)}</span>
+      <span class="trk"><span class="z" style="left:${x(0)}%"></span><span class="ref" style="left:${x(IB.dia)}%"></span><i style="left:${a}%;width:${Math.max(.5, w)}%;--c:${COR[e.subsetor]}"></i></span>
+      <span class="n ${cls(e.dia)}">${sp(e.dia)}</span></div>`;
+  }).join("") + `<div class="note">Cor = subsetor; tracejado = Ibovespa (${sp(IB.dia)}).</div>`;
+}
+
+function disp() {
+  const v = visiveis().filter(e => e.dia != null && e.dy_agora != null);
+  const W = 560, H = 300, m = { l: 44, r: 14, t: 10, b: 34 };
+  const [xlo, xhi] = escala(v.map(e => e.dia), [IB.dia]);
+  const yhi = Math.max(...v.map(e => e.dy_agora)) * 1.08, ylo = 0;
+  const x = t => m.l + (t - xlo) / (xhi - xlo) * (W - m.l - m.r), y = t => m.t + (yhi - t) / (yhi - ylo) * (H - m.t - m.b);
+  const xt = []; for (let t = Math.ceil(xlo * 20) / 20; t <= xhi; t += .05) xt.push(t);
+  const yt = []; for (let t = 0; t <= yhi; t += .02) yt.push(t);
+  $("#disp").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="DY de agora contra variação do dia">
+    ${yt.map(t => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${pct(t, 0)}</text>`).join("")}
+    ${xt.map(t => `<text x="${x(t)}" y="${H - 18}" text-anchor="middle">${sp(t, 0)}</text>`).join("")}
+    <text x="${(m.l + W - m.r) / 2}" y="${H - 2}" text-anchor="middle">variação do dia</text>
+    <line x1="${x(IB.dia)}" x2="${x(IB.dia)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--text-2)" stroke-dasharray="4 3" opacity=".6"/>
+    <line x1="${x(0)}" x2="${x(0)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--axis)"/>
+    ${v.map(e => `<g><circle cx="${x(e.dia)}" cy="${y(e.dy_agora)}" r="6" fill="${COR[e.subsetor]}" stroke="var(--surface)" stroke-width="1.5"><title>${esc(e.ticker)} (${e.subsetor}) · dia ${sp(e.dia)} · DY ${pct(e.dy_snapshot)} → ${pct(e.dy_agora)}</title></circle>
+      <text x="${x(e.dia) + 8}" y="${y(e.dy_agora) + 4}" style="font-size:10px">${esc(e.ticker)}</text></g>`).join("")}
+  </svg>`;
+}
+
+const COLS = [
+  ["ticker", "Ticker", "l"], ["nome", "Empresa", "l"], ["subsetor", "Subsetor", "l"], ["preco", DADOS.finalizado ? "Fech." : "Agora"], ["fech_anterior", "Fech. ant."],
+  ["dia", "Dia"], ["acum_ult", "Acumulado"], ["dy_snapshot", "DY 02/10"], ["dy_agora", DADOS.finalizado ? "DY fech." : "DY agora"], ["pl_agora", "P/L"], ["pvp_agora", "P/VP"],
+  ["score_hoje", "Score"], ["decisao", "Decisão", "l"], ["p_governo", "Governo"], ["oposicao", "Flávio"],
+];
+function tabela() {
+  const v = visiveis().map(e => ({ ...e, acum_ult: e.acum[N - 1] }));
+  const k = estado.ord;
+  v.sort((a, b) => {
+    const x = a[k], y = b[k];
+    if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * (estado.asc ? 1 : -1);
+  });
+  $("#thead").innerHTML = COLS.map(([c, n, l]) => `<th class="${l || ""}" data-c="${c}">${n}${estado.ord === c ? (estado.asc ? " ▲" : " ▼") : ""}</th>`).join("");
+  $("#thead").querySelectorAll("th").forEach(th => th.onclick = () => {
+    estado.asc = estado.ord === th.dataset.c ? !estado.asc : th.dataset.c === "dia" || th.dataset.c === "acum_ult" || ["ticker", "nome", "subsetor", "decisao"].includes(th.dataset.c);
+    estado.ord = th.dataset.c; tabela();
+  });
+  $("#tbody").innerHTML = v.map(e => `<tr>
+    <td class="l tk">${esc(e.ticker)}${e.estatal ? ' <span class="badge" title="controle estatal">estatal</span>' : ""}</td>
+    <td class="l nm" title="${esc(e.nome)}">${esc(e.nome)}</td>
+    <td class="l"><span class="dot" style="--c:${COR[e.subsetor]}"></span>${e.subsetor}</td>
+    <td>${num(e.preco)}</td><td>${num(e.fech_anterior)}</td>
+    <td class="${cls(e.dia)}">${sp(e.dia, 2)}</td><td class="${cls(e.acum_ult)}">${sp(e.acum_ult)}</td>
+    <td>${pct(e.dy_snapshot)}</td><td style="font-weight:600">${pct(e.dy_agora)}</td>
+    <td>${num(e.pl_agora, 1)}</td><td>${num(e.pvp_agora, 2)}</td>
+    <td>${e.analisada ? `${num(e.score_hoje, 1)}` : "–"}</td>
+    <td class="l">${e.analisada ? `<span class="badge">${esc(e.decisao)}</span>` : '<span class="muted">não analisada</span>'}</td>
+    <td>${e.p_governo == null ? "–" : num(e.p_governo, 2)}</td><td>${e.oposicao == null ? "–" : (e.oposicao > 0 ? "+" : "") + num(e.oposicao, 2)}</td></tr>`).join("");
+  $("#ntab").textContent = `${v.length} empresas`;
+}
+
+function render() { chips(); kpis(); barras(); linhas(); rank(); disp(); tabela(); }
+render();
+</script>
+</body>
+</html>
