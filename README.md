@@ -103,8 +103,9 @@ nenhuma das duas entra no painel consolidado de `resultados/`, que só usa preg�
 ├── AJUSTES.md                 # o que mudou na robustez e na metodologia, e o que ficou para depois
 ├── requirements-dev.txt       # pytest; a execução dos estudos segue só com a biblioteca padrão
 ├── templates/                 # HTML dos dashboards (os scripts embutem os dados neles)
-│   └── _camada_visual.css     # visual comum (neutros, tipografia, cartões, tabelas); copiado para cada template
-├── tools/aplicar_camada_visual.py   # reaplica a camada nos templates e regrava os dashboards com os mesmos dados
+│   ├── _camada_visual.css     # visual comum (neutros, tipografia, cartões, tabelas); copiado para cada template
+│   └── _menu_lateral.html     # menu lateral e faixa do rodapé; copiado para cada template e para o index.html
+├── tools/aplicar_camada_visual.py   # reaplica a camada e o menu nos templates e regrava os dashboards com os mesmos dados
 ├── resultados/                # CSVs e dashboards gerados pelos scripts da raiz
 │   ├── resultado_dividendos.csv / dashboard.html   (análise mais recente: 26/10)
 │   ├── snapshot_2026_10_05/   # análise de ações de 05/10, base das leituras diárias

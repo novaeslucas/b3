@@ -54,6 +54,9 @@ h2 { font-size: 15px; font-weight: 600; letter-spacing: 0; color: var(--text); }
 .sub { font-size: 12.5px; line-height: 1.5; max-width: 120ch; margin-top: 4px; color: var(--muted); }
 header { align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 
+/* Com o menu lateral, o conteúdo ocupa a largura da tela como num terminal */
+.wrap { max-width: 1640px; }
+
 /* Painéis: planos, canto reto, sem sombra */
 .card, .tablebox, .tabwrap, .ctxbox, .mapa, .fx-caixa, .andamento { border-radius: var(--v2-raio); box-shadow: none; }
 .card { border-color: var(--border); }
@@ -120,6 +123,10 @@ input[type="checkbox"], input[type="range"] { accent-color: var(--accent); }
 :is(.tablebox, .tabwrap) tbody tr.sel, :is(.tablebox, .tabwrap) tbody tr.sel td:first-child { background: var(--v2-sel); }
 :is(.tablebox, .tabwrap) tbody tr.sel td:first-child { box-shadow: inset 2px 0 0 var(--accent), inset -1px 0 0 var(--grid); }
 .tk { font-weight: 600; }
+/* Setas de alta e baixa ao lado da variação, como nas grades de cotação */
+:is(.tablebox, .tabwrap) td:is(.pos, .neg)::after { display: inline-block; width: 0; height: 0; margin-left: 6px; vertical-align: 2px; content: ""; border-inline: 3.5px solid transparent; }
+:is(.tablebox, .tabwrap) td.pos::after { border-bottom: 5px solid currentColor; }
+:is(.tablebox, .tabwrap) td.neg::after { border-top: 5px solid currentColor; }
 
 /* Selos preenchidos (decisão, classe do Jev) */
 .badge { border-radius: var(--v2-raio); font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; }

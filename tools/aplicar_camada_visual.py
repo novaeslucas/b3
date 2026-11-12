@@ -1,7 +1,10 @@
-"""Aplica templates/_camada_visual.css aos templates e reembute os dados nos dashboards já publicados.
+"""Aplica templates/_camada_visual.css e templates/_menu_lateral.html aos templates e reembute os dados nos
+dashboards já publicados.
 
 Os dashboards são HTML autocontido (abrem pelo htmlpreview, sem arquivos ao lado), então a camada visual
-é copiada para dentro do <style> de cada template, entre dois marcadores. Rodar de novo troca o bloco.
+é copiada para dentro do <style> de cada template, entre dois marcadores, e o menu lateral (com a faixa do
+rodapé) entra logo depois de <body>, também entre marcadores; a página inicial recebe só o menu. Rodar de
+novo troca os blocos.
 Os dashboards da lista PARES são regravados com os MESMOS dados que já tinham: nada é coletado nem
 recalculado. Uso:  python tools/aplicar_camada_visual.py
 """
@@ -12,7 +15,10 @@ import re
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CAMADA = os.path.join("templates", "_camada_visual.css")
 BLOCO = re.compile(r"/\* ===== Camada visual v2 — início.*?/\* ===== Camada visual v2 — fim ===== \*/\n", re.S)
+MENU = os.path.join("templates", "_menu_lateral.html")
+BLOCO_MENU = re.compile(r"<!-- ===== Menu lateral v1 — início.*?<!-- ===== Menu lateral v1 — fim ===== -->\n", re.S)
 MARCA = "/*__DADOS__*/null"
+SO_MENU = ["index.html"]  # páginas com estilo próprio: recebem o menu, não a camada
 
 # template -> dashboards gerados a partir dele que devem ser regravados
 PARES = {
@@ -45,12 +51,21 @@ def dados_de(html):
     return m.group(1)
 
 
+def com_menu(html, menu):
+    html = BLOCO_MENU.sub("", html)
+    assert html.count("<body>\n") == 1
+    return html.replace("<body>\n", "<body>\n" + menu)
+
+
 def main():
-    camada = ler(CAMADA)
+    camada, menu = ler(CAMADA), ler(MENU)
+    for pagina in SO_MENU:
+        gravar(pagina, com_menu(ler(pagina), menu))
+        print("menu", pagina)
     for template, saidas in PARES.items():
-        html = BLOCO.sub("", ler(template))
+        html = BLOCO.sub("", BLOCO_MENU.sub("", ler(template)))
         assert html.count("</style>") == 1 and MARCA in html, template
-        html = html.replace("</style>", camada + "</style>")
+        html = com_menu(html.replace("</style>", camada + "</style>"), menu)
         gravar(template, html)
         print("template", template)
         for saida in saidas:
