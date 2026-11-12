@@ -17,3 +17,6 @@ __pycache__/
 
 # Painel ao vivo: regravado a cada coleta (python painel_ao_vivo.py)
 resultados_ao_vivo/
+
+# Carteira pessoal (posições, preço médio e painel): só local, nunca no git
+carteira/
