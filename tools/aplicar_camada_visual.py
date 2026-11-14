@@ -26,10 +26,11 @@ PARES = {
     "templates/dashboard_fiis_template.html": ["resultados/dashboard_fiis.html"],
     "templates/dashboard_eleicao_template.html": ["resultados/dashboard_eleicao.html"],
     "templates/dashboard_pos_eleicao_template.html": ["resultados/dashboard_pos_eleicao.html"],
-    "templates/painel_besst_template.html": ["resultados/painel_besst_2026_11_06.html", "resultados/painel_besst_2026_11_12.html"],
+    "templates/painel_besst_template.html": ["resultados/painel_besst_2026_11_06.html", "resultados/painel_besst_2026_11_12.html", "resultados/painel_besst_2026_11_13.html"],
     "templates/painel_ao_vivo_template.html": [],
     "leituras/2026_11_11/dashboard_eleicao_template.html": ["leituras/2026_11_11/dashboard_eleicao.html"],
     "leituras/2026_11_12/dashboard_eleicao_template.html": ["leituras/2026_11_12/dashboard_eleicao.html"],
+    "leituras/2026_11_13/dashboard_eleicao_template.html": ["leituras/2026_11_13/dashboard_eleicao.html"],
 }
 
 
