@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Qualidade de Dividendos B3</title>
+<style>
+:root {
+  --bg: #f6f7f9; --surface: #ffffff; --surface-2: #f0f2f5; --border: #dfe3e8;
+  --text: #1a1f26; --muted: #5d6773; --faint: #8a939e;
+  --accent: #2f5fd0;
+  --estudar: #1f8a5b; --monitorar: #b7791f; --descartar: #c2413b; --neutro: #8a939e;
+  --estudar-bg: #e3f4ec; --monitorar-bg: #fbf0dc; --descartar-bg: #fbe5e3;
+  --fund: #2f5fd0; --b3: #e08a2e;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1216; --surface: #171b21; --surface-2: #1f242c; --border: #2b323c;
+    --text: #e7ebf0; --muted: #9aa5b1; --faint: #6b7682;
+    --accent: #7aa2ff;
+    --estudar: #4cc38a; --monitorar: #e0a84a; --descartar: #ef6b64; --neutro: #6b7682;
+    --estudar-bg: #16302a; --monitorar-bg: #33280f; --descartar-bg: #3a1c1b;
+    --fund: #7aa2ff; --b3: #f0a65a;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1216; --surface: #171b21; --surface-2: #1f242c; --border: #2b323c;
+  --text: #e7ebf0; --muted: #9aa5b1; --faint: #6b7682;
+  --accent: #7aa2ff;
+  --estudar: #4cc38a; --monitorar: #e0a84a; --descartar: #ef6b64; --neutro: #6b7682;
+  --estudar-bg: #16302a; --monitorar-bg: #33280f; --descartar-bg: #3a1c1b;
+  --fund: #7aa2ff; --b3: #f0a65a;
+  --shadow: none;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.wrap { max-width: 1280px; margin: 0 auto; padding: 24px 16px 48px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; }
+h2 { font-size: 15px; margin: 0 0 12px; }
+.sub { color: var(--muted); font-size: 13px; }
+.theme { border: 1px solid var(--border); background: var(--surface); color: var(--text); border-radius: 8px; padding: 4px 10px; cursor: pointer; font: inherit; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+.kpi { cursor: pointer; transition: border-color .15s; }
+.kpi:hover, .kpi.on { border-color: var(--accent); }
+.kpi .v { font-size: 26px; font-weight: 650; }
+.kpi .l { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 12px; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 16px 0 8px; }
+.filters input, .filters select {
+  background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 8px;
+  padding: 7px 10px; font: inherit; min-width: 0;
+}
+.filters input { flex: 1 1 200px; }
+.filters label { color: var(--muted); font-size: 13px; display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+.filters label input { flex: none; }
+.tablebox { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 980px; }
+th, td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; cursor: pointer; user-select: none; position: sticky; top: 0; background: var(--surface-2); }
+th:hover { color: var(--text); }
+th.l, td.l { text-align: left; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--surface-2); }
+tbody tr.sel { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
+td.tk { font-weight: 650; }
+.setor { color: var(--muted); max-width: 190px; overflow: hidden; text-overflow: ellipsis; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.b-estudar { color: var(--estudar); background: var(--estudar-bg); }
+.b-monitorar { color: var(--monitorar); background: var(--monitorar-bg); }
+.b-descartar { color: var(--descartar); background: var(--descartar-bg); }
+.b-neutro { color: var(--muted); background: var(--surface-2); }
+.bar { position: relative; height: 6px; width: 64px; background: var(--surface-2); border-radius: 3px; display: inline-block; vertical-align: middle; margin-left: 8px; }
+.bar > i { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--accent); }
+.warn { color: var(--descartar); }
+.ok { color: var(--estudar); }
+.muted { color: var(--muted); }
+svg text { fill: var(--muted); font-size: 11px; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+.detail-empty { color: var(--muted); display: grid; place-items: center; min-height: 260px; text-align: center; }
+.dhead { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; }
+.dhead .t { font-size: 20px; font-weight: 700; }
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px 12px; margin: 12px 0; }
+.facts div { font-size: 12px; color: var(--muted); }
+.facts b { display: block; color: var(--text); font-size: 14px; font-weight: 600; }
+.rows { display: grid; gap: 6px; margin-bottom: 14px; }
+.row { display: grid; grid-template-columns: 130px 1fr 44px; gap: 8px; align-items: center; font-size: 12px; }
+.row .track { height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.row .track i { display: block; height: 100%; background: var(--c, var(--accent)); border-radius: 4px; }
+.row .n { text-align: right; color: var(--text); }
+.sec { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 14px 0 8px; }
+.note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+footer { color: var(--faint); font-size: 12px; margin-top: 20px; }
+/* ===== Camada visual v2 — início (fonte: templates/_camada_visual.css; aplicar com tools/aplicar_camada_visual.py) ===== */
+/* Estilo "terminal de mesa": fundo azul-noite, painéis planos de canto reto com borda de 1px, rótulos pequenos em
+   caixa alta, selos preenchidos, alta em verde e baixa em vermelho, botão principal invertido (claro sobre escuro).
+   Só CSS: não muda dados, cálculos nem o comportamento dos scripts. --pos, --neg e --mid ficam em hexadecimal
+   porque o mapa de calor do painel pós-eleição interpola essas cores no JavaScript. */
+:root {
+  --bg: #f3f4f7; --surface: #ffffff; --surface-2: #eceef3; --border: #d5d9e2;
+  --text: #0a0c12; --text-2: #3b4150; --muted: #626a7a; --faint: #7f8696; --grid: #e4e7ee; --axis: #b7bdca; --mid: #eceef3; --map-bg: #e9ebf1;
+  --accent: #1d5fd6;
+  --pos: #16a34a; --neg: #dc2626; --pos-txt: #12813b; --neg-txt: #c2261f;
+  --estudar: #12813b; --monitorar: #a85d05; --descartar: #c2261f; --neutro: #7f8696;
+  --ok: #16a34a; --warn: #b7791f; --bad: #dc2626;
+  --v2-raio: 2px;
+  --v2-sel: #e7e3ff;            /* linha selecionada */
+  --v2-sobre-cor: #ffffff;      /* texto sobre selo preenchido */
+  --v2-dica: #ffffff;           /* fundo de dica flutuante */
+  --v2-sombra-dica: 0 8px 24px -8px rgba(10, 12, 18, .28);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #04060c; --surface: #090c15; --surface-2: #121622; --border: #1d2230;
+    --text: #f3f5f9; --text-2: #b6bcc9; --muted: #7c8495; --faint: #5d6474; --grid: #161a26; --axis: #2b3141; --mid: #121622; --map-bg: #060911;
+    --accent: #4b8cf7;
+    --pos: #1fa855; --neg: #e5484d; --pos-txt: #3ddc84; --neg-txt: #ff6b6e;
+    --estudar: #2fc46b; --monitorar: #e6a93a; --descartar: #f05656; --neutro: #5d6474;
+    --ok: #2fc46b; --warn: #e6a93a; --bad: #f05656;
+    --v2-sel: #221d47; --v2-sobre-cor: #04130a; --v2-dica: #1a1e2b;
+    --v2-sombra-dica: 0 10px 28px -8px rgba(0, 0, 0, .9);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #04060c; --surface: #090c15; --surface-2: #121622; --border: #1d2230;
+  --text: #f3f5f9; --text-2: #b6bcc9; --muted: #7c8495; --faint: #5d6474; --grid: #161a26; --axis: #2b3141; --mid: #121622; --map-bg: #060911;
+  --accent: #4b8cf7;
+  --pos: #1fa855; --neg: #e5484d; --pos-txt: #3ddc84; --neg-txt: #ff6b6e;
+  --estudar: #2fc46b; --monitorar: #e6a93a; --descartar: #f05656; --neutro: #5d6474;
+  --ok: #2fc46b; --warn: #e6a93a; --bad: #f05656;
+  --v2-sel: #221d47; --v2-sobre-cor: #04130a; --v2-dica: #1a1e2b;
+  --v2-sombra-dica: 0 10px 28px -8px rgba(0, 0, 0, .9);
+}
+
+/* Base */
+html { -webkit-text-size-adjust: 100%; scrollbar-color: var(--axis) transparent; }
+body {
+  font-family: "Roboto", "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 13.5px; line-height: 1.5; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased;
+}
+::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+:where(a, button, input, select, th, [tabindex], .chip, .kpi):focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Títulos */
+h1 { font-size: clamp(20px, .9vw + 14px, 26px); font-weight: 600; letter-spacing: -.012em; line-height: 1.2; text-wrap: balance; }
+h2 { font-size: 15px; font-weight: 600; letter-spacing: 0; color: var(--text); }
+.sub { font-size: 12.5px; line-height: 1.5; max-width: 120ch; margin-top: 4px; color: var(--muted); }
+header { align-items: flex-start; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+
+/* Com o menu lateral, o conteúdo ocupa a largura da tela como num terminal */
+.wrap { max-width: 1640px; }
+
+/* Painéis: planos, canto reto, sem sombra */
+.card, .tablebox, .tabwrap, .ctxbox, .mapa, .fx-caixa, .andamento { border-radius: var(--v2-raio); box-shadow: none; }
+.card { border-color: var(--border); }
+
+/* KPIs */
+.kpis { gap: 8px; }
+.kpi { position: relative; padding: 12px 14px 11px; transition: border-color .12s, background-color .12s; }
+.kpi .l { font-size: 10.5px; font-weight: 500; letter-spacing: .07em; line-height: 1.3; color: var(--muted); }
+.kpi .v { font-size: clamp(20px, .7vw + 14px, 25px); font-weight: 600; letter-spacing: -.01em; line-height: 1.2; margin-top: 4px; }
+.kpi .d { font-size: 12px; line-height: 1.4; margin-top: 2px; }
+.kpi[data-k]:hover { border-color: var(--axis); background: var(--surface-2); }
+.kpi.on { border-color: var(--text); background: var(--surface-2); box-shadow: inset 0 2px 0 var(--text); }
+
+/* Botões: secundário com contorno, principal invertido */
+.btn, .theme, .ms-fechar, .ms-nav .voltar, .context .fontes-btn {
+  min-height: 32px; border-radius: var(--v2-raio); padding: 5px 13px; font-size: 13px; font-weight: 500;
+  background: transparent; border: 1px solid var(--axis); color: var(--text);
+  transition: background-color .12s, border-color .12s, color .12s;
+}
+.btn:hover, .theme:hover, .ms-nav .voltar:hover, .context .fontes-btn:hover { background: var(--surface-2); border-color: var(--text); }
+.theme.mapa-btn, .context .fontes-btn { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 600; }
+.theme.mapa-btn:hover, .context .fontes-btn:hover { background: var(--text-2); border-color: var(--text-2); color: var(--bg); }
+#theme::before, #tema::before { content: "◐"; margin-right: 6px; opacity: .7; }
+
+/* Abas segmentadas e chips retangulares */
+.tabs { border-radius: var(--v2-raio); padding: 0; gap: 0; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; }
+.tabs button { border-radius: 0; padding: 6px 15px; font-weight: 500; color: var(--muted); transition: background-color .12s, color .12s; }
+.tabs button:hover:not(.on) { color: var(--text); }
+.tabs button.on { background: var(--bg); color: var(--text); box-shadow: inset 0 0 0 1px var(--axis); }
+.chip, .tag {
+  border-radius: var(--v2-raio); padding: 3px 10px; font-weight: 500; background: var(--surface-2); border-color: var(--border); color: var(--text-2);
+  transition: background-color .12s, border-color .12s, color .12s;
+}
+.chip:hover:not(.on) { border-color: var(--axis); color: var(--text); }
+.chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+.chip i, .dot { border-radius: 0; }
+
+/* Campos */
+select, input[type="search"], input[type="text"] {
+  min-height: 32px; border-radius: var(--v2-raio); background-color: var(--surface); border: 1px solid var(--border); color: var(--text);
+  transition: border-color .12s;
+}
+select:hover, input[type="search"]:hover, input[type="text"]:hover { border-color: var(--axis); }
+select:focus, input[type="search"]:focus, input[type="text"]:focus { outline: none; border-color: var(--text); }
+input::placeholder { color: var(--faint); }
+input[type="checkbox"], input[type="range"] { accent-color: var(--accent); }
+
+/* Barras fixas no topo */
+.dayctl, .status { background: color-mix(in srgb, var(--bg) 88%, transparent); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+
+/* Tabelas densas: faixa de cabeçalho, 1ª coluna fixa, linha selecionada em violeta */
+.tablebox, .tabwrap { scrollbar-width: thin; }
+:is(.tablebox, .tabwrap) th {
+  font-size: 10.5px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--muted);
+  background: var(--surface-2); padding-top: 9px; padding-bottom: 9px; border-bottom-color: var(--border);
+}
+:is(.tablebox, .tabwrap) th:hover, :is(.tablebox, .tabwrap) th.on { color: var(--text); }
+:is(.tablebox, .tabwrap) td { padding-top: 7px; padding-bottom: 7px; border-bottom-color: var(--grid); }
+:is(.tablebox, .tabwrap) tbody tr:last-child td { border-bottom-color: transparent; }
+:is(.tablebox, .tabwrap) :is(th, td):first-child { position: sticky; left: 0; z-index: 1; }
+:is(.tablebox, .tabwrap) td:first-child { background: var(--surface); box-shadow: inset -1px 0 0 var(--grid); }
+:is(.tablebox, .tabwrap) th:first-child { z-index: 2; }
+:is(.tablebox, .tabwrap) tbody tr:hover td:first-child { background: var(--surface-2); }
+:is(.tablebox, .tabwrap) tbody tr.sel, :is(.tablebox, .tabwrap) tbody tr.sel td:first-child { background: var(--v2-sel); }
+:is(.tablebox, .tabwrap) tbody tr.sel td:first-child { box-shadow: inset 2px 0 0 var(--accent), inset -1px 0 0 var(--grid); }
+.tk { font-weight: 600; }
+/* Setas de alta e baixa ao lado da variação, como nas grades de cotação */
+:is(.tablebox, .tabwrap) td:is(.pos, .neg)::after { display: inline-block; width: 0; height: 0; margin-left: 6px; vertical-align: 2px; content: ""; border-inline: 3.5px solid transparent; }
+:is(.tablebox, .tabwrap) td.pos::after { border-bottom: 5px solid currentColor; }
+:is(.tablebox, .tabwrap) td.neg::after { border-top: 5px solid currentColor; }
+
+/* Selos preenchidos (decisão, classe do Jev) */
+.badge { border-radius: var(--v2-raio); font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; padding: 2px 7px; }
+.b-estudar { background: var(--estudar); color: var(--v2-sobre-cor); }
+.b-monitorar { background: var(--monitorar); color: var(--v2-sobre-cor); }
+.b-descartar { background: var(--descartar); color: var(--v2-sobre-cor); }
+.b-neutro { background: var(--surface-2); color: var(--text-2); box-shadow: inset 0 0 0 1px var(--border); }
+.pill, .top .vb { border-radius: var(--v2-raio); }
+
+/* Contexto do pregão */
+.ctxbox, .context { line-height: 1.6; }
+.ctxbox { padding: 11px 14px; background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--text); }
+.context { color: var(--text-2); max-width: 150ch; }
+.andamento { background: color-mix(in srgb, currentColor 8%, transparent); }
+
+/* Detalhe do ativo, barras, rótulos de seção e legendas */
+.dhead .t { font-size: 21px; font-weight: 600; letter-spacing: -.01em; }
+.facts { gap: 10px 14px; padding: 12px 0; border-block: 1px solid var(--grid); }
+.facts div { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; }
+.facts b { font-size: 14px; font-weight: 600; margin-top: 2px; letter-spacing: 0; text-transform: none; }
+.sec, .hb .grp, .rank .sep { font-size: 10.5px; font-weight: 500; letter-spacing: .07em; }
+.row .track, .bar { background: var(--surface-2); border-radius: 0; }
+.row .track { height: 10px; }
+.row .track i, .bar > i, .hb .trk i, .rank .trk i, .amp, .scale .bar, .legenda .esc, .ms-leg i { border-radius: 0; }
+.legend, .legenda { gap: 5px 14px; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.legend .muted { text-transform: none; letter-spacing: 0; font-size: 12px; }
+.legend span::before { border-radius: 0; width: 7px; height: 7px; margin-right: 6px; }
+.legend i, .tag i { border-radius: 0; }
+svg text { font-size: 10.5px; }
+.heat td.c { border-radius: 0; }
+
+/* Dicas flutuantes e modais */
+.tip, .ms-tip { border-radius: var(--v2-raio); background: var(--v2-dica); border-color: var(--axis); box-shadow: var(--v2-sombra-dica); }
+.fx-caixa { box-shadow: var(--v2-sombra-dica); }
+.ms-topo { background: var(--surface); }
+
+/* Rodapé e notas */
+.note { line-height: 1.55; }
+footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border); line-height: 1.6; max-width: 130ch; color: var(--muted); }
+
+/* Telas pequenas */
+@media (max-width: 560px) {
+  .wrap { padding-left: 12px; padding-right: 12px; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .kpi { padding: 10px 11px; }
+  .card { padding: 12px 11px; }
+  .row { grid-template-columns: 104px 1fr 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+@media print {
+  .btn, .theme, .filters, .filtros, .tabs { display: none !important; }
+  .card, .tablebox { break-inside: avoid; }
+  .dayctl, .status { position: static; }
+}
+/* ===== Camada visual v2 — fim ===== */
+</style>
+</head>
+<body>
+<!-- ===== Menu lateral v1 — início (fonte: templates/_menu_lateral.html; aplicar com tools/aplicar_camada_visual.py) ===== -->
+<style>
+/* Moldura de navegação no estilo "terminal de mesa": menu lateral fixo à esquerda e faixa de leitura fixa no rodapé.
+   Serve aos dashboards (variáveis --surface/--border) e à página inicial (--card/--line). */
+.v2-lado, .v2-faixa {
+  --l-sup: var(--surface, var(--card)); --l-sup2: var(--surface-2, var(--card-2)); --l-borda: var(--border, var(--line));
+  font: 13.5px/1.3 "Roboto", "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+}
+.v2-lado *, .v2-faixa * { box-sizing: border-box; }
+body { padding-left: 212px; padding-bottom: 32px; }
+html.v2-rec body { padding-left: 56px; }
+.v2-lado {
+  position: fixed; inset: 0 auto 32px 0; width: 212px; z-index: 30; display: flex; flex-direction: column;
+  background: var(--bg); border-right: 1px solid var(--l-borda); padding: 16px 10px 12px 0; overflow: hidden auto; scrollbar-width: none;
+}
+.v2-marca { display: flex; align-items: center; gap: 9px; padding: 2px 10px 18px 16px; color: var(--text); font-size: 19px; font-weight: 700; letter-spacing: -.02em; text-decoration: none; white-space: nowrap; }
+.v2-marca:hover { text-decoration: none; }
+.v2-marca svg { flex: none; }
+.v2-marca small { font-size: 10.5px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); align-self: flex-end; padding-bottom: 3px; }
+.v2-nav { display: flex; flex-direction: column; }
+.v2-nav a, .v2-rec-btn {
+  display: flex; align-items: center; gap: 11px; min-height: 40px; padding: 8px 10px 8px 13px; border: 0; border-left: 3px solid transparent;
+  background: none; color: var(--muted); font: inherit; text-align: left; text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: color .12s, background-color .12s;
+}
+.v2-nav a svg, .v2-rec-btn svg { flex: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.v2-nav a:hover, .v2-rec-btn:hover { color: var(--text); background: var(--l-sup); text-decoration: none; }
+.v2-nav a.on { color: var(--text); font-weight: 500; border-left-color: var(--text); }
+.v2-nav a:focus-visible, .v2-rec-btn:focus-visible, .v2-caixa a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.v2-sep { height: 1px; background: var(--l-borda); margin: 8px 0 8px 16px; }
+.v2-rec-btn { width: 100%; color: var(--text); font-weight: 500; }
+.v2-caixa { margin: 14px 0 0 16px; padding: 10px; background: var(--l-sup); border: 1px solid var(--l-borda); border-radius: 2px; color: var(--text); line-height: 1.4; white-space: normal; }
+.v2-caixa a { display: block; margin-top: 9px; padding: 7px 10px; background: var(--text); color: var(--bg); border-radius: 2px; font-weight: 600; text-align: center; text-decoration: none; }
+.v2-caixa a:hover { background: var(--text-2); text-decoration: none; }
+.v2-fim { margin-top: auto; }
+html.v2-rec .v2-lado { width: 56px; padding-right: 0; }
+html.v2-rec .v2-marca { padding-left: 17px; }
+html.v2-rec :is(.v2-marca span, .v2-marca small, .v2-nav a span, .v2-rec-btn span, .v2-caixa) { display: none; }
+html.v2-rec :is(.v2-nav a, .v2-rec-btn) { padding-left: 17px; }
+html.v2-rec .v2-rec-btn svg { transform: scaleX(-1); }
+html.v2-rec .v2-sep { margin-left: 0; }
+
+.v2-faixa {
+  position: fixed; inset: auto 0 0 0; height: 32px; z-index: 31; display: flex; align-items: center; gap: 8px; padding: 0 14px;
+  background: var(--l-sup2); border-top: 1px solid var(--l-borda); color: var(--text); white-space: nowrap; overflow: hidden;
+}
+.v2-faixa svg { flex: none; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.v2-faixa b { font-weight: 600; flex: none; }
+.v2-faixa span { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.v2-faixa i { font-style: normal; color: var(--muted); padding: 0 7px; }
+.v2-faixa .pos { color: var(--pos-txt, var(--pos)); } .v2-faixa .neg { color: var(--neg-txt, var(--neg)); }
+
+@media (max-width: 900px) {
+  body, html.v2-rec body { padding-left: 0; }
+  .v2-lado, html.v2-rec .v2-lado {
+    position: static; width: auto; flex-direction: row; align-items: stretch; padding: 0; border-right: 0; border-bottom: 1px solid var(--l-borda);
+    overflow: auto hidden;
+  }
+  .v2-marca, html.v2-rec .v2-marca { padding: 8px 6px 8px 12px; font-size: 16px; }
+  .v2-marca small, .v2-fim, .v2-sep { display: none; }
+  html.v2-rec :is(.v2-marca span, .v2-nav a span) { display: inline; }
+  .v2-nav { flex-direction: row; }
+  .v2-nav a, html.v2-rec .v2-nav a { padding: 8px 11px; border-left: 0; border-bottom: 2px solid transparent; gap: 7px; }
+  .v2-nav a.on { border-bottom-color: var(--text); }
+}
+@media print { .v2-lado, .v2-faixa { display: none; } body, html.v2-rec body { padding-left: 0; padding-bottom: 0; } }
+</style>
+<nav class="v2-lado" id="v2-lado" aria-label="Dashboards">
+  <a class="v2-marca" data-rel="index.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/index.html">
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 18V11h4v7zM8 18V6h4v12zM14 18V2h4v16z" fill="currentColor"/></svg>
+    <span>b3·jev</span><small>estudo</small></a>
+  <div class="v2-nav">
+    <a data-rel="index.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/index.html" title="Página inicial">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z"/></svg><span>Início</span></a>
+    <a data-rel="resultados/dashboard_pos_eleicao.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_pos_eleicao.html" title="Painel pós-eleição">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 14V2M2 14h12M4.5 10.5l3-3.5 2.5 2 3.5-5"/></svg><span>Painel pós-eleição</span></a>
+    <a data-rel="index.html#leituras" data-grupo="leituras" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/index.html#leituras" title="Leituras diárias">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3.5h11v10h-11zM2.5 6.5h11M5.5 2v3M10.5 2v3"/></svg><span>Leituras diárias</span></a>
+    <a data-rel="resultados/dashboard.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard.html" title="Ações — dividendos">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M10 6c-.4-.8-1.1-1.2-2-1.2-1.2 0-2 .6-2 1.5 0 2.2 4.1.9 4.1 3.2 0 1-.9 1.7-2.1 1.7-1 0-1.8-.5-2.2-1.3M8 3.6v8.8"/></svg><span>Ações — dividendos</span></a>
+    <a data-rel="resultados/dashboard_fiis.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_fiis.html" title="FIIs — rendimentos">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 14V2h7v12M10 6h3v8M1.5 14h13M5.5 5h2M5.5 8h2M5.5 11h2"/></svg><span>FIIs — rendimentos</span></a>
+    <a data-rel="resultados/painel_besst_2026_11_17.html" data-grupo="painel_besst" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/painel_besst_2026_11_17.html" title="Painel BESST">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l5 2v4c0 3-2 5.200-5 6.400-3-1.200-5-3.400-5-6.400v-4z"/></svg><span>Painel BESST</span></a>
+    <a data-rel="resultados/dashboard_eleicao.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_eleicao.html" title="Leitura pós-1º turno">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 14.500V2M3 2.500h9.500l-2 3 2 3H3"/></svg><span>Pós-1º turno</span></a>
+  </div>
+  <div class="v2-sep"></div>
+  <button class="v2-rec-btn" id="v2-recolher" type="button" title="Recolher ou abrir o menu" aria-expanded="true">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.500L3.500 8 8 12.500M13 3.500L8.500 8l4.500 4.500"/></svg><span>Recolher menu</span></button>
+  <div class="v2-fim">
+    <div class="v2-caixa">Estudo pessoal. Não é recomendação de investimento.
+      <a href="https://github.com/novaeslucas/b3#readme">Ver metodologia</a></div>
+  </div>
+</nav>
+<div class="v2-faixa" id="v2-faixa" role="note">
+  <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.500h10v11H3zM5.500 5.500h5M5.500 8h5M5.500 10.500h3"/></svg>
+  <b id="v2-faixa-rot">Leitura:</b><span id="v2-faixa-txt">Estudo pessoal, não é recomendação de investimento.</span>
+</div>
+<script>
+// Menu lateral: marca a página atual, lembra se está recolhido e, fora do htmlpreview (servidor local), troca os links por relativos.
+(() => {
+  const d = document, raiz = d.documentElement, botao = d.getElementById("v2-recolher");
+  const marca = on => { raiz.classList.toggle("v2-rec", on); botao.setAttribute("aria-expanded", String(!on)); };
+  try { marca(localStorage.getItem("v2-menu") === "recolhido"); } catch (e) {}
+  botao.addEventListener("click", () => {
+    const on = !raiz.classList.contains("v2-rec"); marca(on);
+    try { localStorage.setItem("v2-menu", on ? "recolhido" : "aberto"); } catch (e) {}
+  });
+  const previa = location.hostname === "htmlpreview.github.io";
+  const onde = decodeURIComponent(previa ? location.search : location.pathname).replace(/\/$/, "/index.html");
+  const links = [...d.querySelectorAll("#v2-lado a[data-rel]")];
+  const base = (onde.match(/^(.*\/)(?:index\.html|(?:resultados|resultados_ao_vivo|leituras|carteira)\/.*)$/) || [])[1];
+  if (!previa && base != null) links.forEach(a => { a.href = base + a.dataset.rel; });
+  const itens = links.filter(a => !a.classList.contains("v2-marca"));
+  const atual = itens.find(a => !a.dataset.rel.includes("#") && onde.endsWith("/" + a.dataset.rel))
+    || itens.find(a => a.dataset.grupo && onde.includes("/" + a.dataset.grupo));
+  if (atual) { atual.classList.add("on"); atual.setAttribute("aria-current", "page"); }
+
+  // Faixa do rodapé: na página inicial, o Ibovespa dos últimos pregões; nos dashboards, o subtítulo (data e base da leitura).
+  const esc = s => s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  let feito = false;
+  const faixa = () => {
+    if (feito) return;
+    const txt = d.getElementById("v2-faixa-txt"), rot = d.getElementById("v2-faixa-rot");
+    const linhas = [...d.querySelectorAll("#leituras tbody tr")].filter(tr => tr.cells.length > 1);
+    if (linhas.length) {
+      rot.textContent = "Ibovespa por pregão:";
+      txt.innerHTML = linhas.slice(-12).reverse().map(tr => {
+        const v = tr.cells[1].textContent.trim();
+        return `${esc(tr.cells[0].textContent.trim())} <span class="${/^[−-]/.test(v) ? "neg" : "pos"}">${esc(v)}</span>`;
+      }).join("<i>•</i>");
+      feito = true; return;
+    }
+    const sub = d.querySelector("header .sub, .wrap .sub");
+    const t = sub && sub.textContent.replace(/\s+/g, " ").trim();
+    if (t) { txt.innerHTML = esc(t) + "<i>•</i>Estudo pessoal, não é recomendação de investimento."; feito = true; }
+  };
+  d.addEventListener("DOMContentLoaded", faixa); addEventListener("load", faixa); setTimeout(faixa, 1500);
+})();
+</script>
+<!-- ===== Menu lateral v1 — fim ===== -->
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Qualidade de Dividendos — B3</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <button class="theme" id="theme" type="button">Tema</button>
+  </header>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Score × Dividend Yield</h2>
+      <div id="scatter"></div>
+      <div class="legend">
+        <span style="--c: var(--estudar)">estudar</span>
+        <span style="--c: var(--monitorar)">monitorar</span>
+        <span style="--c: var(--descartar)">descartar</span>
+        <span class="muted">· clique em um ponto para detalhar · DY acima de 25% aparece na borda</span>
+      </div>
+    </div>
+    <div class="card" id="detail"><div class="detail-empty">Selecione uma empresa no gráfico ou na tabela.</div></div>
+  </div>
+
+  <div class="filters">
+    <input id="q" type="search" placeholder="Buscar ticker, empresa ou setor">
+    <select id="fClasse">
+      <option value="">Jev: todas as classes</option>
+      <option value="DIVIDENDO_SUSTENTAVEL">Sustentável</option>
+      <option value="DIVIDENDO_ATENCAO">Atenção</option>
+      <option value="DIVIDENDO_FRAGIL">Frágil</option>
+    </select>
+    <select id="fSetor"><option value="">Todos os setores</option></select>
+    <label><input type="checkbox" id="fDiv"> só divergências com a B3</label>
+  </div>
+
+  <div class="tablebox">
+    <table>
+      <thead><tr id="thead"></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <footer>
+    Score determinístico (0–100) calculado em Python; classe e P(extraordinário) são julgamentos do Jev (TypeSafe).
+    Decisão: <b>estudar</b> = Jev sustentável, score ≥ 60 e P(extra) &lt; 0,5; <b>descartar</b> = frágil ou P(extra) ≥ 0,7.
+    Fontes: Fundamentus (indicadores e proventos) e B3 (conferência de proventos por espécie). Não é recomendação de investimento.
+  </footer>
+</div>
+
+<script>
+const DADOS = {"gerado_em": "04/11/2026 21:21", "precos_em": "fechamento de 04/11/2026 (Yahoo Finance) sobre indicadores do Fundamentus baixados em 04/11/2026", "anos": [2020, 2021, 2022, 2023, 2024, 2025], "ano_corrente": 2026, "pesos": {"sustentabilidade": 0.25, "historico": 0.2, "rentabilidade": 0.2, "crescimento": 0.2, "valuation": 0.15}, "empresas": [{"ticker": "JHSF3", "empresa": "JHSF Part ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 9.5600004196167, "dy": 0.08242834366231074, "payout": 0.24983579162122602, "payout_fonte": "cvm", "payout_dy_pl": 0.25258, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.284, "roic": 0.13119999999999998, "mrg_liq": 0.5179, "pl": 3.064237236584057, "pvp": 0.8709989405358792, "ev_ebitda": 4.292030923845477, "div_liq_ebit": 1.0205188983072682, "liq_2m": 61976500.0, "oscil_12m": 0.5682178514901421, "cresc_rec_5a": 0.16870000000000002, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.2063440741794027, "div_fundamentus": [0.146, 0.394, 0.209, 0.451, 0.371, 0.373], "div_b3": [0.1459, 0.3938, 0.2087, 0.4511, 0.3709, 0.3427], "div_ano_corrente": 0.758, "score": 95.2, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 94, "crescimento": 100, "valuation": 99}, "jev": {"ticker": "JHSF3", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.72, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.81, "DIVIDENDO_ATENCAO": 0.18, "DIVIDENDO_FRAGIL": 0.01}, "p_extraordinario": 0.14}, "decisao": "estudar", "conferencia_b3": "confere"}, {"ticker": "TGMA3", "empresa": "Tegma ON NM", "setor": "Transporte", "subsetor": "Transporte Rodoviário", "cotacao": 37.0, "dy": 0.09810745945945948, "payout": 0.46619265563691464, "payout_fonte": "cvm", "payout_dy_pl": 0.943656, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.2555, "roic": 0.2701, "mrg_liq": 0.1014, "pl": 9.618595825426944, "pvp": 2.4573055028462996, "ev_ebitda": 6.629709948495527, "div_liq_ebit": 0.0807244677677994, "liq_2m": 19111500.0, "oscil_12m": 0.11992952019517467, "cresc_rec_5a": 0.2274, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.6710327510395617, "div_fundamentus": [0.34, 0.786, 1.122, 1.71, 2.71, 4.43], "div_b3": [0.3402, 0.7858, 1.1217, 1.71, 2.71, 4.43], "div_ano_corrente": 1.14, "score": 91.1, "pilares": {"sustentabilidade": 100, "historico": 100, "rentabilidade": 84, "crescimento": 100, "valuation": 63}, "jev": {"ticker": "TGMA3", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.8, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.87, "DIVIDENDO_ATENCAO": 0.1, "DIVIDENDO_FRAGIL": 0.03}, "p_extraordinario": 0.34}, "decisao": "estudar", "conferencia_b3": "confere"}, {"ticker": "VBBR3", "empresa": "VIBRA ON", "setor": "Petróleo, Gás e Biocombustíveis", "subsetor": "Exploração, Refino e Distribuição", "cotacao": 29.25, "dy": 0.06590577777777779, "payout": 0.31978335565779514, "payout_fonte": "cvm", "payout_dy_pl": 0.45678, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.21489999999999998, "roic": 0.1606, "mrg_liq": 0.0248, "pl": 6.930803571428571, "pvp": 1.4866071428571426, "ev_ebitda": 5.353794642857142, "div_liq_ebit": 1.9276331502268929, "liq_2m": 501634000.0, "oscil_12m": 0.3911830357142856, "cresc_rec_5a": 0.054400000000000004, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.11234153215188991, "div_fundamentus": [0.929, 2.016, 0.856, 0.833, 1.57, 1.582], "div_b3": [0.9287, 2.035, 0.8562, 0.8327, 1.5702, 1.5818], "div_ano_corrente": 1.214, "score": 79.6, "pilares": {"sustentabilidade": 90, "historico": 83, "rentabilidade": 71, "crescimento": 68, "valuation": 85}, "jev": {"ticker": "VBBR3", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.49, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.66, "DIVIDENDO_ATENCAO": 0.33, "DIVIDENDO_FRAGIL": 0.01}, "p_extraordinario": 0.2}, "decisao": "estudar", "conferencia_b3": "confere"}, {"ticker": "ABEV3", "empresa": "AMBEV S/A ON", "setor": "Bebidas", "subsetor": "Cervejas e Refrigerantes", "cotacao": 15.25, "dy": 0.056486557377049176, "payout": 0.7601951799440596, "payout_fonte": "cvm", "payout_dy_pl": 0.84677, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1732, "roic": 0.20739999999999997, "mrg_liq": 0.1826, "pl": 14.990646258503403, "pvp": 2.593537414965987, "ev_ebitda": 8.03996598639456, "div_liq_ebit": -0.9277403019115913, "liq_2m": 573359000.0, "oscil_12m": 0.26979591836734707, "cresc_rec_5a": 0.0337, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.21892495924755173, "div_fundamentus": [0.414, 0.68, 0.762, 0.73, 0.668, 1.114], "div_b3": [0.4137, 0.6803, 0.7623, 0.7302, 0.6676, 1.1141], "div_ano_corrente": 0.116, "score": 76.7, "pilares": {"sustentabilidade": 79, "historico": 100, "rentabilidade": 91, "crescimento": 61, "valuation": 43}, "jev": {"ticker": "ABEV3", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.8, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.87, "DIVIDENDO_ATENCAO": 0.12, "DIVIDENDO_FRAGIL": 0.01}, "p_extraordinario": 0.48}, "decisao": "estudar", "conferencia_b3": "confere"}, {"ticker": "CPFE3", "empresa": "CPFL ENERGIA S.A. ON", "setor": "Energia Elétrica", "subsetor": "Energia Elétrica", "cotacao": 42.63999938964844, "dy": 0.08755426954594009, "payout": 0.6839959718372113, "payout_fonte": "cvm", "payout_dy_pl": 0.7167030000000001, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.2643, "roic": 0.1557, "mrg_liq": 0.1379, "pl": 8.185814395081476, "pvp": 2.161710685059063, "ev_ebitda": 5.5528302905308635, "div_liq_ebit": 2.334459745583278, "liq_2m": 110232000.0, "oscil_12m": 0.1065704791148312, "cresc_rec_5a": 0.032799999999999996, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.09179861184560556, "div_fundamentus": [1.801, 3.701, 3.242, 2.886, 2.754, 2.794], "div_b3": [1.801, 3.7014, 3.2423, 2.8856, 2.754, 2.7942], "div_ano_corrente": 3.732, "score": 75.0, "pilares": {"sustentabilidade": 58, "historico": 100, "rentabilidade": 90, "crescimento": 58, "valuation": 74}, "jev": {"ticker": "CPFE3", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.67, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.78, "DIVIDENDO_ATENCAO": 0.21, "DIVIDENDO_FRAGIL": 0.01}, "p_extraordinario": 0.18}, "decisao": "estudar", "conferencia_b3": "confere"}, {"ticker": "BMGB4", "empresa": "BANCO BMG PN N1", "setor": "Intermediários Financeiros", "subsetor": "Bancos", "cotacao": 5.519999980926514, "dy": 0.09281086988591068, "payout": 0.8098038729453292, "payout_fonte": "cvm", "payout_dy_pl": 0.531576, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.1447, "roic": 0.0, "mrg_liq": 0.0, "pl": 5.727518777201946, "pvp": 0.8300751851017314, "ev_ebitda": 0.0, "div_liq_ebit": null, "liq_2m": 10853500.0, "oscil_12m": 0.5263007466058085, "cresc_rec_5a": 0.0748, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.2503363552483693, "div_fundamentus": [0.179, 0.316, 0.365, 0.376, 0.37, 0.547], "div_b3": [0.1786, 0.3155, 0.3653, 0.3756, 0.37, 0.547], "div_ano_corrente": 0.2, "score": 66.3, "pilares": {"sustentabilidade": 50, "historico": 100, "rentabilidade": 21, "crescimento": 75, "valuation": 98}, "jev": {"ticker": "BMGB4", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.26, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.51, "DIVIDENDO_ATENCAO": 0.46, "DIVIDENDO_FRAGIL": 0.03}, "p_extraordinario": 0.4}, "decisao": "estudar", "conferencia_b3": "confere"}, {"ticker": "MILS3", "empresa": "MILLS ON NM", "setor": "Diversos", "subsetor": "Aluguel de carros", "cotacao": 16.229999542236328, "dy": 0.05214972420654647, "payout": 0.4900576072811951, "payout_fonte": "cvm", "payout_dy_pl": 0.441618, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.23809999999999998, "roic": 0.2065, "mrg_liq": 0.2354, "pl": 8.468271054529618, "pvp": 2.017230227016124, "ev_ebitda": 5.017476199177162, "div_liq_ebit": 1.7436190503403888, "liq_2m": 22007400.0, "oscil_12m": 0.3200058302774038, "cresc_rec_5a": 0.19879999999999998, "anos_pagos": 5, "cortes": 1, "cagr_div": null, "div_fundamentus": [0.0, 0.187, 0.262, 0.298, 0.623, 0.464], "div_b3": [0.0, 0.1874, 0.2623, 0.2981, 0.6233, 0.464], "div_ano_corrente": 0.66, "score": 87.8, "pilares": {"sustentabilidade": 92, "historico": 67, "rentabilidade": 100, "crescimento": 100, "valuation": 77}, "jev": {"ticker": "MILS3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.49, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.33, "DIVIDENDO_ATENCAO": 0.66, "DIVIDENDO_FRAGIL": 0.01}, "p_extraordinario": 0.39}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "LEVE3", "empresa": "MAHLE METAL LEVE ON", "setor": "Automóveis e Motocicletas", "subsetor": "Automóveis e Motocicletas", "cotacao": 31.440000534057617, "dy": 0.09070435596560585, "payout": 0.16750165490687313, "payout_fonte": "cvm", "payout_dy_pl": 0.554216, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.7229000000000001, "roic": 0.34450000000000003, "mrg_liq": 0.1301, "pl": 6.110136543058119, "pvp": 4.415201406113915, "ev_ebitda": 5.095267973406343, "div_liq_ebit": 1.1737041071314154, "liq_2m": 13780300.0, "oscil_12m": 0.14240720742554136, "cresc_rec_5a": 0.0858, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.9646311897519215, "div_fundamentus": [0.093, 1.474, 4.493, 9.881, 2.362, 2.722], "div_b3": [0.0929, 1.474, 4.4927, 9.8815, 2.3623, 2.7219], "div_ano_corrente": 2.036, "score": 82.7, "pilares": {"sustentabilidade": 95, "historico": 83, "rentabilidade": 88, "crescimento": 79, "valuation": 60}, "jev": {"ticker": "LEVE3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.33, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.39, "DIVIDENDO_ATENCAO": 0.55, "DIVIDENDO_FRAGIL": 0.06}, "p_extraordinario": 0.54}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "ALOS3", "empresa": "ALLOS ON", "setor": "Exploração de Imóveis", "subsetor": "Exploração de Imóveis", "cotacao": 24.860000610351562, "dy": 0.1410632306477006, "payout": 0.2598816382692961, "payout_fonte": "cvm", "payout_dy_pl": 1.892079, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.0727, "roic": 0.0639, "mrg_liq": 0.3556, "pl": 13.412985023187131, "pvp": 0.9724149898606904, "ev_ebitda": 4.428716095126406, "div_liq_ebit": -2.2330623117259845, "liq_2m": 261278000.0, "oscil_12m": 0.12261082688156444, "cresc_rec_5a": 0.2764, "anos_pagos": 5, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.226, 0.384, 0.519, 1.524, 1.584], "div_b3": [0.0, 0.2264, 0.3839, 0.519, 1.5274, 1.585], "div_ano_corrente": 2.921, "score": 82.2, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 43, "crescimento": 100, "valuation": 80}, "jev": {"ticker": "ALOS3", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.24, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.49, "DIVIDENDO_ATENCAO": 0.42, "DIVIDENDO_FRAGIL": 0.09}, "p_extraordinario": 0.61}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "PSSA3", "empresa": "PORTO SEGURO SA ON", "setor": "Previdência e Seguros", "subsetor": "Seguradoras", "cotacao": 44.88999938964844, "dy": 0.06685544755636727, "payout": 0.4152201983160292, "payout_fonte": "cvm", "payout_dy_pl": 0.526706, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.2284, "roic": 0.7928000000000001, "mrg_liq": 0.0872, "pl": 7.878280966647076, "pvp": 1.8024858766878913, "ev_ebitda": 0.405053005997279, "div_liq_ebit": -0.411243527434593, "liq_2m": 112107000.0, "oscil_12m": -0.014708562911618928, "cresc_rec_5a": 0.1434, "anos_pagos": 6, "cortes": 1, "cagr_div": -0.014818518109997902, "div_fundamentus": [2.141, 2.612, 1.159, 1.411, 1.543, 1.987], "div_b3": [2.1413, 2.6121, 1.1586, 1.4113, 1.543, 2.5932], "div_ano_corrente": 2.462, "score": 80.0, "pilares": {"sustentabilidade": 90, "historico": 83, "rentabilidade": 81, "crescimento": 60, "valuation": 85}, "jev": {"ticker": "PSSA3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.34, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.44, "DIVIDENDO_ATENCAO": 0.56, "DIVIDENDO_FRAGIL": 0}, "p_extraordinario": 0.16}, "decisao": "monitorar", "conferencia_b3": "diverge em 2025"}, {"ticker": "UGPA3", "empresa": "ULTRAPAR PARTICIPAÇÕES SA ON", "setor": "Petróleo, Gás e Biocombustíveis", "subsetor": "Exploração, Refino e Distribuição", "cotacao": 30.68000030517578, "dy": 0.06521864341906289, "payout": 0.40795896924510155, "payout_fonte": "cvm", "payout_dy_pl": 0.645932, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1925, "roic": 0.215, "mrg_liq": 0.0236, "pl": 9.904100516926716, "pvp": 1.9057740775342535, "ev_ebitda": 4.72000004695012, "div_liq_ebit": 1.3491210030429333, "liq_2m": 411943000.0, "oscil_12m": 0.5463431116158761, "cresc_rec_5a": 0.0426, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.4878712821162938, "div_fundamentus": [0.24, 0.64, 0.583, 0.35, 0.65, 1.75], "div_b3": [0.24, 0.64, 0.5829, 0.35, 0.65, 1.7502], "div_ano_corrente": 1.0, "score": 78.7, "pilares": {"sustentabilidade": 96, "historico": 83, "rentabilidade": 69, "crescimento": 64, "valuation": 76}, "jev": {"ticker": "UGPA3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.19, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.46, "DIVIDENDO_ATENCAO": 0.46, "DIVIDENDO_FRAGIL": 0.08}, "p_extraordinario": 0.57}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "INTB3", "empresa": "INTELBRAS ON NM", "setor": "Computadores e Equipamentos", "subsetor": "Computadores e Equipamentos", "cotacao": 14.300000190734863, "dy": 0.08830769112983529, "payout": 0.21928967334571337, "payout_fonte": "cvm", "payout_dy_pl": 0.66176, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1857, "roic": 0.1844, "mrg_liq": 0.136, "pl": 7.493798009360709, "pvp": 1.3951219698277915, "ev_ebitda": 5.839581959422042, "div_liq_ebit": -1.1651661880506705, "liq_2m": 26952000.0, "oscil_12m": 0.3137066377314126, "cresc_rec_5a": 0.0426, "anos_pagos": 5, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.165, 0.562, 0.534, 0.488, 1.403], "div_b3": [0.0, 0.1646, 0.5622, 0.5343, 0.4878, 1.4028], "div_ano_corrente": 0.347, "score": 76.9, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 86, "crescimento": 28, "valuation": 82}, "jev": {"ticker": "INTB3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.3, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.41, "DIVIDENDO_ATENCAO": 0.53, "DIVIDENDO_FRAGIL": 0.06}, "p_extraordinario": 0.61}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "FLRY3", "empresa": "FLEURY ON NM", "setor": "Serv.Méd.Hospit. Análises e Diagnósticos", "subsetor": "Serv.Méd.Hospit. Análises e Diagnósticos", "cotacao": 20.709999084472656, "dy": 0.0564542757935989, "payout": 0.5343350955057031, "payout_fonte": "cvm", "payout_dy_pl": 0.9083360000000001, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.13, "roic": 0.127, "mrg_liq": 0.0789, "pl": 16.08976445505997, "pvp": 2.087211258024152, "ev_ebitda": 6.504804017725756, "div_liq_ebit": 2.5539256348686603, "liq_2m": 142500000.0, "oscil_12m": 0.5314659303415077, "cresc_rec_5a": 0.20600000000000002, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.1595572595123782, "div_fundamentus": [0.737, 0.958, 1.004, 0.435, 0.699, 1.545], "div_b3": [0.7368, 0.9577, 1.0043, 0.4348, 0.6989, 1.6753], "div_ano_corrente": 0.401, "score": 76.6, "pilares": {"sustentabilidade": 83, "historico": 83, "rentabilidade": 57, "crescimento": 100, "valuation": 53}, "jev": {"ticker": "FLRY3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.55, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.28, "DIVIDENDO_ATENCAO": 0.7, "DIVIDENDO_FRAGIL": 0.02}, "p_extraordinario": 0.59}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "BMOB3", "empresa": "BEMOBI TECH ON NM", "setor": "Programas e Serviços", "subsetor": "Programas e Serviços", "cotacao": 24.610000610351562, "dy": 0.07985838891744443, "payout": 0.40835720734218817, "payout_fonte": "cvm", "payout_dy_pl": 1.053708, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1697, "roic": 0.1127, "mrg_liq": 0.09140000000000001, "pl": 13.19470645831957, "pvp": 2.237272782759233, "ev_ebitda": 7.284143943867271, "div_liq_ebit": -1.6356662103582023, "liq_2m": 28345900.0, "oscil_12m": 0.12987478489301196, "cresc_rec_5a": 0.1263, "anos_pagos": 4, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.202, 0.755, 0.644, 2.641], "div_b3": [0.0, 0.0, 0.2024, 0.7552, 0.6438, 2.6406], "div_ano_corrente": 0.38, "score": 75.9, "pilares": {"sustentabilidade": 100, "historico": 67, "rentabilidade": 63, "crescimento": 84, "valuation": 54}, "jev": {"ticker": "BMOB3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.68, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.14, "DIVIDENDO_ATENCAO": 0.79, "DIVIDENDO_FRAGIL": 0.07}, "p_extraordinario": 0.68}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "RENT3", "empresa": "LOCALIZA ON", "setor": "Diversos", "subsetor": "Aluguel de carros", "cotacao": 29.459999084472656, "dy": 0.07164188953123247, "payout": 0.6922077123422181, "payout_fonte": "cvm", "payout_dy_pl": 0.6929999999999998, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.1263, "roic": 0.12269999999999999, "mrg_liq": 0.0738, "pl": 9.673111702307693, "pvp": 1.225260815625641, "ev_ebitda": 4.772068439805129, "div_liq_ebit": 4.055438484261228, "liq_2m": 712750000.0, "oscil_12m": -0.1911129036492477, "cresc_rec_5a": 0.38789999999999997, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.4185203312032353, "div_fundamentus": [0.347, 0.443, 1.317, 1.508, 1.586, 1.993], "div_b3": [0.3475, 0.4435, 1.3168, 1.5078, 1.5857, 1.9934], "div_ano_corrente": 1.614, "score": 75.7, "pilares": {"sustentabilidade": 50, "historico": 100, "rentabilidade": 53, "crescimento": 100, "valuation": 84}, "jev": {"ticker": "RENT3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.48, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.33, "DIVIDENDO_ATENCAO": 0.65, "DIVIDENDO_FRAGIL": 0.02}, "p_extraordinario": 0.64}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "BLAU3", "empresa": "BLAU ON NM", "setor": "Comércio e Distribuição", "subsetor": "Medicamentos e Outros Produtos", "cotacao": 8.630000114440918, "dy": 0.08628841137022884, "payout": 0.3583006827146096, "payout_fonte": "cvm", "payout_dy_pl": 0.7429629999999998, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.1002, "roic": 0.12240000000000001, "mrg_liq": 0.13140000000000002, "pl": 8.610229209253195, "pvp": 0.8600343756659333, "ev_ebitda": 4.626391813927089, "div_liq_ebit": -0.09002212520999119, "liq_2m": 3972000.0, "oscil_12m": -0.10101694111425319, "cresc_rec_5a": 0.0867, "anos_pagos": 5, "cortes": 1, "cagr_div": null, "div_fundamentus": [0.0, 0.248, 0.849, 0.422, 0.364, 1.024], "div_b3": [0.0, 0.2481, 0.8497, 0.4223, 0.3643, 1.0243], "div_ano_corrente": 0.227, "score": 74.7, "pilares": {"sustentabilidade": 100, "historico": 67, "rentabilidade": 57, "crescimento": 58, "valuation": 89}, "jev": {"ticker": "BLAU3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.74, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.14, "DIVIDENDO_ATENCAO": 0.83, "DIVIDENDO_FRAGIL": 0.03}, "p_extraordinario": 0.69}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "RECV3", "empresa": "PETRORECONCA ON NM", "setor": "Petróleo, Gás e Biocombustíveis", "subsetor": "Exploração, Refino e Distribuição", "cotacao": 10.359999656677246, "dy": 0.16461969657506637, "payout": 0.36736865015900083, "payout_fonte": "cvm", "payout_dy_pl": 1.0033050000000001, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.11259999999999999, "roic": 0.1015, "mrg_liq": 0.1673, "pl": 6.094683812896559, "pvp": 0.6836059253011937, "ev_ebitda": 3.1869515672492272, "div_liq_ebit": 2.1280999147325113, "liq_2m": 27500800.0, "oscil_12m": -0.03370858220805906, "cresc_rec_5a": 0.1038, "anos_pagos": 4, "cortes": 1, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.778, 0.99, 2.751, 0.9], "div_b3": [0.0, 0.0, 0.7782, 0.9901, 2.7512, 0.9001], "div_ano_corrente": 1.705, "score": 72.1, "pilares": {"sustentabilidade": 87, "historico": 50, "rentabilidade": 59, "crescimento": 69, "valuation": 98}, "jev": {"ticker": "RECV3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.82, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.02, "DIVIDENDO_ATENCAO": 0.88, "DIVIDENDO_FRAGIL": 0.1}, "p_extraordinario": 0.69}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "TAEE11", "empresa": "TAESA UNT", "setor": "Energia Elétrica", "subsetor": "Energia Elétrica", "cotacao": 39.900001525878906, "dy": 0.07535638809562097, "payout": 0.5649397118997908, "payout_fonte": "cvm", "payout_dy_pl": 0.63744, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.2014, "roic": 0.11109999999999999, "mrg_liq": 0.3625, "pl": 8.45900415491175, "pvp": 1.7019924022533277, "ev_ebitda": 9.651417993616176, "div_liq_ebit": 4.270254976093429, "liq_2m": 109410000.0, "oscil_12m": 0.1195441041169345, "cresc_rec_5a": 0.1301, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.00111864054587274, "div_fundamentus": [3.211, 4.504, 4.855, 2.915, 3.532, 3.229], "div_b3": null, "div_ano_corrente": 2.068, "score": 72.0, "pilares": {"sustentabilidade": 67, "historico": 83, "rentabilidade": 87, "crescimento": 60, "valuation": 61}, "jev": {"ticker": "TAEE11", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.49, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.33, "DIVIDENDO_ATENCAO": 0.66, "DIVIDENDO_FRAGIL": 0.01}, "p_extraordinario": 0.11}, "decisao": "monitorar", "conferencia_b3": "unit (não comparável)"}, {"ticker": "ISAE4", "empresa": "ISA ENERGIA PN", "setor": "Energia Elétrica", "subsetor": "Energia Elétrica", "cotacao": 25.670000076293945, "dy": 0.06666147233790937, "payout": 0.4234191879658886, "payout_fonte": "cvm", "payout_dy_pl": 0.40848000000000007, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.1235, "roic": 0.0852, "mrg_liq": 0.2867, "pl": 6.127677437566942, "pvp": 0.7556088732134911, "ev_ebitda": 7.794157281229573, "div_liq_ebit": 3.735537446781132, "liq_2m": 136072000.0, "oscil_12m": 0.08134875321388235, "cresc_rec_5a": 0.1812, "anos_pagos": 5, "cortes": 2, "cagr_div": 0.13559549810561045, "div_fundamentus": [1.74, 3.589, 1.062, 2.204, 0.0, 3.286], "div_b3": [1.7396, 3.5889, 1.0624, 2.2041, 0.0, 3.2864], "div_ano_corrente": 1.114, "score": 71.9, "pilares": {"sustentabilidade": 70, "historico": 50, "rentabilidade": 61, "crescimento": 100, "valuation": 82}, "jev": {"ticker": "ISAE4", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.8, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.08, "DIVIDENDO_ATENCAO": 0.87, "DIVIDENDO_FRAGIL": 0.05}, "p_extraordinario": 0.4}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "CMIG4", "empresa": "CEMIG PN N1", "setor": "Energia Elétrica", "subsetor": "Energia Elétrica", "cotacao": 10.199999809265137, "dy": 0.10005000187088464, "payout": 0.5686560097152257, "payout_fonte": "cvm", "payout_dy_pl": 0.63549, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1575, "roic": 0.09300000000000001, "mrg_liq": 0.1051, "pl": 6.351724019156992, "pvp": 1.0034482570980916, "ev_ebitda": 6.444827465691867, "div_liq_ebit": 3.2065026581362264, "liq_2m": 213518000.0, "oscil_12m": -0.017965535604929417, "cresc_rec_5a": 0.060599999999999994, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.07900036875372285, "div_fundamentus": [0.614, 1.176, 1.532, 1.291, 1.059, 0.898], "div_b3": [0.6143, 1.176, 1.5323, 1.2907, 1.4254, 1.6506], "div_ano_corrente": 0.757, "score": 71.7, "pilares": {"sustentabilidade": 60, "historico": 100, "rentabilidade": 56, "crescimento": 63, "valuation": 87}, "jev": {"ticker": "CMIG4", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.38, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.4, "DIVIDENDO_ATENCAO": 0.59, "DIVIDENDO_FRAGIL": 0.01}, "p_extraordinario": 0.17}, "decisao": "monitorar", "conferencia_b3": "diverge em 2024, 2025"}, {"ticker": "CMIN3", "empresa": "CSNMINERACAO ON N2", "setor": "Mineração", "subsetor": "Minerais Metálicos", "cotacao": 5.239999771118164, "dy": 0.20788989457675972, "payout": 0.4750804070158406, "payout_fonte": "cvm", "payout_dy_pl": 2.535499, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.3179, "roic": 0.20329999999999998, "mrg_liq": 0.1341, "pl": 12.196355215639457, "pvp": 3.8760085074865374, "ev_ebitda": 4.785336016574288, "div_liq_ebit": 0.2121503740725794, "liq_2m": 49674500.0, "oscil_12m": -0.07464559356457767, "cresc_rec_5a": 0.0823, "anos_pagos": 5, "cortes": 1, "cagr_div": null, "div_fundamentus": [0.0, 0.468, 0.921, 0.777, 0.739, 0.445], "div_b3": [0.0, 0.4684, 0.9211, 0.7769, 0.7387, 0.4446], "div_ano_corrente": 0.219, "score": 70.5, "pilares": {"sustentabilidade": 84, "historico": 67, "rentabilidade": 89, "crescimento": 55, "valuation": 49}, "jev": {"ticker": "CMIN3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.83, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.09, "DIVIDENDO_ATENCAO": 0.89, "DIVIDENDO_FRAGIL": 0.02}, "p_extraordinario": 0.35}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "BRSR6", "empresa": "BANRISUL S/A PNB", "setor": "Intermediários Financeiros", "subsetor": "Bancos", "cotacao": 12.739999771118164, "dy": 0.12067535538621638, "payout": 0.4342537461256444, "payout_fonte": "cvm", "payout_dy_pl": 0.4100579999999999, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.1326, "roic": 0.0, "mrg_liq": 0.0, "pl": 3.3980260400943227, "pvp": 0.44683522851393237, "ev_ebitda": 0.0, "div_liq_ebit": null, "liq_2m": 48206600.0, "oscil_12m": 0.009743701272065364, "cresc_rec_5a": 0.085, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.19529094793556534, "div_fundamentus": [0.657, 0.954, 0.881, 0.917, 0.995, 1.603], "div_b3": [0.6569, 0.9539, 0.8814, 0.9173, 0.9949, 1.603], "div_ano_corrente": 0.731, "score": 66.8, "pilares": {"sustentabilidade": 50, "historico": 100, "rentabilidade": 18, "crescimento": 78, "valuation": 100}, "jev": {"ticker": "BRSR6", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.49, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.66, "DIVIDENDO_ATENCAO": 0.27, "DIVIDENDO_FRAGIL": 0.07}, "p_extraordinario": 0.58}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "ABCB4", "empresa": "ABC Brasil PN N2", "setor": "Intermediários Financeiros", "subsetor": "Bancos", "cotacao": 23.0, "dy": 0.10962860869565216, "payout": 0.45074849967705144, "payout_fonte": "cvm", "payout_dy_pl": 0.6652260000000001, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.1405, "roic": 0.0, "mrg_liq": 0.0, "pl": 6.067996373526746, "pvp": 0.8549410698096102, "ev_ebitda": 0.0, "div_liq_ebit": null, "liq_2m": 21146400.0, "oscil_12m": 0.11496826835902096, "cresc_rec_5a": 0.0757, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.751114336234193, "div_fundamentus": [0.159, 1.254, 1.397, 1.577, 1.645, 2.618], "div_b3": [0.1587, 1.2542, 1.397, 1.577, 1.645, 2.618], "div_ano_corrente": 1.168, "score": 66.0, "pilares": {"sustentabilidade": 50, "historico": 100, "rentabilidade": 20, "crescimento": 75, "valuation": 96}, "jev": {"ticker": "ABCB4", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.53, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.69, "DIVIDENDO_ATENCAO": 0.25, "DIVIDENDO_FRAGIL": 0.06}, "p_extraordinario": 0.53}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "MOTV3", "empresa": "MOTIVA SA ON", "setor": "Transporte", "subsetor": "Exploração de Rodovias", "cotacao": 14.579999923706055, "dy": 0.06383319649314723, "payout": 0.1504294177487125, "payout_fonte": "cvm", "payout_dy_pl": 0.31000900000000003, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.3222, "roic": 0.122, "mrg_liq": 0.3411, "pl": 4.8565482700412925, "pvp": 1.5636221509088168, "ev_ebitda": 7.124318144538186, "div_liq_ebit": 4.357289950278172, "liq_2m": 325454000.0, "oscil_12m": -0.035524720955978806, "cresc_rec_5a": 0.023, "anos_pagos": 6, "cortes": 2, "cagr_div": 0.0012417256811054767, "div_fundamentus": [0.482, 0.166, 0.38, 0.193, 0.417, 0.485], "div_b3": [0.4818, 0.166, 0.3803, 0.1933, 0.417, 0.4848], "div_ano_corrente": 0.785, "score": 65.2, "pilares": {"sustentabilidade": 67, "historico": 67, "rentabilidade": 91, "crescimento": 25, "valuation": 81}, "jev": {"ticker": "MOTV3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.43, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.35, "DIVIDENDO_ATENCAO": 0.62, "DIVIDENDO_FRAGIL": 0.03}, "p_extraordinario": 0.32}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "B3SA3", "empresa": "B3 ON", "setor": "Serviços Financeiros Diversos", "subsetor": "Serviços Financeiros Diversos", "cotacao": 14.300000190734863, "dy": 0.0642430061361272, "payout": 0.6376813660194008, "payout_fonte": "cvm", "payout_dy_pl": 0.870075, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.2849, "roic": 0.222, "mrg_liq": 0.4443, "pl": 13.543497609006055, "pvp": 3.8560617707565727, "ev_ebitda": 9.39324038979939, "div_liq_ebit": -0.22041756497679024, "liq_2m": 1229260000.0, "oscil_12m": 0.18676342508707044, "cresc_rec_5a": 0.0397, "anos_pagos": 6, "cortes": 2, "cagr_div": -0.22539308741294628, "div_fundamentus": [2.13, 1.702, 0.483, 0.418, 0.365, 0.594], "div_b3": [2.1307, 1.7018, 0.4833, 0.4185, 0.3651, 0.5944], "div_ano_corrente": 0.522, "score": 65.0, "pilares": {"sustentabilidade": 100, "historico": 67, "rentabilidade": 100, "crescimento": 13, "valuation": 27}, "jev": {"ticker": "B3SA3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.92, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.03, "DIVIDENDO_ATENCAO": 0.95, "DIVIDENDO_FRAGIL": 0.02}, "p_extraordinario": 0.23}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "MTRE3", "empresa": "MITRE REALTY ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 3.009999990463257, "dy": 0.1193833890825677, "payout": 0.37705418005093616, "payout_fonte": "cvm", "payout_dy_pl": 0.579078, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.064, "roic": 0.053, "mrg_liq": 0.0888, "pl": 4.8505743089559905, "pvp": 0.31523648548770594, "ev_ebitda": 6.233547277547217, "div_liq_ebit": 4.49510255411102, "liq_2m": 3694340.0, "oscil_12m": -0.09008513801806683, "cresc_rec_5a": 0.154, "anos_pagos": 5, "cortes": 2, "cagr_div": null, "div_fundamentus": [0.0, 0.565, 0.327, 0.759, 0.299, 0.506], "div_b3": [0.0, 0.5647, 0.3274, 0.7591, 0.2995, 0.5058], "div_ano_corrente": 0.279, "score": 64.1, "pilares": {"sustentabilidade": 67, "historico": 50, "rentabilidade": 19, "crescimento": 100, "valuation": 91}, "jev": {"ticker": "MTRE3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.7, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.01, "DIVIDENDO_ATENCAO": 0.8, "DIVIDENDO_FRAGIL": 0.19}, "p_extraordinario": 0.49}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "PINE4", "empresa": "Pine PN", "setor": "Intermediários Financeiros", "subsetor": "Bancos", "cotacao": 10.300000190734863, "dy": 0.07820427039647758, "payout": 0.3698706587729552, "payout_fonte": "cvm", "payout_dy_pl": 0.340228, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.3343, "roic": 0.0, "mrg_liq": 0.0, "pl": 4.350504112820472, "pvp": 1.4536290591762913, "ev_ebitda": 0.0, "div_liq_ebit": null, "liq_2m": 17759100.0, "oscil_12m": 0.15002824710261442, "cresc_rec_5a": 0.5571, "anos_pagos": 3, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.0, 0.162, 0.606, 0.642], "div_b3": [0.0, 0.0, 0.0, 0.1622, 0.6056, 0.6426], "div_ano_corrente": 0.803, "score": 63.0, "pilares": {"sustentabilidade": 50, "historico": 50, "rentabilidade": 33, "crescimento": 100, "valuation": 92}, "jev": {"ticker": "PINE4", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.82, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.07, "DIVIDENDO_ATENCAO": 0.88, "DIVIDENDO_FRAGIL": 0.05}, "p_extraordinario": 0.6}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "VALE3", "empresa": "VALE ON NM", "setor": "Mineração", "subsetor": "Minerais Metálicos", "cotacao": 62.349998474121094, "dy": 0.08996431655612916, "payout": 0.6083643528221674, "payout_fonte": "cvm", "payout_dy_pl": 11.380544, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.011200000000000002, "roic": 0.1653, "mrg_liq": 0.0026, "pl": 126.50064420707987, "pvp": 1.4177510026480649, "ev_ebitda": 4.129070438369181, "div_liq_ebit": 1.0346930995043844, "liq_2m": 1924390000.0, "oscil_12m": 0.026161966588190477, "cresc_rec_5a": -0.0126, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.25906542556773515, "div_fundamentus": [2.408, 14.636, 7.566, 6.078, 5.353, 7.619], "div_b3": [2.4075, 14.6486, 7.5833, 6.0778, 5.3529, 7.619], "div_ano_corrente": 2.031, "score": 62.8, "pilares": {"sustentabilidade": 81, "historico": 83, "rentabilidade": 34, "crescimento": 50, "valuation": 61}, "jev": {"ticker": "VALE3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.49, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.16, "DIVIDENDO_ATENCAO": 0.66, "DIVIDENDO_FRAGIL": 0.18}, "p_extraordinario": 0.43}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "BBDC4", "empresa": "BANCO BRADESCO S.A. PN N1", "setor": "Intermediários Financeiros", "subsetor": "Bancos", "cotacao": 14.0600004196167, "dy": 0.10865931396904249, "payout": 0.5570667147477548, "payout_fonte": "cvm", "payout_dy_pl": 0.6659999999999999, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.1362, "roic": 0.0, "mrg_liq": 0.0, "pl": 6.129249078360151, "pvp": 0.8386303637621154, "ev_ebitda": 0.0, "div_liq_ebit": null, "liq_2m": 1265320000.0, "oscil_12m": -0.16820292068335374, "cresc_rec_5a": 0.1306, "anos_pagos": 6, "cortes": 2, "cagr_div": 0.15225076523694736, "div_fundamentus": [0.707, 1.026, 0.424, 1.697, 1.114, 1.436], "div_b3": [0.707, 1.0264, 0.4243, 1.6969, 1.1143, 1.4362], "div_ano_corrente": 1.209, "score": 62.8, "pilares": {"sustentabilidade": 50, "historico": 67, "rentabilidade": 19, "crescimento": 94, "valuation": 96}, "jev": {"ticker": "BBDC4", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.25, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.48, "DIVIDENDO_ATENCAO": 0.5, "DIVIDENDO_FRAGIL": 0.02}, "p_extraordinario": 0.68}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "BRAP4", "empresa": "BRADESPAR S/A PN N1", "setor": "Mineração", "subsetor": "Minerais Metálicos", "cotacao": 18.639999389648438, "dy": 0.12641245049120367, "payout": 0.36898484959549965, "payout_fonte": "cvm", "payout_dy_pl": 1.58436, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.0726, "roic": -0.004699999999999999, "mrg_liq": 0.0, "pl": 12.533259135817849, "pvp": 0.9077586863802227, "ev_ebitda": -189.82471984964613, "div_liq_ebit": null, "liq_2m": 86811600.0, "oscil_12m": 0.11726526502093093, "cresc_rec_5a": 0.0, "anos_pagos": 6, "cortes": 2, "cagr_div": 0.10346636129948705, "div_fundamentus": [2.003, 11.268, 3.272, 3.022, 2.291, 3.277], "div_b3": [2.0034, 11.2675, 3.2716, 3.0219, 2.2914, 3.2768], "div_ano_corrente": 0.0, "score": 61.8, "pilares": {"sustentabilidade": 100, "historico": 67, "rentabilidade": 5, "crescimento": 50, "valuation": 83}, "jev": {"ticker": "BRAP4", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.28, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.04, "DIVIDENDO_ATENCAO": 0.52, "DIVIDENDO_FRAGIL": 0.44}, "p_extraordinario": 0.59}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "ARML3", "empresa": "ARMAC ON NM", "setor": "Diversos", "subsetor": "Aluguel de carros", "cotacao": 3.180000066757202, "dy": 0.12718395959419962, "payout": 0.8736380464282891, "payout_fonte": "cvm", "payout_dy_pl": 2.260779, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.0451, "roic": 0.09849999999999999, "mrg_liq": 0.0446, "pl": 17.775661390110592, "pvp": 0.7976949320001115, "ev_ebitda": 4.883186543189873, "div_liq_ebit": 5.419020172910662, "liq_2m": 8247460.0, "oscil_12m": -0.07381150598041097, "cresc_rec_5a": 0.3002, "anos_pagos": 5, "cortes": 2, "cagr_div": null, "div_fundamentus": [0.0, 0.067, 0.407, 0.237, 0.318, 0.213], "div_b3": [0.0, 0.0673, 0.4067, 0.2368, 0.3179, 0.2132], "div_ano_corrente": 0.405, "score": 61.6, "pilares": {"sustentabilidade": 67, "historico": 50, "rentabilidade": 24, "crescimento": 100, "valuation": 68}, "jev": {"ticker": "ARML3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.61, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0, "DIVIDENDO_ATENCAO": 0.74, "DIVIDENDO_FRAGIL": 0.26}, "p_extraordinario": 0.53}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "PETR4", "empresa": "PETROBRAS PN", "setor": "Petróleo, Gás e Biocombustíveis", "subsetor": "Exploração, Refino e Distribuição", "cotacao": 47.119998931884766, "dy": 0.07737795166911225, "payout": 0.7504242173829363, "payout_fonte": "cvm", "payout_dy_pl": 0.35231, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.2773, "roic": 0.19690000000000002, "mrg_liq": 0.2439, "pl": 4.553105793063209, "pvp": 1.2637191588910133, "ev_ebitda": 2.7876157916713526, "div_liq_ebit": 1.3335934268817342, "liq_2m": 2608290000.0, "oscil_12m": 0.7157775197737175, "cresc_rec_5a": -0.0233, "anos_pagos": 5, "cortes": 2, "cagr_div": null, "div_fundamentus": [0.0, 5.648, 16.657, 7.133, 7.774, 3.234], "div_b3": [0.0005, 5.6532, 16.7666, 7.3184, 7.9024, 3.2724], "div_ano_corrente": 2.675, "score": 60.9, "pilares": {"sustentabilidade": 65, "historico": 50, "rentabilidade": 100, "crescimento": 0, "valuation": 97}, "jev": {"ticker": "PETR4", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.91, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.02, "DIVIDENDO_ATENCAO": 0.94, "DIVIDENDO_FRAGIL": 0.04}, "p_extraordinario": 0.33}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "VIVT3", "empresa": "TELEF BRASIL ON", "setor": "Telecomunicações", "subsetor": "Telecomunicações", "cotacao": 31.0, "dy": 0.08286554838709677, "payout": 0.6047739126001769, "payout_fonte": "cvm", "payout_dy_pl": 1.256234, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1005, "roic": 0.091, "mrg_liq": 0.1069, "pl": 15.159906914893618, "pvp": 1.5252659574468086, "ev_ebitda": 4.37998670212766, "div_liq_ebit": 1.1100559995217123, "liq_2m": 203128000.0, "oscil_12m": 0.036459441489361755, "cresc_rec_5a": 0.0766, "anos_pagos": 6, "cortes": 1, "cagr_div": -0.06311724918264949, "div_fundamentus": [3.415, 3.463, 3.056, 2.058, 2.803, 2.465], "div_b3": [3.4151, 3.4626, 3.0563, 2.0585, 2.803, 2.4718], "div_ano_corrente": 2.353, "score": 59.0, "pilares": {"sustentabilidade": 73, "historico": 83, "rentabilidade": 43, "crescimento": 26, "valuation": 70}, "jev": {"ticker": "VIVT3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.92, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.05, "DIVIDENDO_ATENCAO": 0.95, "DIVIDENDO_FRAGIL": 0}, "p_extraordinario": 0.13}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "ITUB4", "empresa": "ITAUUNIBANCO PN N1", "setor": "Intermediários Financeiros", "subsetor": "Bancos", "cotacao": 39.709999084472656, "dy": 0.07851145988112285, "payout": 0.5922331787552888, "payout_fonte": "cvm", "payout_dy_pl": 0.73467, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.2137, "roic": 0.0, "mrg_liq": 0.0, "pl": 9.357487443392232, "pvp": 2.0014912502955817, "ev_ebitda": 0.0, "div_liq_ebit": null, "liq_2m": 1645250000.0, "oscil_12m": 0.11051813495781682, "cresc_rec_5a": 0.0359, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.2940570672323892, "div_fundamentus": [1.304, 0.909, 1.018, 1.257, 2.413, 4.732], "div_b3": [1.3036, 0.9093, 1.0181, 1.2566, 2.4133, 4.7322], "div_ano_corrente": 0.893, "score": 58.5, "pilares": {"sustentabilidade": 50, "historico": 83, "rentabilidade": 33, "crescimento": 62, "valuation": 69}, "jev": {"ticker": "ITUB4", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.24, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.49, "DIVIDENDO_ATENCAO": 0.38, "DIVIDENDO_FRAGIL": 0.13}, "p_extraordinario": 0.62}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "POSI3", "empresa": "POSITIVO TEC ON NM", "setor": "Computadores e Equipamentos", "subsetor": "Computadores e Equipamentos", "cotacao": 3.1700000762939453, "dy": 0.0566876957965527, "payout": 0.2875966304038248, "payout_fonte": "cvm", "payout_dy_pl": 2.0443870000000004, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.008, "roic": 0.0693, "mrg_liq": 0.0037, "pl": 36.06403420130412, "pvp": 0.28530000686645507, "ev_ebitda": 3.7723000907897943, "div_liq_ebit": 3.0451608892756763, "liq_2m": 5201850.0, "oscil_12m": -0.19492564729054773, "cresc_rec_5a": -0.0621, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.5364559616667315, "div_fundamentus": [0.032, 0.341, 0.34, 0.514, 0.418, 0.274], "div_b3": [0.0321, 0.3416, 0.3402, 0.5141, 0.4182, 0.2737], "div_ano_corrente": 0.18, "score": 57.4, "pilares": {"sustentabilidade": 77, "historico": 83, "rentabilidade": 7, "crescimento": 50, "valuation": 67}, "jev": {"ticker": "POSI3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.43, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.02, "DIVIDENDO_ATENCAO": 0.62, "DIVIDENDO_FRAGIL": 0.36}, "p_extraordinario": 0.67}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "CXSE3", "empresa": "CAIXA SEGURI ON NM", "setor": "Previdência e Seguros", "subsetor": "Seguradoras", "cotacao": 20.760000228881836, "dy": 0.06653203202177391, "payout": 0.4450976408268326, "payout_fonte": "cvm", "payout_dy_pl": 0.9163699999999999, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.32789999999999997, "roic": -0.0121, "mrg_liq": 0.0, "pl": 13.773365582763201, "pvp": 4.517823834113909, "ev_ebitda": -373.5700570796623, "div_liq_ebit": null, "liq_2m": 183460000.0, "oscil_12m": 0.5007770988765565, "cresc_rec_5a": 0.0, "anos_pagos": 5, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.245, 0.649, 1.0, 1.065, 1.26], "div_b3": [0.0, 0.2446, 0.6486, 1.0104, 1.0803, 1.2619], "div_ano_corrente": 1.38, "score": 55.4, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 33, "crescimento": 0, "valuation": 47}, "jev": {"ticker": "CXSE3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.31, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.42, "DIVIDENDO_ATENCAO": 0.54, "DIVIDENDO_FRAGIL": 0.04}, "p_extraordinario": 0.28}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "KLBN11", "empresa": "KLABIN UNT N2", "setor": "Madeira e Papel", "subsetor": "Papel e Celulose", "cotacao": 18.079999923706055, "dy": 0.06421371708512819, "payout": 0.3349789969486235, "payout_fonte": "cvm", "payout_dy_pl": 3.0400679999999993, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.0482, "roic": 0.045700000000000005, "mrg_liq": 0.0217, "pl": 47.34296873002661, "pvp": 2.2886075852792476, "ev_ebitda": 6.980253135101705, "div_liq_ebit": 10.950960659522696, "liq_2m": 127819000.0, "oscil_12m": 0.0781422279015509, "cresc_rec_5a": 0.024300000000000002, "anos_pagos": 6, "cortes": 0, "cagr_div": 1.3847992821597055, "div_fundamentus": [0.022, 0.366, 1.509, 1.354, 1.371, 1.697], "div_b3": null, "div_ano_corrente": 0.0, "score": 55.0, "pilares": {"sustentabilidade": 67, "historico": 100, "rentabilidade": 4, "crescimento": 58, "valuation": 40}, "jev": {"ticker": "KLBN11", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.67, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.03, "DIVIDENDO_ATENCAO": 0.78, "DIVIDENDO_FRAGIL": 0.19}, "p_extraordinario": 0.5}, "decisao": "monitorar", "conferencia_b3": "unit (não comparável)"}, {"ticker": "SANB11", "empresa": "SANTANDER UNT", "setor": "Intermediários Financeiros", "subsetor": "Bancos", "cotacao": 25.809999465942383, "dy": 0.08412925396861172, "payout": 0.5805072139482677, "payout_fonte": "cvm", "payout_dy_pl": 0.5818719999999998, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.1407, "roic": 0.0, "mrg_liq": 0.0, "pl": 6.916405085644691, "pvp": 0.9699836400599262, "ev_ebitda": 0.0, "div_liq_ebit": null, "liq_2m": 145310000.0, "oscil_12m": -0.12068874368480609, "cresc_rec_5a": 0.1, "anos_pagos": 6, "cortes": 2, "cagr_div": -0.07730111949323681, "div_fundamentus": [2.805, 2.836, 2.242, 1.668, 1.61, 1.876], "div_b3": null, "div_ano_corrente": 2.172, "score": 50.6, "pilares": {"sustentabilidade": 50, "historico": 67, "rentabilidade": 20, "crescimento": 33, "valuation": 94}, "jev": {"ticker": "SANB11", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.91, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.03, "DIVIDENDO_ATENCAO": 0.94, "DIVIDENDO_FRAGIL": 0.03}, "p_extraordinario": 0.45}, "decisao": "monitorar", "conferencia_b3": "unit (não comparável)"}, {"ticker": "BBSE3", "empresa": "BBSEGURIDADE ON NM", "setor": "Previdência e Seguros", "subsetor": "Seguradoras", "cotacao": 37.75, "dy": 0.12328845033112583, "payout": 0.8446990746955458, "payout_fonte": "cvm", "payout_dy_pl": 0.9835419999999999, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.6817, "roic": 0.0, "mrg_liq": 0.0, "pl": 7.9775680313802395, "pvp": 5.4417749448394215, "ev_ebitda": 0.0, "div_liq_ebit": 0.0, "liq_2m": 304475000.0, "oscil_12m": 0.2964010786957587, "cresc_rec_5a": 0.0, "anos_pagos": 6, "cortes": 2, "cagr_div": 0.004229700184534613, "div_fundamentus": [4.126, 0.996, 1.953, 3.448, 2.633, 4.214], "div_b3": [4.1384, 0.997, 1.9661, 3.4862, 2.6522, 4.2623], "div_ano_corrente": 4.533, "score": 46.3, "pilares": {"sustentabilidade": 67, "historico": 67, "rentabilidade": 33, "crescimento": 18, "valuation": 40}, "jev": {"ticker": "BBSE3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.62, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.2, "DIVIDENDO_ATENCAO": 0.75, "DIVIDENDO_FRAGIL": 0.05}, "p_extraordinario": 0.55}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "CPLE3", "empresa": "COPEL ON", "setor": "Energia Elétrica", "subsetor": "Energia Elétrica", "cotacao": 14.59000015258789, "dy": 0.07282268601015353, "payout": 0.5504023221565322, "payout_fonte": "cvm", "payout_dy_pl": 1.011279, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.12990000000000002, "roic": 0.09820000000000001, "mrg_liq": 0.114, "pl": 13.886867615113776, "pvp": 1.7991920811837654, "ev_ebitda": 9.171743540287356, "div_liq_ebit": 3.686131991887964, "liq_2m": 398545000.0, "oscil_12m": 0.19739335058091956, "cresc_rec_5a": 0.0362, "anos_pagos": 6, "cortes": 3, "cagr_div": -0.15389152837603826, "div_fundamentus": [2.818, 1.191, 0.805, 0.304, 0.386, 1.222], "div_b3": [2.8183, 1.1905, 0.8051, 0.304, 0.3859, 1.2234], "div_ano_corrente": 0.238, "score": 45.6, "pilares": {"sustentabilidade": 61, "historico": 50, "rentabilidade": 53, "crescimento": 12, "valuation": 50}, "jev": {"ticker": "CPLE3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.83, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.03, "DIVIDENDO_ATENCAO": 0.89, "DIVIDENDO_FRAGIL": 0.08}, "p_extraordinario": 0.33}, "decisao": "monitorar", "conferencia_b3": "confere"}, {"ticker": "POMO4", "empresa": "MARCOPOLO PN N2", "setor": "Material de Transporte", "subsetor": "Material Rodoviário", "cotacao": 3.5399999618530273, "dy": 0.260993223151441, "payout": 0.42227780978007845, "payout_fonte": "cvm", "payout_dy_pl": 1.084372, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.2498, "roic": 0.1593, "mrg_liq": 0.1197, "pl": 4.15478987119445, "pvp": 1.0411764593685375, "ev_ebitda": 4.571260454941865, "div_liq_ebit": 1.5134698411896887, "liq_2m": 92617300.0, "oscil_12m": -0.42616303139374034, "cresc_rec_5a": 0.1764, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.6841373956512014, "div_fundamentus": [0.093, 0.107, 0.142, 0.332, 0.59, 1.26], "div_b3": [0.093, 0.107, 0.142, 0.332, 0.59, 1.26], "div_ano_corrente": 0.215, "score": 95.5, "pilares": {"sustentabilidade": 94, "historico": 100, "rentabilidade": 87, "crescimento": 100, "valuation": 97}, "jev": {"ticker": "POMO4", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.34, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.56, "DIVIDENDO_ATENCAO": 0.34, "DIVIDENDO_FRAGIL": 0.1}, "p_extraordinario": 0.92}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "PLPL3", "empresa": "PLANOEPLANO ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 4.539999961853027, "dy": 0.10857092602239037, "payout": 0.22637537485359796, "payout_fonte": "cvm", "payout_dy_pl": 0.329749, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.2732, "roic": 0.2426, "mrg_liq": 0.0989, "pl": 3.0371759004063072, "pvp": 0.8302314745055304, "ev_ebitda": 1.3346759147114222, "div_liq_ebit": 0.20557598849875197, "liq_2m": 28728400.0, "oscil_12m": -0.6777861138184866, "cresc_rec_5a": 0.2865, "anos_pagos": 5, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.196, 0.161, 0.16, 0.504, 1.499], "div_b3": [0.0, 0.1958, 0.1612, 0.1601, 0.5044, 1.4988], "div_ano_corrente": 0.0, "score": 93.3, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 83, "crescimento": 100, "valuation": 100}, "jev": {"ticker": "PLPL3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.28, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.26, "DIVIDENDO_ATENCAO": 0.52, "DIVIDENDO_FRAGIL": 0.22}, "p_extraordinario": 0.97}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "DIRR3", "empresa": "Direcional Engenharia ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 8.430000305175781, "dy": 0.1838986884790716, "payout": 0.6993651377747766, "payout_fonte": "cvm", "payout_dy_pl": 0.9433039999999998, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.3678, "roic": 0.0999, "mrg_liq": 0.2259, "pl": 5.129476494919928, "pvp": 1.8815087962923505, "ev_ebitda": 3.889152260492568, "div_liq_ebit": 0.49052125971096816, "liq_2m": 157546000.0, "oscil_12m": -0.4522602046100872, "cresc_rec_5a": 0.2562, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.4286057831800769, "div_fundamentus": [0.81, 0.69, 1.17, 0.47, 2.06, 4.82], "div_b3": [0.81, 0.69, 1.17, 0.47, 2.06, 4.82], "div_ano_corrente": 0.0, "score": 91.8, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 83, "crescimento": 100, "valuation": 90}, "jev": {"ticker": "DIRR3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.28, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.29, "DIVIDENDO_ATENCAO": 0.52, "DIVIDENDO_FRAGIL": 0.19}, "p_extraordinario": 0.95}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "FIQE3", "empresa": "UNIFIQUE ON NM", "setor": "Telecomunicações", "subsetor": "Telecomunicações", "cotacao": 5.329999923706055, "dy": 0.11804878217756236, "payout": 0.3241056794023618, "payout_fonte": "cvm", "payout_dy_pl": 1.1228799999999999, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.184, "roic": 0.1431, "mrg_liq": 0.1725, "pl": 9.51199986384465, "pvp": 1.7527499749110294, "ev_ebitda": 3.833499945127047, "div_liq_ebit": 1.052237338899457, "liq_2m": 10622100.0, "oscil_12m": 0.37964998025160557, "cresc_rec_5a": 0.2155, "anos_pagos": 5, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.083, 0.084, 0.155, 0.212, 0.878], "div_b3": [0.0, 0.0834, 0.0843, 0.1548, 0.2124, 0.8779], "div_ano_corrente": 0.077, "score": 91.7, "pilares": {"sustentabilidade": 99, "historico": 83, "rentabilidade": 90, "crescimento": 100, "valuation": 82}, "jev": {"ticker": "FIQE3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.14, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.34, "DIVIDENDO_ATENCAO": 0.43, "DIVIDENDO_FRAGIL": 0.23}, "p_extraordinario": 0.74}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "VULC3", "empresa": "VULCABRAS S/A. ON", "setor": "Tecidos, Vestuário e Calçados", "subsetor": "Calçados", "cotacao": 12.020000457763672, "dy": 0.07188419027404569, "payout": 0.5068340247599639, "payout_fonte": "cvm", "payout_dy_pl": 0.29567600000000005, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.3506, "roic": 0.1783, "mrg_liq": 0.2489, "pl": 4.113227107000689, "pvp": 1.43856388457278, "ev_ebitda": 5.6583512793196, "div_liq_ebit": 0.8924485548563477, "liq_2m": 40355900.0, "oscil_12m": -0.36852373481642264, "cresc_rec_5a": 0.12480000000000001, "anos_pagos": 5, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.35, 0.37, 0.934, 3.15, 5.454], "div_b3": [0.0, 0.35, 0.37, 0.9345, 3.15, 5.4543], "div_ano_corrente": 0.0, "score": 91.5, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 100, "crescimento": 83, "valuation": 88}, "jev": {"ticker": "VULC3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.42, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.22, "DIVIDENDO_ATENCAO": 0.61, "DIVIDENDO_FRAGIL": 0.17}, "p_extraordinario": 0.93}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "CURY3", "empresa": "CURY S/A ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 26.579999923706055, "dy": 0.15666068517502865, "payout": 0.6470599412010164, "payout_fonte": "cvm", "payout_dy_pl": 1.168185, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.6638, "roic": 0.3772, "mrg_liq": 0.2024, "pl": 7.456784698055221, "pvp": 4.9500357995600615, "ev_ebitda": 4.770226806840999, "div_liq_ebit": -0.17943110869578643, "liq_2m": 168804000.0, "oscil_12m": -0.13617644497848247, "cresc_rec_5a": 0.33039999999999997, "anos_pagos": 5, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.565, 0.515, 1.133, 1.668, 4.272], "div_b3": [0.0, 0.5653, 0.5153, 1.1327, 1.668, 4.538], "div_ano_corrente": 1.591, "score": 90.4, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 100, "crescimento": 100, "valuation": 58}, "jev": {"ticker": "CURY3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.3, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.3, "DIVIDENDO_ATENCAO": 0.53, "DIVIDENDO_FRAGIL": 0.17}, "p_extraordinario": 0.89}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "LAVV3", "empresa": "LAVVI ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 7.429999828338623, "dy": 0.3268957006884746, "payout": 0.8139258317612224, "payout_fonte": "cvm", "payout_dy_pl": 1.3157530000000004, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.249, "roic": 0.08689999999999999, "mrg_liq": 0.23379999999999998, "pl": 4.024993284490725, "pvp": 1.0037880562788604, "ev_ebitda": 5.5011521907831655, "div_liq_ebit": 1.5553824560586118, "liq_2m": 15836500.0, "oscil_12m": -0.4242980265459477, "cresc_rec_5a": 0.39659999999999995, "anos_pagos": 5, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.68, 0.604, 0.66, 0.685, 2.065], "div_b3": [0.0, 0.6799, 0.6035, 0.6603, 0.6849, 2.0648], "div_ano_corrente": 1.023, "score": 90.0, "pilares": {"sustentabilidade": 94, "historico": 83, "rentabilidade": 79, "crescimento": 100, "valuation": 94}, "jev": {"ticker": "LAVV3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.52, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.06, "DIVIDENDO_ATENCAO": 0.68, "DIVIDENDO_FRAGIL": 0.26}, "p_extraordinario": 0.96}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "LREN3", "empresa": "RENNER ON", "setor": "Comércio", "subsetor": "Tecidos, Vestuário e Calçados", "cotacao": 9.390000343322754, "dy": 0.09804099748032959, "payout": 0.5735290332184942, "payout_fonte": "cvm", "payout_dy_pl": 0.6201650000000001, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1441, "roic": 0.2353, "mrg_liq": 0.0935, "pl": 6.325568037232859, "pvp": 0.91104744235105, "ev_ebitda": 1.6564498951837274, "div_liq_ebit": -0.315211686612987, "liq_2m": 333146000.0, "oscil_12m": -0.33079424234577415, "cresc_rec_5a": 0.061799999999999994, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.20931600776587622, "div_fundamentus": [0.324, 0.467, 0.667, 0.714, 0.646, 0.838], "div_b3": [0.3236, 0.4675, 0.6671, 0.7137, 0.6456, 0.8383], "div_ano_corrente": 0.693, "score": 87.6, "pilares": {"sustentabilidade": 100, "historico": 100, "rentabilidade": 70, "crescimento": 71, "valuation": 97}, "jev": {"ticker": "LREN3", "classe": "DIVIDENDO_SUSTENTAVEL", "confianca": 0.85, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.9, "DIVIDENDO_ATENCAO": 0.09, "DIVIDENDO_FRAGIL": 0.01}, "p_extraordinario": 0.82}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "MDNE3", "empresa": "MOURA DUBEUX ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 16.770000457763672, "dy": 0.2314159149711509, "payout": 0.39116587058647634, "payout_fonte": "cvm", "payout_dy_pl": 0.723303, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.2438, "roic": 0.10980000000000001, "mrg_liq": 0.214, "pl": 3.125554264883508, "pvp": 0.7580247884933425, "ev_ebitda": 3.125554264883508, "div_liq_ebit": 0.3340251519618234, "liq_2m": 54579500.0, "oscil_12m": -0.27053093984031074, "cresc_rec_5a": 0.40130000000000005, "anos_pagos": 2, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.0, 0.0, 0.65, 5.354], "div_b3": [0.0, 0.0, 0.0, 0.0, 0.65, 5.3535], "div_ano_corrente": 0.0, "score": 87.3, "pilares": {"sustentabilidade": 100, "historico": 50, "rentabilidade": 87, "crescimento": 100, "valuation": 100}, "jev": {"ticker": "MDNE3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.31, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0, "DIVIDENDO_ATENCAO": 0.54, "DIVIDENDO_FRAGIL": 0.46}, "p_extraordinario": 0.96}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "EZTC3", "empresa": "EZTec ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 9.5, "dy": 0.10534736842105262, "payout": 0.3314745860607399, "payout_fonte": "cvm", "payout_dy_pl": 0.52264, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.1015, "roic": 0.051399999999999994, "mrg_liq": 0.3823, "pl": 4.961111111111111, "pvp": 0.5066666666666667, "ev_ebitda": 8.402222222222223, "div_liq_ebit": -0.004771022999314533, "liq_2m": 67803500.0, "oscil_12m": -0.3036500000000001, "cresc_rec_5a": 0.1215, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.3951494647415046, "div_fundamentus": [0.294, 0.424, 0.778, 0.205, 1.08, 1.554], "div_b3": [0.2941, 0.424, 0.7783, 0.2049, 1.0805, 1.5536], "div_ano_corrente": 0.197, "score": 81.1, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 45, "crescimento": 90, "valuation": 82}, "jev": {"ticker": "EZTC3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.34, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.4, "DIVIDENDO_ATENCAO": 0.56, "DIVIDENDO_FRAGIL": 0.04}, "p_extraordinario": 0.88}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "RDOR3", "empresa": "REDE D OR ON NM", "setor": "Serv.Méd.Hospit. Análises e Diagnósticos", "subsetor": "Serv.Méd.Hospit. Análises e Diagnósticos", "cotacao": 32.540000915527344, "dy": 0.13202571847347402, "payout": 0.8032059235340401, "payout_fonte": "cvm", "payout_dy_pl": 1.9963420000000003, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.23260000000000003, "roic": 0.1563, "mrg_liq": 0.087, "pl": 15.120856929107306, "pvp": 3.5150272641253575, "ev_ebitda": 6.468482125106426, "div_liq_ebit": 0.7159995865011418, "liq_2m": 369215000.0, "oscil_12m": -0.1737606031515987, "cresc_rec_5a": 0.2698, "anos_pagos": 5, "cortes": 1, "cagr_div": null, "div_fundamentus": [0.0, 1.46, 0.405, 0.369, 0.647, 4.293], "div_b3": [0.0, 1.4597, 0.4053, 0.3693, 0.6477, 4.2927], "div_ano_corrente": 0.526, "score": 80.5, "pilares": {"sustentabilidade": 100, "historico": 67, "rentabilidade": 81, "crescimento": 100, "valuation": 39}, "jev": {"ticker": "RDOR3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.49, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.03, "DIVIDENDO_ATENCAO": 0.66, "DIVIDENDO_FRAGIL": 0.31}, "p_extraordinario": 0.95}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "WIZC3", "empresa": "WIZ CO ON", "setor": "Previdência e Seguros", "subsetor": "Corretoras de Seguros", "cotacao": 5.960000038146973, "dy": 0.10545805301629102, "payout": 0.34773533683752744, "payout_fonte": "cvm", "payout_dy_pl": 0.5069849999999999, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.26780000000000004, "roic": 0.3281, "mrg_liq": 0.27190000000000003, "pl": 4.80745647676315, "pvp": 1.2875261406449905, "ev_ebitda": 1.2875261406449905, "div_liq_ebit": -0.029043981716935407, "liq_2m": 6983640.0, "oscil_12m": -0.23049546545806254, "cresc_rec_5a": 0.1226, "anos_pagos": 6, "cortes": 2, "cagr_div": -0.032885126009271404, "div_fundamentus": [0.669, 0.609, 0.588, 0.445, 0.246, 0.566], "div_b3": [0.6688, 0.6089, 0.588, 0.4452, 0.2462, 0.5664], "div_ano_corrente": 0.313, "score": 77.4, "pilares": {"sustentabilidade": 81, "historico": 67, "rentabilidade": 100, "crescimento": 47, "valuation": 97}, "jev": {"ticker": "WIZC3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.79, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.12, "DIVIDENDO_ATENCAO": 0.86, "DIVIDENDO_FRAGIL": 0.02}, "p_extraordinario": 0.7}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "PGMN3", "empresa": "PAGUE MENOS ON NM", "setor": "Comércio e Distribuição", "subsetor": "Medicamentos e Outros Produtos", "cotacao": 2.5399999618530273, "dy": 0.09290000139521803, "payout": 0.6138993408031365, "payout_fonte": "cvm", "payout_dy_pl": 0.5202399999999999, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.09609999999999999, "roic": 0.1278, "mrg_liq": 0.021, "pl": 5.599999915896437, "pvp": 0.5399999918900137, "ev_ebitda": 2.2199999666589454, "div_liq_ebit": 1.5572648775982307, "liq_2m": 51487600.0, "oscil_12m": -0.3228000101705236, "cresc_rec_5a": 0.17600000000000002, "anos_pagos": 3, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.0, 0.186, 0.296, 0.511], "div_b3": [0.0, 0.0, 0.0, 0.186, 0.2958, 0.5106], "div_ano_corrente": 0.0, "score": 76.2, "pilares": {"sustentabilidade": 94, "historico": 50, "rentabilidade": 40, "crescimento": 100, "valuation": 99}, "jev": {"ticker": "PGMN3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.88, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.03, "DIVIDENDO_ATENCAO": 0.92, "DIVIDENDO_FRAGIL": 0.05}, "p_extraordinario": 0.93}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "CYRE3", "empresa": "CYRELA BRAZIL REALTY PN", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 17.809999465942383, "dy": 0.1298306608274595, "payout": 0.23750015424584225, "payout_fonte": "cvm", "payout_dy_pl": 0.513994, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.1826, "roic": 0.0703, "mrg_liq": 0.1702, "pl": 3.958956973061089, "pvp": 0.7217401452229333, "ev_ebitda": 7.217401452229332, "div_liq_ebit": 2.920540524089235, "liq_2m": 338132000.0, "oscil_12m": -0.2458876864986852, "cresc_rec_5a": 0.1866, "anos_pagos": 6, "cortes": 3, "cagr_div": 0.15894512566327257, "div_fundamentus": [1.817, 1.087, 0.565, 0.845, 0.597, 3.799], "div_b3": [1.8174, 1.0873, 0.5648, 0.8447, 0.5968, 3.7991], "div_ano_corrente": 0.0, "score": 75.6, "pilares": {"sustentabilidade": 79, "historico": 50, "rentabilidade": 65, "crescimento": 100, "valuation": 87}, "jev": {"ticker": "CYRE3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.33, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.1, "DIVIDENDO_ATENCAO": 0.55, "DIVIDENDO_FRAGIL": 0.35}, "p_extraordinario": 0.95}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "GRND3", "empresa": "GRENDENE SA ON", "setor": "Tecidos, Vestuário e Calçados", "subsetor": "Calçados", "cotacao": 3.6700000762939453, "dy": 0.4055040787636224, "payout": 0.6466979835065214, "payout_fonte": "cvm", "payout_dy_pl": 2.3173399999999997, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1804, "roic": 0.0781, "mrg_liq": 0.2271, "pl": 5.714714404514857, "pvp": 1.0276000213623047, "ev_ebitda": 8.734600181579589, "div_liq_ebit": -1.3873680109097994, "liq_2m": 13386800.0, "oscil_12m": -0.06498883770533981, "cresc_rec_5a": 0.0148, "anos_pagos": 6, "cortes": 2, "cagr_div": 0.5892092099072428, "div_fundamentus": [0.168, 0.865, 0.306, 1.387, 0.409, 1.703], "div_b3": [0.1677, 0.8655, 0.3056, 1.3871, 0.4095, 1.7032], "div_ano_corrente": 0.219, "score": 75.4, "pilares": {"sustentabilidade": 100, "historico": 67, "rentabilidade": 72, "crescimento": 55, "valuation": 78}, "jev": {"ticker": "GRND3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.44, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.3, "DIVIDENDO_ATENCAO": 0.63, "DIVIDENDO_FRAGIL": 0.07}, "p_extraordinario": 0.77}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "CEAB3", "empresa": "CEA MODAS ON NM", "setor": "Comércio", "subsetor": "Tecidos, Vestuário e Calçados", "cotacao": 6.809999942779541, "dy": 0.07661982443233797, "payout": 0.6373855648819235, "payout_fonte": "cvm", "payout_dy_pl": 0.285681, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.1479, "roic": 0.1493, "mrg_liq": 0.0702, "pl": 3.728552004870246, "pvp": 0.5546606288236731, "ev_ebitda": 1.694796365850112, "div_liq_ebit": 0.1722999746809908, "liq_2m": 132492000.0, "oscil_12m": -0.566234845273635, "cresc_rec_5a": 0.0855, "anos_pagos": 2, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.0, 0.0, 0.345, 0.559], "div_b3": [0.0, 0.0, 0.0, 0.0, 0.3447, 0.5594], "div_ano_corrente": 0.0, "score": 74.7, "pilares": {"sustentabilidade": 100, "historico": 50, "rentabilidade": 67, "crescimento": 57, "valuation": 100}, "jev": {"ticker": "CEAB3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.89, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0, "DIVIDENDO_ATENCAO": 0.93, "DIVIDENDO_FRAGIL": 0.07}, "p_extraordinario": 0.96}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "TEND3", "empresa": "Tenda ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 19.75, "dy": 0.07396556962025316, "payout": null, "payout_fonte": "sem_base_de_lucro", "payout_dy_pl": 0.3094830000000001, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.3761, "roic": 0.1439, "mrg_liq": 0.1158, "pl": 4.184149484536084, "pvp": 1.5779639175257736, "ev_ebitda": 3.0032216494845367, "div_liq_ebit": 0.3636160880231953, "liq_2m": 146141000.0, "oscil_12m": -0.11705283505154629, "cresc_rec_5a": 0.1839, "anos_pagos": 4, "cortes": 2, "cagr_div": 0.20073515357749305, "div_fundamentus": [0.494, 0.178, 0.0, 0.0, 0.171, 1.233], "div_b3": [0.4936, 0.1777, 0.0, 0.0, 0.1706, 1.2331], "div_ano_corrente": 0.636, "score": 74.2, "pilares": {"sustentabilidade": 67, "historico": 33, "rentabilidade": 84, "crescimento": 100, "valuation": 94}, "jev": {"ticker": "TEND3", "classe": "DIVIDENDO_FRAGIL", "confianca": 0.42, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.01, "DIVIDENDO_ATENCAO": 0.38, "DIVIDENDO_FRAGIL": 0.61}, "p_extraordinario": 0.93}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "RIAA3", "empresa": "RIACHUELO ON NM", "setor": "Comércio", "subsetor": "Tecidos, Vestuário e Calçados", "cotacao": 6.139999866485596, "dy": 0.5364239530326262, "payout": 0.5958309225300001, "payout_fonte": "cvm", "payout_dy_pl": 1.081162, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.28350000000000003, "roic": 0.08960000000000001, "mrg_liq": 0.1435, "pl": 2.0154991101492477, "pvp": 0.5714043868979827, "ev_ebitda": 2.3687309129589096, "div_liq_ebit": 1.213971180692188, "liq_2m": 24529800.0, "oscil_12m": -0.15826939224591718, "cresc_rec_5a": 0.0728, "anos_pagos": 5, "cortes": 2, "cagr_div": 0.5010627756167321, "div_fundamentus": [0.406, 0.47, 0.14, 0.0, 0.12, 3.094], "div_b3": [0.4058, 0.47, 0.1405, 0.0, 0.1202, 3.0936], "div_ano_corrente": 0.339, "score": 74.2, "pilares": {"sustentabilidade": 81, "historico": 50, "rentabilidade": 70, "crescimento": 74, "valuation": 100}, "jev": {"ticker": "RIAA3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.3, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.01, "DIVIDENDO_ATENCAO": 0.53, "DIVIDENDO_FRAGIL": 0.46}, "p_extraordinario": 0.95}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "ECOR3", "empresa": "ECORODOVIAS ON NM", "setor": "Transporte", "subsetor": "Exploração de Rodovias", "cotacao": 5.179999828338623, "dy": 0.05836486679903347, "payout": 0.20993120533805398, "payout_fonte": "cvm", "payout_dy_pl": 0.385625, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.1328, "roic": 0.1152, "mrg_liq": 0.0436, "pl": 6.607142638187019, "pvp": 0.8774285423512361, "ev_ebitda": 5.179999828338623, "div_liq_ebit": 6.050517467393688, "liq_2m": 162179000.0, "oscil_12m": -0.32564859377608013, "cresc_rec_5a": 0.2335, "anos_pagos": 4, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.008, 0.084, 0.194, 0.309], "div_b3": [0.0, 0.0, 0.0076, 0.0839, 0.1945, 0.3087], "div_ano_corrente": 0.302, "score": 73.2, "pilares": {"sustentabilidade": 67, "historico": 67, "rentabilidade": 47, "crescimento": 100, "valuation": 92}, "jev": {"ticker": "ECOR3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.76, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.05, "DIVIDENDO_ATENCAO": 0.84, "DIVIDENDO_FRAGIL": 0.11}, "p_extraordinario": 0.87}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "AZZA3", "empresa": "AZZAS 2154 ON", "setor": "Comércio", "subsetor": "Tecidos, Vestuário e Calçados", "cotacao": 13.970000267028809, "dy": 0.17717966733628662, "payout": 0.4753151835080351, "payout_fonte": "cvm", "payout_dy_pl": 1.5761199999999997, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.0403, "roic": 0.0588, "mrg_liq": 0.0285, "pl": 8.895603111210992, "pvp": 0.35952206569559436, "ev_ebitda": 3.543860361856573, "div_liq_ebit": 2.9016920729424864, "liq_2m": 97689800.0, "oscil_12m": -0.46451756329396177, "cresc_rec_5a": 0.37549999999999994, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.3604924513016663, "div_fundamentus": [0.531, 0.927, 1.836, 1.932, 1.116, 2.475], "div_b3": [0.5307, 0.927, 1.8356, 1.9325, 1.1159, 2.4762], "div_ano_corrente": 0.0, "score": 71.6, "pilares": {"sustentabilidade": 79, "historico": 83, "rentabilidade": 8, "crescimento": 100, "valuation": 91}, "jev": {"ticker": "AZZA3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.74, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.07, "DIVIDENDO_ATENCAO": 0.83, "DIVIDENDO_FRAGIL": 0.1}, "p_extraordinario": 0.9}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "LOGG3", "empresa": "LOG COM PROP ON NM", "setor": "Exploração de Imóveis", "subsetor": "Exploração de Imóveis", "cotacao": 20.75, "dy": 0.3312961445783132, "payout": 0.36541277427566426, "payout_fonte": "cvm", "payout_dy_pl": 1.615295, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1063, "roic": 0.0304, "mrg_liq": 1.45, "pl": 4.87568306010929, "pvp": 0.5153999006458023, "ev_ebitda": 18.100844510680577, "div_liq_ebit": 8.873642140852125, "liq_2m": 21787400.0, "oscil_12m": 0.14109538002980626, "cresc_rec_5a": 0.0832, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.7962201209670228, "div_fundamentus": [0.212, 0.325, 0.867, 0.918, 2.415, 3.964], "div_b3": [0.2117, 0.3254, 0.8666, 0.9178, 2.4153, 3.9643], "div_ano_corrente": 3.384, "score": 68.4, "pilares": {"sustentabilidade": 55, "historico": 100, "rentabilidade": 46, "crescimento": 78, "valuation": 67}, "jev": {"ticker": "LOGG3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.46, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.12, "DIVIDENDO_ATENCAO": 0.64, "DIVIDENDO_FRAGIL": 0.24}, "p_extraordinario": 0.75}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "ALLD3", "empresa": "ALLIED ON NM", "setor": "Comércio", "subsetor": "Eletrodomésticos", "cotacao": 5.269999980926514, "dy": 0.55317324678386, "payout": 0.5352095454710305, "payout_fonte": "cvm", "payout_dy_pl": 0.7695289999999999, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.2306, "roic": 0.0932, "mrg_liq": 0.06559999999999999, "pl": 1.3911175286838773, "pvp": 0.3249325614444093, "ev_ebitda": 2.558843921374723, "div_liq_ebit": 0.21773500601477916, "liq_2m": 11157900.0, "oscil_12m": -0.2651447040083782, "cresc_rec_5a": -0.0069, "anos_pagos": 5, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.761, 0.925, 0.965, 2.37, 2.636], "div_b3": [0.0, 0.761, 0.925, 0.9655, 2.3668, 2.6358], "div_ano_corrente": 1.046, "score": 68.4, "pilares": {"sustentabilidade": 100, "historico": 83, "rentabilidade": 59, "crescimento": 0, "valuation": 100}, "jev": {"ticker": "ALLD3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.46, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.25, "DIVIDENDO_ATENCAO": 0.64, "DIVIDENDO_FRAGIL": 0.11}, "p_extraordinario": 0.94}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "VLID3", "empresa": "VALID ON NM", "setor": "Serviços Diversos", "subsetor": "Serviços Diversos", "cotacao": 14.1899995803833, "dy": 0.1344897855133305, "payout": 0.5658183203637168, "payout_fonte": "cvm", "payout_dy_pl": 0.6742119999999999, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1318, "roic": 0.1568, "mrg_liq": 0.1153, "pl": 5.013109340806947, "pvp": 0.6628904913463732, "ev_ebitda": 2.682634957167354, "div_liq_ebit": 0.4023655484937441, "liq_2m": 5694340.0, "oscil_12m": -0.30831520293576875, "cresc_rec_5a": -0.0048, "anos_pagos": 4, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.29, 1.22, 1.777, 3.08], "div_b3": [0.0, 0.0, 0.2904, 1.22, 1.7774, 3.0814], "div_ano_corrente": 0.36, "score": 67.5, "pilares": {"sustentabilidade": 100, "historico": 67, "rentabilidade": 71, "crescimento": 0, "valuation": 100}, "jev": {"ticker": "VLID3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.7, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.13, "DIVIDENDO_ATENCAO": 0.8, "DIVIDENDO_FRAGIL": 0.07}, "p_extraordinario": 0.91}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "MOVI3", "empresa": "MOVIDA ON NM", "setor": "Diversos", "subsetor": "Aluguel de carros", "cotacao": 5.929999828338623, "dy": 0.10377571969886726, "payout": 0.9001608815461571, "payout_fonte": "cvm", "payout_dy_pl": 0.5080799999999999, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.12279999999999999, "roic": 0.1432, "mrg_liq": 0.0341, "pl": 4.895942918770678, "pvp": 0.6014412637282944, "ev_ebitda": 3.524234773425445, "div_liq_ebit": 4.898677571322668, "liq_2m": 188802000.0, "oscil_12m": -0.20757475603517683, "cresc_rec_5a": 0.1521, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.4208603153636248, "div_fundamentus": [0.134, 0.521, 1.449, 0.121, 0.154, 0.776], "div_b3": [0.1337, 0.5207, 1.4488, 0.1208, 0.1537, 0.7758], "div_ano_corrente": 0.0, "score": 66.4, "pilares": {"sustentabilidade": 17, "historico": 83, "rentabilidade": 53, "crescimento": 100, "valuation": 100}, "jev": {"ticker": "MOVI3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.73, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.01, "DIVIDENDO_ATENCAO": 0.82, "DIVIDENDO_FRAGIL": 0.17}, "p_extraordinario": 0.89}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "EVEN3", "empresa": "Even ON NM", "setor": "Construção Civil", "subsetor": "Incorporações", "cotacao": 3.4100000858306885, "dy": 0.2686680284281636, "payout": 0.619983112659251, "payout_fonte": "cvm", "payout_dy_pl": 0.9248009999999999, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.10279999999999999, "roic": 0.0493, "mrg_liq": 0.16149999999999998, "pl": 3.442169897961167, "pvp": 0.3538679334352602, "ev_ebitda": 6.59481148674803, "div_liq_ebit": 3.282707162591388, "liq_2m": 8316770.0, "oscil_12m": -0.4860336348620601, "cresc_rec_5a": -0.11779999999999999, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.40047260582552635, "div_fundamentus": [0.142, 0.831, 0.15, 0.503, 0.903, 0.765], "div_b3": [0.1443, 0.8308, 0.15, 0.5035, 0.9029, 0.7652], "div_ano_corrente": 0.151, "score": 66.4, "pilares": {"sustentabilidade": 75, "historico": 83, "rentabilidade": 39, "crescimento": 50, "valuation": 89}, "jev": {"ticker": "EVEN3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.64, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.06, "DIVIDENDO_ATENCAO": 0.76, "DIVIDENDO_FRAGIL": 0.18}, "p_extraordinario": 0.92}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "MDIA3", "empresa": "M.DIASBRANCO ON NM", "setor": "Alimentos Processados", "subsetor": "Alimentos Diversos", "cotacao": 16.34000015258789, "dy": 0.05851988929440474, "payout": 0.19464429638216998, "payout_fonte": "cvm", "payout_dy_pl": 0.49918700000000005, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.0765, "roic": 0.0832, "mrg_liq": 0.0623, "pl": 8.530210942277513, "pvp": 0.6577763639699917, "ev_ebitda": 4.061508025148044, "div_liq_ebit": -0.8338096774689224, "liq_2m": 19928700.0, "oscil_12m": -0.4181289402532121, "cresc_rec_5a": 0.023700000000000002, "anos_pagos": 6, "cortes": 3, "cagr_div": 0.23387702453153136, "div_fundamentus": [0.457, 0.2, 1.947, 0.63, 0.24, 1.307], "div_b3": [0.4572, 0.2, 1.9466, 0.6304, 0.24, 1.3066], "div_ano_corrente": 0.3, "score": 65.8, "pilares": {"sustentabilidade": 100, "historico": 50, "rentabilidade": 27, "crescimento": 58, "valuation": 92}, "jev": {"ticker": "MDIA3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.49, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.26, "DIVIDENDO_ATENCAO": 0.66, "DIVIDENDO_FRAGIL": 0.08}, "p_extraordinario": 0.9}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "ITSA4", "empresa": "ITAÚSA PN N1", "setor": "Intermediários Financeiros", "subsetor": "Bancos", "cotacao": 12.819999694824219, "dy": 0.08796692877109019, "payout": 0.5620565115785001, "payout_fonte": "cvm", "payout_dy_pl": 0.6964360000000002, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.1936, "roic": 0.0038, "mrg_liq": 2.1508000000000003, "pl": 7.91702074551544, "pvp": 1.5276650199951567, "ev_ebitda": 85.18796898662181, "div_liq_ebit": 9.502325581395349, "liq_2m": 557390000.0, "oscil_12m": 0.22605439915557235, "cresc_rec_5a": -0.0005, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.21870298735620164, "div_fundamentus": [0.645, 0.394, 0.614, 0.585, 0.666, 1.734], "div_b3": [0.6451, 0.3942, 0.614, 0.5847, 0.6657, 1.7577], "div_ano_corrente": 0.327, "score": 64.5, "pilares": {"sustentabilidade": 67, "historico": 83, "rentabilidade": 65, "crescimento": 50, "valuation": 54}, "jev": {"ticker": "ITSA4", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.22, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.35, "DIVIDENDO_ATENCAO": 0.48, "DIVIDENDO_FRAGIL": 0.17}, "p_extraordinario": 0.79}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "SBFG3", "empresa": "GRUPO SBF ON", "setor": "Comércio", "subsetor": "Produtos Diversos", "cotacao": 5.010000228881836, "dy": 0.10816885733375516, "payout": 0.1739688339243373, "payout_fonte": "cvm", "payout_dy_pl": 0.298452, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1307, "roic": 0.0898, "mrg_liq": 0.0501, "pl": 2.759130560833475, "pvp": 0.36304349484650983, "ev_ebitda": 3.412608851557193, "div_liq_ebit": 3.9736889271247806, "liq_2m": 50458300.0, "oscil_12m": -0.5937024659103487, "cresc_rec_5a": 0.0818, "anos_pagos": 4, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.118, 0.136, 0.174, 0.548], "div_b3": [0.0, 0.0, 0.1178, 0.1358, 0.1735, 0.5484], "div_ano_corrente": 0.543, "score": 63.9, "pilares": {"sustentabilidade": 67, "historico": 67, "rentabilidade": 40, "crescimento": 55, "valuation": 100}, "jev": {"ticker": "SBFG3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.48, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.04, "DIVIDENDO_ATENCAO": 0.65, "DIVIDENDO_FRAGIL": 0.31}, "p_extraordinario": 0.97}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "SMFT3", "empresa": "SMART FIT ON NM", "setor": "Viagens e Lazer", "subsetor": "Atividades Esportivas", "cotacao": 16.790000915527344, "dy": 0.06013370726301054, "payout": 0.868607089581817, "payout_fonte": "cvm", "payout_dy_pl": 0.9064510000000001, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.113, "roic": 0.106, "mrg_liq": 0.08529999999999999, "pl": 15.07392511217376, "pvp": 1.705482742839055, "ev_ebitda": 3.90883932986094, "div_liq_ebit": 2.3382649595254024, "liq_2m": 243541000.0, "oscil_12m": -0.3037181323800554, "cresc_rec_5a": 0.4594, "anos_pagos": 3, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.0, 0.454, 0.526, 1.043], "div_b3": [0.0, 0.0, 0.0, 0.4537, 0.5262, 1.0427], "div_ano_corrente": 0.196, "score": 63.4, "pilares": {"sustentabilidade": 54, "historico": 50, "rentabilidade": 47, "crescimento": 100, "valuation": 70}, "jev": {"ticker": "SMFT3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.86, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.01, "DIVIDENDO_ATENCAO": 0.91, "DIVIDENDO_FRAGIL": 0.08}, "p_extraordinario": 0.94}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "ALPA4", "empresa": "ALPARGATAS PN N1", "setor": "Tecidos, Vestuário e Calçados", "subsetor": "Calçados", "cotacao": 13.020000457763672, "dy": 0.13782103970126994, "payout": null, "payout_fonte": "sem_base_de_lucro", "payout_dy_pl": 1.7484569999999995, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1937, "roic": 0.1796, "mrg_liq": 0.1452, "pl": 12.686430198101956, "pvp": 2.4533554581571213, "ev_ebitda": 8.156330865276747, "div_liq_ebit": 0.6014586334664983, "liq_2m": 43349700.0, "oscil_12m": 0.4313392238774576, "cresc_rec_5a": 0.049699999999999994, "anos_pagos": 3, "cortes": 1, "cagr_div": 1.0310652953699093, "div_fundamentus": [0.055, 0.435, 0.0, 0.0, 0.0, 1.901], "div_b3": [0.0552, 0.4351, 0.0, 0.0, 0.0, 1.9013], "div_ano_corrente": 0.0, "score": 62.0, "pilares": {"sustentabilidade": 67, "historico": 33, "rentabilidade": 89, "crescimento": 67, "valuation": 49}, "jev": {"ticker": "ALPA4", "classe": "DIVIDENDO_FRAGIL", "confianca": 0.67, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0, "DIVIDENDO_ATENCAO": 0.22, "DIVIDENDO_FRAGIL": 0.78}, "p_extraordinario": 0.95}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "SEER3", "empresa": "SER EDUCA ON NM", "setor": "Diversos", "subsetor": "Serviços Educacionais", "cotacao": 10.850000381469727, "dy": 0.08138976672371133, "payout": null, "payout_fonte": "sem_base_de_lucro", "payout_dy_pl": 0.418084, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1783, "roic": 0.1704, "mrg_liq": 0.1185, "pl": 5.136812855346339, "pvp": 0.9201771059773953, "ev_ebitda": 2.4167288827318405, "div_liq_ebit": 0.7713355961341793, "liq_2m": 16519400.0, "oscil_12m": 0.1416263215917355, "cresc_rec_5a": 0.1007, "anos_pagos": 3, "cortes": 1, "cagr_div": -0.05560566786964427, "div_fundamentus": [0.205, 0.331, 0.0, 0.0, 0.0, 0.154], "div_b3": [0.2054, 0.3306, 0.0, 0.0, 0.0, 0.1541], "div_ano_corrente": 0.883, "score": 61.3, "pilares": {"sustentabilidade": 67, "historico": 33, "rentabilidade": 82, "crescimento": 34, "valuation": 100}, "jev": {"ticker": "SEER3", "classe": "DIVIDENDO_FRAGIL", "confianca": 0.35, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.01, "DIVIDENDO_ATENCAO": 0.42, "DIVIDENDO_FRAGIL": 0.57}, "p_extraordinario": 0.81}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "COGN3", "empresa": "COGNA ON", "setor": "Diversos", "subsetor": "Serviços Educacionais", "cotacao": 1.4299999475479126, "dy": 0.08289650653712922, "payout": null, "payout_fonte": "sem_base_de_lucro", "payout_dy_pl": 0.348754, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.051100000000000007, "roic": 0.1024, "mrg_liq": 0.0863, "pl": 4.207101294959801, "pvp": 0.21760868767033453, "ev_ebitda": 2.8496375766353332, "div_liq_ebit": 2.3641970587838355, "liq_2m": 138492000.0, "oscil_12m": -0.5635391464440718, "cresc_rec_5a": 0.1235, "anos_pagos": 1, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.0, 0.0, 0.0, 0.181], "div_b3": [0.0, 0.0, 0.0, 0.0, 0.0, 0.1815], "div_ano_corrente": 0.014, "score": 60.8, "pilares": {"sustentabilidade": 52, "historico": 50, "rentabilidade": 32, "crescimento": 82, "valuation": 100}, "jev": {"ticker": "COGN3", "classe": "DIVIDENDO_FRAGIL", "confianca": 0.73, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0, "DIVIDENDO_ATENCAO": 0.18, "DIVIDENDO_FRAGIL": 0.82}, "p_extraordinario": 0.97}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "BRBI11", "empresa": "BR PARTNERS UNT N2", "setor": "Intermediários Financeiros", "subsetor": "Bancos", "cotacao": 10.020000457763672, "dy": 0.1377146643671886, "payout": 0.7156405480318384, "payout_fonte": "cvm", "payout_dy_pl": 0.908326, "dividendo_acima_fcf": null, "cvm_anos": 5, "coleta": "ok", "roe": 0.19699999999999998, "roic": 0.018500000000000003, "mrg_liq": 0.47729999999999995, "pl": 6.595710080504793, "pvp": 1.295962204316437, "ev_ebitda": -19.144417278398098, "div_liq_ebit": -264.4059650974843, "liq_2m": 11370500.0, "oscil_12m": -0.4421040754588996, "cresc_rec_5a": -0.3074, "anos_pagos": 4, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 1.38, 1.32, 1.95, 1.86], "div_b3": null, "div_ano_corrente": 0.36, "score": 59.9, "pilares": {"sustentabilidade": 78, "historico": 67, "rentabilidade": 66, "crescimento": 0, "valuation": 93}, "jev": {"ticker": "BRBI11", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.72, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.1, "DIVIDENDO_ATENCAO": 0.81, "DIVIDENDO_FRAGIL": 0.09}, "p_extraordinario": 0.91}, "decisao": "descartar", "conferencia_b3": "unit (não comparável)"}, {"ticker": "UNIP6", "empresa": "UNIPAR PARTICIPAÇÕES S.A. PNB", "setor": "Químicos", "subsetor": "Químicos Diversos", "cotacao": 52.650001525878906, "dy": 0.12303790716541413, "payout": 0.677331702969677, "payout_fonte": "cvm", "payout_dy_pl": 2.74989, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.1334, "roic": 0.1166, "mrg_liq": 0.049800000000000004, "pl": 22.349941277065156, "pvp": 2.979992170275354, "ev_ebitda": 8.356481540422497, "div_liq_ebit": 3.3784175455986736, "liq_2m": 18891600.0, "oscil_12m": -0.1761259408962509, "cresc_rec_5a": -0.08380000000000001, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.5917393047627026, "div_fundamentus": [1.221, 15.445, 13.954, 3.48, 4.222, 12.476], "div_b3": [1.2209, 15.4446, 13.954, 3.4801, 4.2225, 12.4757], "div_ano_corrente": 0.0, "score": 58.8, "pilares": {"sustentabilidade": 74, "historico": 83, "rentabilidade": 49, "crescimento": 50, "valuation": 27}, "jev": {"ticker": "UNIP6", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.64, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.05, "DIVIDENDO_ATENCAO": 0.76, "DIVIDENDO_FRAGIL": 0.19}, "p_extraordinario": 0.83}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "YDUQ3", "empresa": "YDUQS PART ON", "setor": "Diversos", "subsetor": "Serviços Educacionais", "cotacao": 9.270000457763672, "dy": 0.06139827097023753, "payout": 0.6836468250896612, "payout_fonte": "cvm", "payout_dy_pl": 1.374318, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.038900000000000004, "roic": 0.11349999999999999, "mrg_liq": 0.0202, "pl": 22.383659641917163, "pvp": 0.8735588014522307, "ev_ebitda": 4.018370486680262, "div_liq_ebit": 4.597593628415021, "liq_2m": 74486200.0, "oscil_12m": -0.31677424564065526, "cresc_rec_5a": 0.055999999999999994, "anos_pagos": 6, "cortes": 1, "cagr_div": 0.17453762925398553, "div_fundamentus": [0.51, 0.47, 0.126, 0.275, 0.274, 1.14], "div_b3": [0.5097, 0.4697, 0.1265, 0.2749, 0.2737, 1.1398], "div_ano_corrente": 0.0, "score": 57.8, "pilares": {"sustentabilidade": 50, "historico": 83, "rentabilidade": 25, "crescimento": 69, "valuation": 67}, "jev": {"ticker": "YDUQ3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.44, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.01, "DIVIDENDO_ATENCAO": 0.63, "DIVIDENDO_FRAGIL": 0.36}, "p_extraordinario": 0.95}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "BEEF3", "empresa": "Minerva ON NM", "setor": "Alimentos Processados", "subsetor": "Carnes e Derivados", "cotacao": 2.609999895095825, "dy": 0.07497011795581546, "payout": 1.9485838124647008, "payout_fonte": "cvm", "payout_dy_pl": 0.426849, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.2904, "roic": 0.1655, "mrg_liq": 0.0085, "pl": 5.6935884808340385, "pvp": 1.6522983206856636, "ev_ebitda": 3.6834675938852373, "div_liq_ebit": 3.7870262459855826, "liq_2m": 104126000.0, "oscil_12m": -0.6232338861111673, "cresc_rec_5a": 0.183, "anos_pagos": 5, "cortes": 2, "cagr_div": -0.11328615457991376, "div_fundamentus": [0.301, 1.079, 0.562, 0.551, 0.0, 0.165], "div_b3": [0.3006, 1.0787, 0.5616, 0.5509, 0.0, 0.1646], "div_ano_corrente": 0.031, "score": 55.4, "pilares": {"sustentabilidade": 32, "historico": 50, "rentabilidade": 68, "crescimento": 50, "valuation": 91}, "jev": {"ticker": "BEEF3", "classe": "DIVIDENDO_FRAGIL", "confianca": 0.96, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0, "DIVIDENDO_ATENCAO": 0.03, "DIVIDENDO_FRAGIL": 0.97}, "p_extraordinario": 0.97}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "FESA4", "empresa": "FERBASA PN", "setor": "Siderurgia e Metalurgia", "subsetor": "Siderurgia", "cotacao": 5.090000152587891, "dy": 0.1274941022683583, "payout": 0.3831763891652066, "payout_fonte": "cvm", "payout_dy_pl": 1.5535349999999999, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.0449, "roic": 0.0369, "mrg_liq": 0.068, "pl": 12.185151880437678, "pvp": 0.5449899153275923, "ev_ebitda": 3.352202120694247, "div_liq_ebit": -3.5409305558884867, "liq_2m": 8431500.0, "oscil_12m": -0.30457230238481003, "cresc_rec_5a": -0.0787, "anos_pagos": 6, "cortes": 2, "cagr_div": -0.046863772638341517, "div_fundamentus": [0.928, 0.839, 5.444, 2.74, 0.526, 0.73], "div_b3": [0.9283, 0.8393, 5.4444, 2.7404, 0.5262, 0.7297], "div_ano_corrente": 0.0, "score": 53.4, "pilares": {"sustentabilidade": 100, "historico": 67, "rentabilidade": 11, "crescimento": 1, "valuation": 84}, "jev": {"ticker": "FESA4", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.6, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.01, "DIVIDENDO_ATENCAO": 0.73, "DIVIDENDO_FRAGIL": 0.26}, "p_extraordinario": 0.87}, "decisao": "descartar", "conferencia_b3": "confere"}, {"ticker": "TIMS3", "empresa": "TIM ON NM", "setor": "Telecomunicações", "subsetor": "Telecomunicações", "cotacao": 19.799999237060547, "dy": 0.07524596249535927, "payout": 0.5421714263669585, "payout_fonte": "cvm", "payout_dy_pl": 259.54071600000003, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.0005, "roic": 0.0076, "mrg_liq": 0.0176, "pl": 3449.2311267333043, "pvp": 1.8832904158643708, "ev_ebitda": 120.48986682254429, "div_liq_ebit": -5.1962092640943816, "liq_2m": 177018000.0, "oscil_12m": -0.13378820818432813, "cresc_rec_5a": -0.534, "anos_pagos": 6, "cortes": 0, "cagr_div": 0.4123502865457407, "div_fundamentus": [0.447, 0.433, 0.578, 0.909, 0.96, 2.512], "div_b3": [0.4474, 0.4328, 0.5784, 0.9088, 1.1404, 2.5132], "div_ano_corrente": 0.547, "score": 51.4, "pilares": {"sustentabilidade": 69, "historico": 100, "rentabilidade": 3, "crescimento": 50, "valuation": 24}, "jev": {"ticker": "TIMS3", "classe": "DIVIDENDO_FRAGIL", "confianca": 0.46, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0.06, "DIVIDENDO_ATENCAO": 0.3, "DIVIDENDO_FRAGIL": 0.64}, "p_extraordinario": 0.93}, "decisao": "descartar", "conferencia_b3": "diverge em 2024"}, {"ticker": "PASS3", "empresa": "COMPASS ON NM", "setor": "Gás", "subsetor": "Gás", "cotacao": 19.010000228881836, "dy": 0.06668321855536151, "payout": 0.5489261276039886, "payout_fonte": "cvm", "payout_dy_pl": 0.787499, "dividendo_acima_fcf": true, "cvm_anos": 5, "coleta": "ok", "roe": 0.1906, "roic": 0.1024, "mrg_liq": 0.0895, "pl": 11.809552943912047, "pvp": 2.25334054437177, "ev_ebitda": 6.422020551459543, "div_liq_ebit": 4.582688136072534, "liq_2m": 39518800.0, "oscil_12m": -0.30597111233349494, "cresc_rec_5a": -0.0187, "anos_pagos": 1, "cortes": 0, "cagr_div": null, "div_fundamentus": [0.0, 0.0, 0.0, 0.0, 0.0, 0.7], "div_b3": [0.0, 1.1096, 2.2868, 1.4695, 3.5005, 2.8004], "div_ano_corrente": 0.568, "score": 48.5, "pilares": {"sustentabilidade": 67, "historico": 50, "rentabilidade": 64, "crescimento": 0, "valuation": 61}, "jev": {"ticker": "PASS3", "classe": "DIVIDENDO_ATENCAO", "confianca": 0.44, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0, "DIVIDENDO_ATENCAO": 0.63, "DIVIDENDO_FRAGIL": 0.37}, "p_extraordinario": 0.96}, "decisao": "descartar", "conferencia_b3": "diverge em 2021, 2022, 2023, 2024, 2025"}, {"ticker": "CAML3", "empresa": "CAMIL ON NM", "setor": "Alimentos Processados", "subsetor": "Alimentos Diversos", "cotacao": 4.099999904632568, "dy": 0.0715429284933818, "payout": 0.3340159729110374, "payout_fonte": "cvm", "payout_dy_pl": 1.4128290000000001, "dividendo_acima_fcf": false, "cvm_anos": 5, "coleta": "ok", "roe": 0.023799999999999998, "roic": 0.0542, "mrg_liq": 0.0067, "pl": 19.7479894904036, "pvp": 0.47386933571130185, "ev_ebitda": 7.829145546534551, "div_liq_ebit": 9.434266043660772, "liq_2m": 8939520.0, "oscil_12m": -0.21409800823010394, "cresc_rec_5a": 0.0347, "anos_pagos": 6, "cortes": 2, "cagr_div": -0.128853984325223, "div_fundamentus": [0.584, 0.247, 0.365, 0.289, 0.293, 0.293], "div_b3": [0.5838, 0.2472, 0.3649, 0.2887, 0.2932, 0.2932], "div_ano_corrente": 0.22, "score": 40.5, "pilares": {"sustentabilidade": 67, "historico": 67, "rentabilidade": 3, "crescimento": 12, "valuation": 51}, "jev": {"ticker": "CAML3", "classe": "DIVIDENDO_FRAGIL", "confianca": 0.3, "probabilidades": {"DIVIDENDO_SUSTENTAVEL": 0, "DIVIDENDO_ATENCAO": 0.47, "DIVIDENDO_FRAGIL": 0.53}, "p_extraordinario": 0.69}, "decisao": "descartar", "conferencia_b3": "confere"}]};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const pct = (v, d = 1) => v == null ? "–" : (100 * v).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d }) + "%";
+const n2 = (v, d = 2) => v == null ? "–" : v.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const brl = v => v == null ? "–" : "R$ " + n2(v, 2);
+const CLASSE = { DIVIDENDO_SUSTENTAVEL: "Sustentável", DIVIDENDO_ATENCAO: "Atenção", DIVIDENDO_FRAGIL: "Frágil" };
+const CLASSE_COR = { DIVIDENDO_SUSTENTAVEL: "estudar", DIVIDENDO_ATENCAO: "monitorar", DIVIDENDO_FRAGIL: "descartar" };
+const PILAR = { sustentabilidade: "Sustentabilidade", historico: "Histórico", rentabilidade: "Rentabilidade", crescimento: "Crescimento", valuation: "Valuation" };
+const DIVIDA = { true: "sim", false: "não" };
+const FONTE_PAYOUT = {
+  cvm: "CVM, soma de 5 anos", dy_x_pl: "DY × P/L", lucro_nao_encontrado: "DY × P/L (lucro não lido na CVM)",
+  lucro_diverge: "DY × P/L (lucro da CVM diverge)", sem_base_de_lucro: "n/d (lucro de 5 anos pequeno demais)",
+};
+const divB3 = e => /^(diverge|erro)/.test(e.conferencia_b3 || "");
+
+// tema: preferência por visitante, opcional
+const root = document.documentElement;
+try { const t = localStorage.getItem("tema"); if (t) root.dataset.theme = t; } catch (_) {}
+$("#theme").onclick = () => {
+  const escuro = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = escuro ? "light" : "dark";
+  try { localStorage.setItem("tema", root.dataset.theme); } catch (_) {}
+};
+
+const estado = { decisao: "", sort: "score", dir: -1, sel: null };
+const empresas = DADOS.empresas;
+$("#sub").textContent = `${empresas.length} empresas · gerado em ${DADOS.gerado_em} · histórico ${DADOS.anos[0]}–${DADOS.anos.at(-1)}` +
+  (DADOS.precos_em ? ` · cotações: ${DADOS.precos_em}` : "");
+
+for (const s of [...new Set(empresas.map(e => e.setor).filter(Boolean))].sort())
+  $("#fSetor").insertAdjacentHTML("beforeend", `<option>${esc(s)}</option>`);
+
+function kpis() {
+  const c = d => empresas.filter(e => e.decisao === d).length;
+  const items = [
+    ["", "Empresas", empresas.length],
+    ["estudar", "Estudar", c("estudar")],
+    ["monitorar", "Monitorar", c("monitorar")],
+    ["descartar", "Descartar", c("descartar")],
+    ["b3", "Divergem da B3", empresas.filter(divB3).length],
+  ];
+  $("#kpis").innerHTML = items.map(([k, l, v]) => `
+    <div class="card kpi ${estado.decisao === k ? "on" : ""}" data-k="${k}">
+      <div class="l">${l}</div><div class="v" style="${k && k !== "b3" ? `color: var(--${k})` : ""}">${v}</div>
+    </div>`).join("");
+  document.querySelectorAll(".kpi").forEach(el => el.onclick = () => {
+    const k = el.dataset.k;
+    if (k === "b3") { $("#fDiv").checked = !$("#fDiv").checked; estado.decisao = ""; }
+    else estado.decisao = estado.decisao === k ? "" : k;
+    render();
+  });
+}
+
+function filtradas() {
+  const q = $("#q").value.trim().toLowerCase(), cl = $("#fClasse").value, st = $("#fSetor").value, dv = $("#fDiv").checked;
+  return empresas.filter(e =>
+    (!estado.decisao || e.decisao === estado.decisao) &&
+    (!cl || e.jev?.classe === cl) && (!st || e.setor === st) && (!dv || divB3(e)) &&
+    (!q || [e.ticker, e.empresa, e.setor, e.subsetor].join(" ").toLowerCase().includes(q)));
+}
+
+const COLS = [
+  ["ticker", "Ticker", "l", e => e.ticker],
+  ["setor", "Setor", "l", e => e.setor || ""],
+  ["dy", "DY", "", e => e.dy],
+  ["payout", "Payout", "", e => e.payout],
+  ["roe", "ROE", "", e => e.roe],
+  ["anos_pagos", "Pagou", "", e => e.anos_pagos],
+  ["cortes", "Cortes", "", e => e.cortes],
+  ["cagr_div", "CAGR div.", "", e => e.cagr_div],
+  ["score", "Score", "", e => e.score],
+  ["classe", "Jev", "l", e => ["DIVIDENDO_SUSTENTAVEL", "DIVIDENDO_ATENCAO", "DIVIDENDO_FRAGIL"].indexOf(e.jev?.classe)],
+  ["extra", "P(extra)", "", e => e.jev?.p_extraordinario],
+  ["b3", "B3", "l", e => e.conferencia_b3 || ""],
+  ["decisao", "Decisão", "l", e => ["estudar", "monitorar", "descartar"].indexOf(e.decisao)],
+];
+
+function b3Cell(e) {
+  const s = e.conferencia_b3;
+  if (!s) return `<span class="muted">–</span>`;
+  if (s === "confere") return `<span class="ok">✓ confere</span>`;
+  if (divB3(e)) return `<span class="warn">⚠ ${esc(s)}</span>`;
+  return `<span class="muted">${esc(s)}</span>`;
+}
+
+function tabela(lista) {
+  $("#thead").innerHTML = COLS.map(([k, l, cls]) =>
+    `<th class="${cls}" data-k="${k}">${l}${estado.sort === k ? (estado.dir < 0 ? " ↓" : " ↑") : ""}</th>`).join("");
+  document.querySelectorAll("#thead th").forEach(th => th.onclick = () => {
+    const k = th.dataset.k;
+    estado.dir = estado.sort === k ? -estado.dir : (["ticker", "setor"].includes(k) ? 1 : -1);
+    estado.sort = k; render();
+  });
+  const get = COLS.find(c => c[0] === estado.sort)[3];
+  lista = [...lista].sort((a, b) => {
+    const x = get(a), y = get(b);
+    if (x == null) return 1; if (y == null) return -1;
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * estado.dir;
+  });
+  $("#tbody").innerHTML = lista.map(e => {
+    const j = e.jev || {};
+    return `<tr data-t="${esc(e.ticker)}" class="${estado.sel === e.ticker ? "sel" : ""}">
+      <td class="l tk">${esc(e.ticker)}</td>
+      <td class="l setor" title="${esc(e.setor)}">${esc(e.setor)}</td>
+      <td>${pct(e.dy)}</td>
+      <td class="${e.payout > 1 ? "warn" : ""}">${pct(e.payout, 0)}</td>
+      <td>${pct(e.roe, 0)}</td>
+      <td>${e.anos_pagos == null ? "–" : `${e.anos_pagos}/${DADOS.anos.length}`}</td>
+      <td class="${(e.cortes || 0) >= 2 ? "warn" : ""}">${e.cortes ?? "–"}</td>
+      <td>${pct(e.cagr_div)}</td>
+      <td>${n2(e.score, 1)}<span class="bar"><i style="width:${e.score == null ? 0 : e.score}%"></i></span></td>
+      <td class="l">${j.classe ? `<span class="badge b-${CLASSE_COR[j.classe]}">${CLASSE[j.classe]}</span> <span class="muted">${n2(j.confianca)}</span>` : "–"}</td>
+      <td class="${j.p_extraordinario >= .7 ? "warn" : ""}">${j.p_extraordinario == null ? "–" : n2(j.p_extraordinario)}</td>
+      <td class="l">${b3Cell(e)}</td>
+      <td class="l"><span class="badge b-${e.decisao === "-" || e.decisao === "coleta incompleta" ? "neutro" : e.decisao}">${esc(e.decisao)}</span></td>
+    </tr>`;
+  }).join("") || `<tr><td class="l muted" colspan="${COLS.length}">Nenhuma empresa com esses filtros.</td></tr>`;
+  document.querySelectorAll("#tbody tr[data-t]").forEach(tr => tr.onclick = () => selecionar(tr.dataset.t));
+}
+
+function scatter(lista) {
+  const W = 640, H = 330, m = { l: 40, r: 14, t: 10, b: 34 }, xmax = .25;
+  const x = v => m.l + Math.min(v, xmax) / xmax * (W - m.l - m.r);
+  const y = v => H - m.b - v / 100 * (H - m.t - m.b);
+  const vis = new Set(lista.map(e => e.ticker));
+  let g = "";
+  for (let s = 0; s <= 100; s += 20) g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(s)}" y2="${y(s)}" stroke="var(--border)"/><text x="${m.l - 8}" y="${y(s) + 4}" text-anchor="end">${s}</text>`;
+  for (let d = 0; d <= xmax + 1e-9; d += .05) g += `<text x="${x(d)}" y="${H - m.b + 18}" text-anchor="middle">${Math.round(d * 100)}%</text>`;
+  g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(60)}" y2="${y(60)}" stroke="var(--estudar)" stroke-dasharray="4 4" opacity=".6"/>`;
+  g += `<text x="${W - m.r}" y="${y(60) - 5}" text-anchor="end">score 60</text>`;
+  g += `<text x="${(W + m.l) / 2}" y="${H - 2}" text-anchor="middle">Dividend yield (12 meses)</text>`;
+  const pts = [...empresas].filter(e => e.score != null && e.dy != null).sort((a, b) => (a.ticker === estado.sel) - (b.ticker === estado.sel)).map(e => {
+    const corNome = e.decisao === "-" || e.decisao === "coleta incompleta" ? "neutro" : e.decisao;
+    const cor = `var(--${corNome})`, sel = e.ticker === estado.sel;
+    return `<circle cx="${x(e.dy)}" cy="${y(e.score)}" r="${sel ? 7.5 : 5}" fill="${cor}" fill-opacity="${vis.has(e.ticker) ? .85 : .12}"
+      stroke="${sel ? "var(--text)" : "var(--surface)"}" stroke-width="${sel ? 2 : 1}" data-t="${esc(e.ticker)}" style="cursor:pointer">
+      <title>${esc(e.ticker)} · DY ${pct(e.dy)} · score ${n2(e.score, 1)} · ${esc(e.decisao)}</title></circle>` +
+      (sel ? `<text x="${x(e.dy) + 10}" y="${y(e.score) - 8}" style="fill: var(--text); font-weight: 600">${esc(e.ticker)}</text>` : "");
+  }).join("");
+  $("#scatter").innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Score versus dividend yield">${g}${pts}</svg>`;
+  document.querySelectorAll("#scatter circle").forEach(c => c.onclick = () => selecionar(c.dataset.t));
+}
+
+function barras(rows, max, fmt) {
+  return `<div class="rows">${rows.map(([l, v, cor]) => `
+    <div class="row"><span>${l}</span><span class="track"><i style="width:${v == null ? 0 : Math.max(0, Math.min(100, v / max * 100))}%; --c:${cor || "var(--accent)"}"></i></span><span class="n">${fmt(v)}</span></div>`).join("")}</div>`;
+}
+
+function historico(e) {
+  const anos = DADOS.anos, f = e.div_fundamentus, b = e.div_b3;
+  const W = 420, H = 160, m = { l: 40, r: 8, t: 8, b: 22 };
+  const max = Math.max(...f, ...(b || []), 0.01);
+  const bw = (W - m.l - m.r) / anos.length, w = b ? bw * .36 : bw * .6;
+  const y = v => H - m.b - v / max * (H - m.t - m.b);
+  let s = `<line x1="${m.l}" x2="${W - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--border)"/>`;
+  s += `<text x="${m.l - 6}" y="${y(max) + 4}" text-anchor="end">${n2(max)}</text><text x="${m.l - 6}" y="${H - m.b}" text-anchor="end">0</text>`;
+  anos.forEach((a, i) => {
+    const cx = m.l + bw * i + bw / 2;
+    s += `<rect x="${b ? cx - w - 1 : cx - w / 2}" y="${y(f[i])}" width="${w}" height="${H - m.b - y(f[i])}" rx="2" fill="var(--fund)"><title>${a} Fundamentus: R$ ${n2(f[i], 4)}</title></rect>`;
+    if (b) s += `<rect x="${cx + 1}" y="${y(b[i])}" width="${w}" height="${H - m.b - y(b[i])}" rx="2" fill="var(--b3)"><title>${a} B3: R$ ${n2(b[i], 4)}</title></rect>`;
+    s += `<text x="${cx}" y="${H - 6}" text-anchor="middle">${a}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Proventos por ação por ano">${s}</svg>
+    <div class="legend"><span style="--c: var(--fund)">Fundamentus</span>${b ? `<span style="--c: var(--b3)">B3</span>` : ""}
+    <span class="muted">${DADOS.ano_corrente} até agora: R$ ${n2(e.div_ano_corrente, 3)}</span></div>`;
+}
+
+function detalhe() {
+  const e = empresas.find(x => x.ticker === estado.sel);
+  if (!e) return;
+  const j = e.jev || {};
+  const probs = j.probabilidades || {};
+  $("#detail").innerHTML = `
+    <div class="dhead">
+      <div><div class="t">${esc(e.ticker)}</div><div class="sub">${esc(e.empresa || "")} · ${esc(e.subsetor || e.setor || "")}</div></div>
+      <span class="badge b-${e.decisao === "-" || e.decisao === "coleta incompleta" ? "neutro" : e.decisao}">${esc(e.decisao)}</span>
+    </div>
+    <div class="facts">
+      <div>Cotação<b>${brl(e.cotacao)}</b></div><div>DY 12m<b>${pct(e.dy)}</b></div>
+      <div>Payout<b class="${e.payout > 1 ? "warn" : ""}">${pct(e.payout, 0)}</b></div>
+      <div>Fonte do payout<b>${FONTE_PAYOUT[e.payout_fonte] || "–"}</b></div>
+      <div>Dividendo &gt; FCF<b>${e.dividendo_acima_fcf == null ? "–" : DIVIDA[e.dividendo_acima_fcf]}</b></div>
+      <div>ROE<b>${pct(e.roe)}</b></div>
+      <div>P/L<b>${n2(e.pl)}</b></div><div>P/VP<b>${n2(e.pvp)}</b></div>
+      <div>Dív. líq./EBIT<b>${e.div_liq_ebit == null ? "–" : n2(e.div_liq_ebit) + "x"}</b></div>
+      <div>Oscilação 12m<b>${pct(e.oscil_12m)}</b></div>
+    </div>
+    <div class="sec">Score ${n2(e.score, 1)} — pilares</div>
+    ${barras(Object.keys(PILAR).map(k => [`${PILAR[k]} <span class="muted">${Math.round(DADOS.pesos[k] * 100)}%</span>`, e.pilares[k]]), 100, v => v == null ? "–" : v)}
+    <div class="sec">Jev</div>
+    ${j.classe ? barras([
+      ["Sustentável", probs.DIVIDENDO_SUSTENTAVEL, "var(--estudar)"],
+      ["Atenção", probs.DIVIDENDO_ATENCAO, "var(--monitorar)"],
+      ["Frágil", probs.DIVIDENDO_FRAGIL, "var(--descartar)"],
+      ["DY inflado (extra)", j.p_extraordinario, "var(--neutro)"],
+    ], 1, v => v == null ? "–" : n2(v)) : `<div class="muted">Sem classificação do Jev nesta execução.</div>`}
+    <div class="sec">Proventos por ação (R$, por data-com)</div>
+    ${historico(e)}
+    <div class="note">Conferência com a B3: ${b3Cell(e)}</div>`;
+}
+
+function selecionar(t) { estado.sel = t; render(); }
+
+function render() {
+  const lista = filtradas();
+  kpis(); tabela(lista); scatter(lista); detalhe();
+}
+
+["#q", "#fClasse", "#fSetor", "#fDiv"].forEach(s => $(s).addEventListener("input", render));
+const melhor = [...empresas].filter(e => e.decisao === "estudar").sort((a, b) => b.score - a.score)[0];
+estado.sel = melhor ? melhor.ticker : null;
+render();
+</script>
+</body>
+</html>

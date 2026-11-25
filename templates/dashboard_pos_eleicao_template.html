@@ -74,7 +74,9 @@ select, input[type="search"], input[type="text"] { border: 1px solid var(--borde
 .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
-  font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); min-width: 170px; max-width: 280px; display: none; z-index: 3; }
+  font-size: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); min-width: 170px; max-width: min(280px, 100%); z-index: 3;
+  left: 0; top: 0; visibility: hidden; opacity: 0; transform: scale(.98); transition: opacity 50ms linear, transform 50ms linear, visibility 0s 50ms; }
+.tip.on { visibility: visible; opacity: 1; transform: none; transition: opacity 150ms ease-out, transform 150ms ease-out, visibility 0s; }
 .tip .h { font-weight: 650; margin-bottom: 4px; }
 .tip .r { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
 .tip .r span:first-child::before { content: ""; display: inline-block; width: 10px; height: 3px; border-radius: 2px; background: var(--c); margin-right: 6px; vertical-align: 3px; }
@@ -83,6 +85,10 @@ select, input[type="search"], input[type="text"] { border: 1px solid var(--borde
 .legend label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 .legend i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; background: var(--c); }
 .legend input { margin: 0; accent-color: var(--accent); }
+.chart [data-s] { transition: opacity 120ms ease-out; }
+.chart [data-s].dim { opacity: .18; }
+@keyframes troca-in { from { opacity: 0; } to { opacity: 1; } }
+.troca { animation: troca-in 150ms ease-out; }
 
 /* contexto do pregão */
 .ctxbox { font-size: 13px; color: var(--text-2); margin-top: 10px; padding: 10px 12px; background: var(--surface-2); border-radius: 8px; }
@@ -95,7 +101,12 @@ select, input[type="search"], input[type="text"] { border: 1px solid var(--borde
 .heat th.sel { color: var(--text); font-weight: 700; }
 .heat td.lab { text-align: left; white-space: nowrap; padding-right: 8px; color: var(--text); max-width: 220px; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
 .heat td.lab small { color: var(--muted); }
-.heat td.c { text-align: center; padding: 5px 2px; border-radius: 4px; min-width: 44px; cursor: default; }
+/* telas estreitas: o rótulo do grupo fica fixo enquanto os pregões rolam por baixo */
+.heat td.lab, .heat thead th:first-child { position: sticky; left: 0; z-index: 1; background: var(--surface); }
+@media (max-width: 560px) { .heat td.lab { max-width: 132px; } }
+.heat th.hov { color: var(--text); }
+.heat td.c { text-align: center; padding: 5px 2px; border-radius: 4px; min-width: 44px; cursor: pointer; }
+.heat td.c:hover { outline: 1px solid var(--text); outline-offset: -1px; }
 .heat td.c.sel { outline: 2px solid var(--text); outline-offset: -1px; }
 .heat tr:hover td.lab { text-decoration: underline; }
 .scale { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); margin-top: 8px; }
@@ -105,6 +116,8 @@ select, input[type="search"], input[type="text"] { border: 1px solid var(--borde
 .rank { display: grid; gap: 3px; font-size: 12px; }
 .rank .r { display: grid; grid-template-columns: 64px 1fr 58px; gap: 8px; align-items: center; cursor: pointer; border-radius: 4px; padding: 1px 2px; }
 .rank .r:hover { background: var(--surface-2); }
+.rank .r.sel { background: var(--v2-sel); box-shadow: inset 2px 0 0 var(--accent); }
+.rank .r:focus-visible, .heat td.lab:focus-visible, table.t th:focus-visible, table.t tr:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .rank .trk { position: relative; height: 12px; }
 .rank .trk i { position: absolute; top: 0; height: 100%; border-radius: 4px; }
 .rank .trk .z { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--axis); }
@@ -404,7 +417,7 @@ html.v2-rec .v2-sep { margin-left: 0; }
       <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M10 6c-.4-.8-1.1-1.2-2-1.2-1.2 0-2 .6-2 1.5 0 2.2 4.1.9 4.1 3.2 0 1-.9 1.7-2.1 1.7-1 0-1.8-.5-2.2-1.3M8 3.6v8.8"/></svg><span>Ações — dividendos</span></a>
     <a data-rel="resultados/dashboard_fiis.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_fiis.html" title="FIIs — rendimentos">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 14V2h7v12M10 6h3v8M1.5 14h13M5.5 5h2M5.5 8h2M5.5 11h2"/></svg><span>FIIs — rendimentos</span></a>
-    <a data-rel="resultados/painel_besst_2026_11_16.html" data-grupo="painel_besst" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/painel_besst_2026_11_16.html" title="Painel BESST">
+    <a data-rel="resultados/painel_besst_2026_11_25.html" data-grupo="painel_besst" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/painel_besst_2026_11_25.html" title="Painel BESST">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l5 2v4c0 3-2 5.200-5 6.400-3-1.200-5-3.400-5-6.400v-4z"/></svg><span>Painel BESST</span></a>
     <a data-rel="resultados/dashboard_eleicao.html" href="https://htmlpreview.github.io/?https://github.com/novaeslucas/b3/blob/main/resultados/dashboard_eleicao.html" title="Leitura pós-1º turno">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 14.500V2M3 2.500h9.500l-2 3 2 3H3"/></svg><span>Pós-1º turno</span></a>
@@ -566,13 +579,26 @@ html.v2-rec .v2-sep { margin-left: 0; }
 const DADOS = /*__DADOS__*/null;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const fmtN = (v, d = 1) => v.toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+const NF = {};  // um formatador por nº de casas (mesma saída de toLocaleString, sem recriar a cada chamada)
+const fmtN = (v, d = 1) => (NF[d] ??= new Intl.NumberFormat("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d })).format(v);
 const pct = (v, d = 1) => v == null || isNaN(v) ? "–" : fmtN(100 * v, d) + "%";
 const sp = (v, d = 1) => v == null || isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fmtN(Math.abs(100 * v), d) + "%";
 const spp = (v, d = 1) => v == null || isNaN(v) ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + fmtN(Math.abs(100 * v), d) + " p.p.";
 const cls = v => v == null ? "" : v >= 0 ? "pos" : "neg";
 const media = a => { a = a.filter(v => v != null && !isNaN(v)); return a.length ? a.reduce((s, x) => s + x, 0) / a.length : null; };
 const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const semMov = matchMedia("(prefers-reduced-motion: reduce)");
+// fade curto só quando um filtro troca o conteúdo (nunca na troca de pregão nem de tema)
+function troca(el) { el.classList.remove("troca"); void el.offsetWidth; el.classList.add("troca"); }
+// rolagem até um bloco sem deixá-lo sob a barra fixa do seletor de pregão
+function irPara(el, block) {
+  el.style.scrollMarginTop = ($(".dayctl").offsetHeight + 8) + "px";
+  el.scrollIntoView({ behavior: semMov.matches ? "auto" : "smooth", block });
+}
+// Enter aciona o clique nos itens focáveis (linhas, cabeçalhos) de um contêiner
+function comEnter(cont, sel) {
+  cont.addEventListener("keydown", e => { if (e.key === "Enter" && e.target.matches(sel)) { e.preventDefault(); e.target.click(); } });
+}
 
 const DIAS = DADOS.dias, N = DIAS.length;
 const REF = Object.fromEntries(DADOS.referencias.map(r => [r.id, r]));
@@ -611,11 +637,34 @@ function ticks(lo, hi, n = 5) {
   return out;
 }
 
-// gráfico de linhas com crosshair e tooltip; series: [{nome, cor, vals, dash}]
+// foco em uma série: as outras do mesmo gráfico esmaecem. O id fica no contêiner (el._foco) para valer também
+// depois de o SVG ser recriado; se a série não está no gráfico, nada esmaece.
+function aplicaFoco(el) {
+  const nos = [...el.querySelectorAll("[data-s]")], id = nos.some(n => n.dataset.s === el._foco) ? el._foco : null;
+  for (const n of nos) n.classList.toggle("dim", id != null && n.dataset.s !== id);
+}
+function focoSerie(el, id) { el._foco = id ?? null; aplicaFoco(el); }
+// legenda que persiste (itens em `sel`) -> foco na série do gráfico `el`, por mouse ou teclado
+function legendaFoco(leg, el, sel, idDe) {
+  const de = t => { const n = t.closest?.(sel); return n && leg.contains(n) ? idDe(n) : null; };
+  leg.addEventListener("mouseover", e => focoSerie(el, de(e.target)));
+  leg.addEventListener("mouseleave", () => focoSerie(el, null));
+  leg.addEventListener("focusin", e => focoSerie(el, de(e.target)));
+  leg.addEventListener("focusout", () => focoSerie(el, null));
+}
+// na troca de pregão os gráficos de linha não são refeitos: só o marcador tracejado anda (escala X guardada em el._X)
+function marcadores() {
+  for (const el of document.querySelectorAll("#cLinha, #cPesq, #cCmp")) {
+    const l = el.querySelector(".msel");
+    if (l && el._X) { const x = el._X(estado.i); l.setAttribute("x1", x); l.setAttribute("x2", x); }
+  }
+}
+
+// gráfico de linhas com crosshair e tooltip; series: [{id, nome, cor, vals, dash}]
 function linhas(el, series, { H = 300, fmtY = v => sp(v, 0), fmtTip = v => sp(v), zero = true, ctx = false, onClick, marcaSel = true, rotuloFim = true } = {}) {
   const W = 760, m = { l: 48, r: rotuloFim ? 128 : 14, t: 12, b: 26 };
   const vals = series.flatMap(s => s.vals).filter(v => v != null).concat(zero ? [0] : []);
-  if (!vals.length) { el.innerHTML = `<div class="note">Sem dados.</div>`; return; }
+  if (!vals.length) { el.innerHTML = `<div class="note">Sem dados.</div>`; el._X = null; return; }
   let lo = Math.min(...vals), hi = Math.max(...vals);
   const pad = (hi - lo || .01) * .08; lo -= pad; hi += pad;
   const tk = ticks(lo, hi); lo = Math.min(lo, tk[0]); hi = Math.max(hi, tk[tk.length - 1]);
@@ -626,24 +675,25 @@ function linhas(el, series, { H = 300, fmtY = v => sp(v, 0), fmtTip = v => sp(v)
     <text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${fmtY(v)}</text>`;
   const passo = Math.ceil(N / 10);
   DIAS.forEach((d, i) => { if (i % passo === 0 || i === N - 1) g += `<text x="${X(i)}" y="${H - 6}" text-anchor="middle">${d}</text>`; });
-  if (marcaSel) g += `<line x1="${X(estado.i)}" x2="${X(estado.i)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--text)" stroke-width="1" opacity=".35" stroke-dasharray="3 3"/>`;
+  if (marcaSel) g += `<line class="msel" x1="${X(estado.i)}" x2="${X(estado.i)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--text)" stroke-width="1" opacity=".35" stroke-dasharray="3 3"/>`;
   // rótulos diretos no fim, sem sobreposição
-  const fins = [];
+  const fins = [], ds = s => `data-s="${esc(s.id ?? s.nome)}"`;
   for (const s of series) {
-    let pts = "", d = "", pen = false;
+    let d = "", pen = false;
     s.vals.forEach((v, i) => { if (v == null) { pen = false; return; } d += `${pen ? "L" : "M"}${X(i).toFixed(1)},${Y(v).toFixed(1)}`; pen = true; });
-    g += `<path d="${d}" fill="none" stroke="var(${s.cor})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" ${s.dash ? `stroke-dasharray="5 4"` : ""}/>`;
+    g += `<path ${ds(s)} d="${d}" fill="none" stroke="var(${s.cor})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" ${s.dash ? `stroke-dasharray="5 4"` : ""}/>`;
     const li = s.vals.map((v, i) => v == null ? -1 : i).filter(i => i >= 0).pop();
-    if (li != null) { g += `<circle cx="${X(li)}" cy="${Y(s.vals[li])}" r="3.5" fill="var(${s.cor})" stroke="var(--surface)" stroke-width="2"/>`; fins.push({ y: Y(s.vals[li]), s, v: s.vals[li] }); }
+    if (li != null) { g += `<circle ${ds(s)} cx="${X(li)}" cy="${Y(s.vals[li])}" r="3.5" fill="var(${s.cor})" stroke="var(--surface)" stroke-width="2"/>`; fins.push({ y: Y(s.vals[li]), s, v: s.vals[li] }); }
   }
   if (rotuloFim) {
     fins.sort((a, b) => a.y - b.y);
     for (let k = 1; k < fins.length; k++) if (fins[k].y - fins[k - 1].y < 14) fins[k].y = fins[k - 1].y + 14;
-    for (const f of fins) g += `<text x="${W - m.r + 8}" y="${f.y + 4}" style="fill:var(--text-2)">${esc(f.s.curto || f.s.nome)} ${fmtTip(f.v)}</text>`;
+    for (const f of fins) g += `<text ${ds(f.s)} x="${W - m.r + 8}" y="${f.y + 4}" style="fill:var(--text-2)">${esc(f.s.curto || f.s.nome)} ${fmtTip(f.v)}</text>`;
   }
   g += `<line class="xh" x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" stroke="var(--text-2)" stroke-width="1" style="display:none"/>`;
   g += `<rect x="${m.l}" y="${m.t}" width="${W - m.l - m.r}" height="${H - m.t - m.b}" fill="transparent" class="hit" style="cursor:${onClick ? "pointer" : "crosshair"}"/>`;
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(series.map(s => s.nome).join(", "))}">${g}</svg><div class="tip"></div>`;
+  el._X = X; aplicaFoco(el);
   const svg = el.querySelector("svg"), tip = el.querySelector(".tip"), xh = el.querySelector(".xh"), hit = el.querySelector(".hit");
   const idx = ev => { const r = svg.getBoundingClientRect(); const x = (ev.clientX - r.left) / r.width * W; return Math.max(0, Math.min(N - 1, Math.round((x - m.l) / (W - m.l - m.r) * (N - 1)))); };
   hit.addEventListener("mousemove", ev => {
@@ -654,24 +704,44 @@ function linhas(el, series, { H = 300, fmtY = v => sp(v, 0), fmtTip = v => sp(v)
     tip.innerHTML = `<div class="h">${DIAS[i]}${i === 0 ? " · base" : ""}</div>` +
       linhasTip.map(o => `<div class="r" style="--c:var(${o.s.cor})"><span>${esc(o.s.curto || o.s.nome)}</span><b>${fmtTip(o.v)}</b></div>`).join("") +
       (c ? `<div class="ctx">${esc(c.texto.length > 220 ? c.texto.slice(0, 217) + "…" : c.texto)}</div>` : "");
-    tip.style.display = "block";
+    tip.classList.add("on");
     const px = X(i) / W * r.width, tw = tip.offsetWidth;
-    tip.style.left = (px + 14 + tw > r.width ? px - tw - 14 : px + 14) + "px";
+    tip.style.left = Math.max(0, Math.min(r.width - tw, px + 14 + tw > r.width ? px - tw - 14 : px + 14)) + "px";
     tip.style.top = Math.max(0, (ev.clientY - r.top) - 30) + "px";
   });
-  hit.addEventListener("mouseleave", () => { tip.style.display = "none"; xh.style.display = "none"; });
+  hit.addEventListener("mouseleave", () => { tip.classList.remove("on"); xh.style.display = "none"; });
   if (onClick) hit.addEventListener("click", ev => onClick(idx(ev)));
 }
 
 // ---------------------------------------------------------------- seletor de pregão
 const slider = $("#dia");
 slider.max = N - 1; slider.value = estado.i;
-slider.addEventListener("input", () => { estado.i = +slider.value; render(); });
+// arrastar o slider: no máximo um desenho por quadro; a tabela (o bloco mais caro) só ~120 ms depois de parar
+let quadroDia = 0, esperaTab = 0;
+slider.addEventListener("input", () => {
+  estado.i = +slider.value;
+  if (!quadroDia) quadroDia = requestAnimationFrame(() => { quadroDia = 0; trocaDia(); });
+  clearTimeout(esperaTab); esperaTab = setTimeout(() => {
+    if (quadroDia) { cancelAnimationFrame(quadroDia); quadroDia = 0; trocaDia(); }  // aba em segundo plano: o quadro pode não vir
+    tabela();
+  }, 120);
+});
+// botões criados uma vez (o foco do teclado fica no botão); na troca de pregão só mudam .on e aria-pressed
+$("#chips").innerHTML = DIAS.slice(1).map((d, k) => `<button type="button" class="chip" data-i="${k + 1}" aria-pressed="false">${d}</button>`).join("");
+$("#chips").addEventListener("click", e => { const b = e.target.closest(".chip"); if (b) selDia(+b.dataset.i); });
 function chips() {
-  $("#chips").innerHTML = DIAS.slice(1).map((d, k) => `<button type="button" class="chip ${k + 1 === estado.i ? "on" : ""}" data-i="${k + 1}">${d}</button>`).join("");
-  document.querySelectorAll("#chips .chip").forEach(b => b.onclick = () => selDia(+b.dataset.i));
+  for (const b of $("#chips").children) { const on = +b.dataset.i === estado.i; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); }
 }
-function selDia(i) { estado.i = Math.max(1, i); slider.value = estado.i; render(); }
+function selDia(i) {
+  estado.i = Math.max(1, i); slider.value = estado.i;
+  cancelAnimationFrame(quadroDia); quadroDia = 0; clearTimeout(esperaTab);
+  trocaDia(); tabela();
+}
+// tudo que acompanha o pregão selecionado, menos a tabela; os gráficos de linha só movem o marcador
+function trocaDia() {
+  $("#diaV").textContent = DIAS[estado.i];
+  chips(); kpis(); marcadores(); contexto(); barrasDia(); heat(); ranking();
+}
 
 // ---------------------------------------------------------------- KPIs
 function kpis() {
@@ -694,11 +764,14 @@ function mediana(a) { a = a.filter(v => v != null).sort((x, y) => x - y); if (!a
 // ---------------------------------------------------------------- gráfico principal
 function legenda() {
   $("#legRef").innerHTML = SERIES.map((s, k) => `<label><input type="checkbox" data-k="${k}" ${s.on ? "checked" : ""}><i style="--c:var(${s.cor})"></i>${esc(s.nome)}</label>`).join("");
-  document.querySelectorAll("#legRef input").forEach(c => c.onchange = () => { SERIES[c.dataset.k].on = c.checked; principal(); });
+  document.querySelectorAll("#legRef input").forEach(c => c.onchange = () => { SERIES[c.dataset.k].on = c.checked; principal(); troca($("#cLinha")); });
 }
+legendaFoco($("#legRef"), $("#cLinha"), "label", n => SERIES[n.querySelector("input").dataset.k].id);
 function principal() {
   const s = SERIES.filter(x => x.on).map(x => ({ ...x, curto: x.nome.replace(/^Média d[oa]s \d+ /, "Média ").replace(" analisadas", "") }));
   linhas($("#cLinha"), s, { H: 320, ctx: true, onClick: i => selDia(i) });
+}
+function contexto() {
   const c = CTX[DIAS[estado.i].slice(0, 5)];
   $("#ctx").innerHTML = c ? `<b>${esc(DIAS[estado.i])}</b> · ${esc(c.texto.replace(/^[^:]*:\s*/, ""))} · <a href="${esc(c.url)}" target="_blank" rel="noopener">fonte</a>`
     : `<span class="muted">Sem nota de contexto para ${esc(DIAS[estado.i])}.</span>`;
@@ -763,26 +836,40 @@ function mix(c1, c2, t) {
   const a = h(c1), b = h(c2);
   return `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * t)).join(",")})`;
 }
-function corCelula(v, M) {
+function corCelula(v, M, cor) {
   if (v == null) return { bg: "transparent", fg: "var(--muted)" };
   const t = Math.min(1, Math.abs(v) / M);
-  return { bg: mix(css("--mid"), css(v >= 0 ? "--pos" : "--neg"), Math.pow(t, .8)), fg: t > .55 ? "#fff" : "var(--text)" };
+  return { bg: mix(cor.mid, v >= 0 ? cor.pos : cor.neg, Math.pow(t, .8)), fg: t > .55 ? "#fff" : "var(--text)" };
+}
+let heatCol = 0;  // coluna (pregão) sob o mouse no mapa: o cabeçalho dela fica em destaque
+function heatHov(col) {
+  heatCol = col;
+  document.querySelectorAll("#heat thead th").forEach((th, j) => th.classList.toggle("hov", j > 0 && j === col));
 }
 function heat() {
   const gs = grupos().sort((a, b) => (b.s[estado.i] ?? -9) - (a.s[estado.i] ?? -9));
   const M = Math.max(.02, ...gs.flatMap(g => g.s.slice(1)).filter(v => v != null).map(Math.abs));
-  const ib = REF.ibov.acum;
-  const linha = (lab, s, extra, k) => `<tr ${k != null ? `data-k="${esc(k)}"` : ""}><td class="lab" title="${esc(lab)}">${esc(lab)} ${extra}</td>` +
-    s.slice(1).map((v, j) => { const c = corCelula(v, M); return `<td class="c ${j + 1 === estado.i ? "sel" : ""}" style="background:${c.bg};color:${c.fg}" title="${esc(lab)} · ${DIAS[j + 1]}: ${sp(v)}">${sp(v, 1)}</td>`; }).join("") + "</tr>";
+  const ib = REF.ibov.acum, cor = { mid: css("--mid"), pos: css("--pos"), neg: css("--neg") };
+  const linha = (lab, s, extra, k) => `<tr ${k != null ? `data-k="${esc(k)}"` : ""}><td class="lab" ${k != null ? `tabindex="0"` : ""} title="${esc(lab)}">${esc(lab)} ${extra}</td>` +
+    s.slice(1).map((v, j) => { const c = corCelula(v, M, cor); return `<td class="c ${j + 1 === estado.i ? "sel" : ""}" style="background:${c.bg};color:${c.fg}" title="${esc(lab)} · ${DIAS[j + 1]}: ${sp(v)}">${sp(v, 1)}</td>`; }).join("") + "</tr>";
   $("#heat").innerHTML = `<table><thead><tr><th></th>${DIAS.slice(1).map((d, j) => `<th class="${j + 1 === estado.i ? "sel" : ""}">${d}</th>`).join("")}</tr></thead><tbody>` +
     linha("Ibovespa", ib, "", null) +
     gs.map(g => linha(g.k, g.s, `<small>n=${g.l.length}</small>`, g.k)).join("") + "</tbody></table>";
-  document.querySelectorAll("#heat tr[data-k]").forEach(tr => tr.querySelector(".lab").onclick = () => {
-    estado.filtroG = { g: estado.grupo, k: tr.dataset.k, classe: estado.classeG }; tabela();
-    $("#tTab").scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-  $("#escala").innerHTML = `<span>${sp(-M, 0)}</span><span class="bar" style="background:linear-gradient(90deg, ${css("--neg")}, ${css("--mid")}, ${css("--pos")})"></span><span>${sp(M, 0)}</span>`;
+  if (heatCol) heatHov(heatCol);
+  $("#escala").innerHTML = `<span>${sp(-M, 0)}</span><span class="bar" style="background:linear-gradient(90deg, ${cor.neg}, ${cor.mid}, ${cor.pos})"></span><span>${sp(M, 0)}</span>`;
 }
+// listeners do mapa registrados uma vez (a tabela é refeita a cada troca de pregão ou de agrupamento)
+$("#heat").addEventListener("click", e => {
+  const c = e.target.closest("td.c"), lab = e.target.closest("tr[data-k] td.lab");
+  if (c) selDia(c.cellIndex);  // a 1ª coluna é o rótulo: cellIndex = índice do pregão
+  else if (lab) {
+    estado.filtroG = { g: estado.grupo, k: lab.parentNode.dataset.k, classe: estado.classeG }; tabela();
+    irPara($("#tTab"), "start");
+  }
+});
+$("#heat").addEventListener("mouseover", e => { const c = e.target.closest("td.c"); heatHov(c ? c.cellIndex : 0); });
+$("#heat").addEventListener("mouseleave", () => heatHov(0));
+comEnter($("#heat"), "tr[data-k] td.lab");
 
 // ---------------------------------------------------------------- ranking
 function ranking() {
@@ -791,31 +878,45 @@ function ranking() {
   const ref = estado.classeR === "acao" ? REF.ibov.acum[i] : REF.ifix.acum[i];
   const vs = top.concat(fim).map(a => a.acum[i]).concat([0, ref ?? 0]);
   const lo = Math.min(...vs), hi = Math.max(...vs), X = v => (v - lo) / (hi - lo || 1) * 100;
-  const row = a => `<div class="r" data-t="${esc(a.ticker)}" title="${esc(a.nome || "")} · ${esc(a.setor || "")}"><span class="tk">${esc(a.ticker)}</span>
+  const row = a => `<div class="r" data-t="${esc(a.ticker)}" tabindex="0" role="button" title="${esc(a.nome || "")} · ${esc(a.setor || "")}"><span class="tk">${esc(a.ticker)}</span>
     <span class="trk"><span class="z" style="left:${X(0)}%"></span><i style="left:${Math.min(X(0), X(a.acum[i]))}%;width:${Math.abs(X(a.acum[i]) - X(0))}%;background:var(${a.acum[i] >= 0 ? "--pos" : "--neg"})"></i>
     ${ref != null ? `<span class="ref" style="left:${X(ref)}%"></span>` : ""}</span><span class="n ${cls(a.acum[i])}">${sp(a.acum[i])}</span></div>`;
   $("#tRank").textContent = `Maiores altas e quedas até ${DIAS[i]}`;
   $("#rank").innerHTML = `<div class="sep">10 maiores altas</div>${top.map(row).join("")}<div class="sep">10 maiores quedas</div>${fim.map(row).join("")}
     <div class="note">Tracejado = ${estado.classeR === "acao" ? "Ibovespa" : "XFIX11 (aprox. do IFIX)"} (${sp(ref)}).</div>`;
-  document.querySelectorAll("#rank .r").forEach(r => r.onclick = () => addCmp(r.dataset.t));
+  marcaCmp();
 }
+$("#rank").addEventListener("click", e => { const r = e.target.closest(".r"); if (r) addCmp(r.dataset.t); });
+comEnter($("#rank"), ".r");
 
 // ---------------------------------------------------------------- comparador
 const CORES_CMP = ["--s1", "--s2", "--s3"];
+const corCmp = {};  // ticker -> cor: cada ativo mantém a sua enquanto estiver no comparador
 function addCmp(t) {
   t = (t || "").trim().toUpperCase();
   if (!A.some(a => a.ticker === t) || estado.cmp.includes(t)) return;
   if (estado.cmp.length >= 3) estado.cmp.shift();
-  estado.cmp.push(t); comparador();
+  estado.cmp.push(t); comparador(); troca($("#cCmp"));
 }
 function comparador() {
-  // cor fixa por posição de entrada; reatribui em ordem ao remover para não repetir
-  const s = estado.cmp.map((t, k) => { const a = A.find(x => x.ticker === t); return { nome: t, cor: CORES_CMP[k], vals: a.acum }; });
-  $("#tags").innerHTML = estado.cmp.map((t, k) => `<span class="tag"><i style="--c:var(${CORES_CMP[k]})"></i>${esc(t)}<button type="button" data-t="${esc(t)}" aria-label="Remover ${esc(t)}">×</button></span>`).join("")
+  // quem saiu libera a cor; quem entrou pega a primeira livre (os que ficam não trocam de cor)
+  for (const t of Object.keys(corCmp)) if (!estado.cmp.includes(t)) delete corCmp[t];
+  for (const t of estado.cmp) corCmp[t] ??= CORES_CMP.find(c => !Object.values(corCmp).includes(c));
+  const s = estado.cmp.map(t => { const a = A.find(x => x.ticker === t); return { id: t, nome: t, cor: corCmp[t], vals: a.acum }; });
+  $("#tags").innerHTML = estado.cmp.map(t => `<span class="tag" data-t="${esc(t)}"><i style="--c:var(${corCmp[t]})"></i>${esc(t)}<button type="button" data-t="${esc(t)}" aria-label="Remover ${esc(t)}">×</button></span>`).join("")
     || `<span class="muted" style="font-size:12px">Nenhum ativo selecionado.</span>`;
-  document.querySelectorAll("#tags button").forEach(b => b.onclick = () => { estado.cmp = estado.cmp.filter(x => x !== b.dataset.t); comparador(); });
-  linhas($("#cCmp"), [{ nome: "Ibovespa", cor: "--text-2", vals: REF.ibov.acum, dash: true }, ...s], { H: 260, onClick: i => selDia(i) });
+  linhas($("#cCmp"), [{ id: "ibov", nome: "Ibovespa", cor: "--text-2", vals: REF.ibov.acum, dash: true }, ...s], { H: 260, onClick: i => selDia(i) });
+  marcaCmp();
 }
+// marca no ranking e na tabela os ativos que já estão no comparador
+function marcaCmp() {
+  for (const n of document.querySelectorAll("#rank .r, #tbody tr[data-t]")) n.classList.toggle("sel", estado.cmp.includes(n.dataset.t));
+}
+$("#tags").addEventListener("click", e => {
+  const b = e.target.closest("button[data-t]"); if (!b) return;
+  estado.cmp = estado.cmp.filter(x => x !== b.dataset.t); focoSerie($("#cCmp"), null); comparador(); troca($("#cCmp"));
+});
+legendaFoco($("#tags"), $("#cCmp"), ".tag", n => n.dataset.t);
 $("#addTk").addEventListener("change", e => { addCmp(e.target.value); e.target.value = ""; });
 $("#tks").innerHTML = A.map(a => `<option value="${esc(a.ticker)}">${esc(a.nome || "")}</option>`).join("");
 
@@ -851,13 +952,9 @@ function tabela() {
   const k = estado.sort;
   l.sort((a, b) => { const x = val(a, k), y = val(b, k); if (x == null) return 1; if (y == null) return -1; return (typeof x === "string" ? x.localeCompare(y) : x - y) * estado.dir; });
   $("#tTab").textContent = `Todos os ativos — acumulado até ${DIAS[estado.i]} (${l.length})`;
-  $("#thead").innerHTML = COLS.map(([k, t, c]) => `<th class="${c}" data-k="${k}">${t}${estado.sort === k ? (estado.dir < 0 ? " ↓" : " ↑") : ""}</th>`).join("");
-  document.querySelectorAll("#thead th").forEach(th => th.onclick = () => {
-    const k = th.dataset.k; if (k === "spark") return;
-    estado.dir = estado.sort === k ? -estado.dir : (["ticker", "nome", "setor", "decisao"].includes(k) ? 1 : -1); estado.sort = k; tabela();
-  });
+  $("#thead").innerHTML = COLS.map(([k, t, c]) => `<th class="${c}" data-k="${k}" ${k === "spark" ? "" : `tabindex="0" aria-sort="${estado.sort === k ? (estado.dir < 0 ? "descending" : "ascending") : "none"}"`}>${t}${estado.sort === k ? (estado.dir < 0 ? " ↓" : " ↑") : ""}</th>`).join("");
   const fx = v => v == null ? "–" : (v > 0 ? "+" : "") + fmtN(v, 1);
-  $("#tbody").innerHTML = l.map(a => { const m = M.get(a.ticker); return `<tr data-t="${esc(a.ticker)}">
+  $("#tbody").innerHTML = l.map(a => { const m = M.get(a.ticker); return `<tr data-t="${esc(a.ticker)}" tabindex="0">
     <td class="l tk">${esc(a.ticker)}</td><td class="l nm" title="${esc(a.nome || "")}">${esc(a.nome || "")}</td>
     <td class="l nm" title="${esc(a.setor_economico || "")}">${esc(a.classe === "fii" ? (TIPO[a.setor] || "FII") : a.setor || "")}</td>
     <td class="l">${spark(a)}</td>
@@ -866,17 +963,26 @@ function tabela() {
     <td>${a.classe === "acao" ? fx(a.oposicao) : "–"}</td><td>${a.classe === "acao" ? fx(a.juros_dir) : "–"}</td>
     <td class="l"><span class="badge">${esc(a.decisao || "–")}</span></td></tr>`; }).join("")
     || `<tr><td class="l muted" colspan="${COLS.length}">Nenhum ativo com esses filtros.</td></tr>`;
-  document.querySelectorAll("#tbody tr[data-t]").forEach(tr => tr.onclick = () => { addCmp(tr.dataset.t); $("#cCmp").scrollIntoView({ behavior: "smooth", block: "center" }); });
+  marcaCmp();
 }
+$("#thead").addEventListener("click", e => {
+  const th = e.target.closest("th"), k = th?.dataset.k; if (!k || k === "spark") return;
+  const foco = document.activeElement === th;
+  estado.dir = estado.sort === k ? -estado.dir : (["ticker", "nome", "setor", "decisao"].includes(k) ? 1 : -1); estado.sort = k; tabela();
+  if (foco) $(`#thead th[data-k="${k}"]`).focus();  // o cabeçalho é refeito: devolve o foco para seguir ordenando pelo teclado
+});
+$("#tbody").addEventListener("click", e => { const tr = e.target.closest("tr[data-t]"); if (tr) { addCmp(tr.dataset.t); irPara($("#cCmp"), "center"); } });
+comEnter($("#thead"), "th[tabindex]"); comEnter($("#tbody"), "tr[data-t]");
 ["#q", "#classeT"].forEach(s => $(s).addEventListener("input", tabela));
-$("#grupo").addEventListener("input", e => { estado.grupo = e.target.value; heat(); });
-$("#classeG").addEventListener("input", e => { estado.classeG = e.target.value; heat(); });
-$("#classeR").addEventListener("input", e => { estado.classeR = e.target.value; ranking(); });
+$("#grupo").addEventListener("input", e => { estado.grupo = e.target.value; heat(); troca($("#heat")); });
+$("#classeG").addEventListener("input", e => { estado.classeG = e.target.value; heat(); troca($("#heat")); });
+$("#classeR").addEventListener("input", e => { estado.classeR = e.target.value; ranking(); troca($("#rank")); });
 
 // ---------------------------------------------------------------- render
+// desenho completo: carga e troca de tema. A troca de pregão passa por trocaDia() (+ tabela()).
 function render() {
-  $("#diaV").textContent = DIAS[estado.i];
-  chips(); kpis(); principal(); barrasDia(); pesquisas(); heat(); ranking(); comparador(); tabela();
+  principal(); pesquisas(); comparador();
+  trocaDia(); tabela();
 }
 if (DADOS.em_andamento) {  // painel com o pregão ainda não finalizado (gerado com --em-andamento)
   document.title = "Painel Pós-Eleição Parcial";
